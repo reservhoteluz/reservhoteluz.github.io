@@ -93,6 +93,38 @@
     .edit-input { width: 100%; border: 1px solid transparent; background: transparent; padding: 4px; border-radius: 4px; transition: 0.2s; }
     .edit-input:hover, .edit-input:focus { border-color: #cbd5e1; background: #fff; outline: none; }
 
+    /* ==================== MOLIYA VIZUAL EFFEKTLARI ==================== */
+    .fin-kpi-card {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease, border-color 0.24s ease;
+    }
+    .fin-kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px -8px rgba(19, 27, 58, 0.14);
+    }
+    .fin-kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+      transition: left 0.65s ease;
+      pointer-events: none;
+    }
+    .fin-kpi-card:hover::after {
+      left: 140%;
+    }
+    .fin-chart-card {
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+    .fin-chart-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px -10px rgba(91, 84, 230, 0.18);
+    }
+
     /* ==================== RESERVHOTEL LOGO ANIMATSIYASI ==================== */
     #splashScreen {
       background: radial-gradient(circle at center, #1b2554 0%, #131b3a 68%, #090d22 100%);
@@ -645,21 +677,135 @@
         </section>
       </main>
 
-      <!-- TAB 4: MOLIYA -->
+      <!-- ==================== TAB 4: MOLIYA VA KASSA (PROFESSIONAL ANALITIKA) ==================== -->
       <main id="tab-finance" class="tab-content hidden flex-1 overflow-y-auto p-5 space-y-5">
-        <div class="bg-white/95 rounded-xl border border-[#d8defa] p-4 flex flex-wrap items-center justify-between gap-3">
-          <div><h3 class="font-bold text-[#131b3a] text-base">Moliyaviy Hisobot va Kassa Kesimi</h3><p class="text-xs text-slate-500">To‘lov turlari va bron manbalari kesimida kassa hisoboti</p></div>
-          <div class="flex items-center gap-2 text-xs"><span class="text-slate-500 font-medium">Davr:</span><input type="date" id="finFrom" onchange="renderFinance()" class="px-3 py-1.5 border border-[#d8defa] rounded-lg font-semibold bg-white" /><span>—</span><input type="date" id="finTo" onchange="renderFinance()" class="px-3 py-1.5 border border-[#d8defa] rounded-lg font-semibold bg-white" /><button onclick="setFinanceCurrentMonth()" class="px-3 py-1.5 bg-[#5b54e6]/12 text-[#5b54e6] rounded-lg font-semibold">Joriy oy</button></div>
+        <!-- Yuqori boshqaruv paneli -->
+        <div class="bg-gradient-to-r from-white via-[#f8f9ff] to-[#eef1ff] rounded-2xl border border-[#d8defa] p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#5b54e6] to-[#131b3a] text-white flex items-center justify-center text-lg shadow-sm">
+              📊
+            </div>
+            <div>
+              <h3 class="font-extrabold text-[#131b3a] text-base">Moliyaviy Hisobot va Kassa Kesimi</h3>
+              <p class="text-xs text-slate-500">To‘lov turlari, bron manbalari va kunlik tushum dinamikasi</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#d8defa]">
+              <button type="button" onclick="setFinancePreset('today')" class="px-2.5 py-1 rounded-lg hover:bg-[#eef0ff] text-[#131b3a] font-semibold transition">Bugun</button>
+              <button type="button" onclick="setFinancePreset('7days')" class="px-2.5 py-1 rounded-lg hover:bg-[#eef0ff] text-[#131b3a] font-semibold transition">7 kun</button>
+              <button type="button" onclick="setFinanceCurrentMonth()" class="px-2.5 py-1 rounded-lg bg-[#5b54e6] text-white font-semibold shadow-2xs transition">Joriy oy</button>
+              <button type="button" onclick="setFinancePreset('prevMonth')" class="px-2.5 py-1 rounded-lg hover:bg-[#eef0ff] text-[#131b3a] font-semibold transition">O‘tgan oy</button>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-[#d8defa]">
+              <input type="date" id="finFrom" onchange="renderFinance()" class="py-1 font-semibold text-[#131b3a] bg-transparent focus:outline-none" />
+              <span class="text-slate-400">—</span>
+              <input type="date" id="finTo" onchange="renderFinance()" class="py-1 font-semibold text-[#131b3a] bg-transparent focus:outline-none" />
+            </div>
+          </div>
         </div>
+
+        <!-- 4 ta Premium KPI Karta -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white/95 p-5 rounded-xl border border-[#d8defa] shadow-sm"><div class="text-xs font-semibold text-slate-500">JAMI HISOBLANGAN DAROMAD</div><div id="finTotalExpected" class="text-2xl font-extrabold text-[#131b3a] mt-1.5">0 so‘m</div></div>
-          <div class="bg-white/95 p-5 rounded-xl border border-emerald-200 shadow-sm"><div class="text-xs font-semibold text-emerald-600">KASSAGA TUSHGAN (TO‘LANGAN)</div><div id="finTotalPaid" class="text-2xl font-extrabold text-emerald-600 mt-1.5">0 so‘m</div></div>
-          <div class="bg-white/95 p-5 rounded-xl border border-rose-200 shadow-sm"><div class="text-xs font-semibold text-rose-600">UMUMIY QARZDORLIK</div><div id="finTotalDebt" class="text-2xl font-extrabold text-rose-600 mt-1.5">0 so‘m</div></div>
-          <div class="bg-white/95 p-5 rounded-xl border border-[#5b54e6]/30 shadow-sm"><div class="text-xs font-semibold text-[#5b54e6]">SOTILGAN XONA-KUNLAR (TUN)</div><div id="finTotalNights" class="text-2xl font-extrabold text-[#5b54e6] mt-1.5">0 tun</div></div>
+          <div class="fin-kpi-card bg-white/95 p-5 rounded-2xl border border-[#d8defa] shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Jami hisoblangan daromad</span>
+              <span class="w-8 h-8 rounded-lg bg-[#eef0ff] text-[#5b54e6] flex items-center justify-center text-sm font-bold">💼</span>
+            </div>
+            <div id="finTotalExpected" class="text-2xl font-extrabold text-[#131b3a] mt-2">0 so‘m</div>
+            <div id="finAvgPerNight" class="text-[11px] text-slate-500 font-medium mt-1.5">O‘rtacha 1 tun: 0 so‘m</div>
+          </div>
+
+          <div class="fin-kpi-card bg-gradient-to-br from-white to-emerald-50/60 p-5 rounded-2xl border border-emerald-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wide">Kassaga tushgan (To‘langan)</span>
+              <span id="finCollectionBadge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-700">0%</span>
+            </div>
+            <div id="finTotalPaid" class="text-2xl font-extrabold text-emerald-600 mt-2">0 so‘m</div>
+            <div class="w-full h-1.5 bg-emerald-100 rounded-full overflow-hidden mt-2.5">
+              <div id="finCollectionBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-700" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="fin-kpi-card bg-gradient-to-br from-white to-rose-50/50 p-5 rounded-2xl border border-rose-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-rose-600 uppercase tracking-wide">Umumiy qarzdorlik</span>
+              <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-bold">⚠️</span>
+            </div>
+            <div id="finTotalDebt" class="text-2xl font-extrabold text-rose-600 mt-2">0 so‘m</div>
+            <div id="finDebtCountText" class="text-[11px] text-rose-500/85 font-medium mt-1.5">Qarzdor bronlar: 0 ta</div>
+          </div>
+
+          <div class="fin-kpi-card bg-gradient-to-br from-[#131b3a] via-[#1b2654] to-[#5b54e6] p-5 rounded-2xl text-white shadow-md">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-indigo-200 uppercase tracking-wide">Sotilgan xona-kunlar</span>
+              <span class="w-8 h-8 rounded-lg bg-white/15 text-white flex items-center justify-center text-sm">🛏️</span>
+            </div>
+            <div id="finTotalNights" class="text-2xl font-extrabold text-white mt-2">0 tun</div>
+            <div id="finBookingsCountText" class="text-[11px] text-indigo-200/85 font-medium mt-1.5">Jami faol bronlar: 0 ta</div>
+          </div>
         </div>
+
+        <!-- Kunlik Tushum Dinamikasi (Bar Chart) -->
+        <div class="fin-chart-card bg-white/95 rounded-2xl border border-[#d8defa] p-5 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <h4 class="font-bold text-[#131b3a] text-sm">📈 Kunlik tushum va hisoblangan daromad dinamikasi</h4>
+              <p class="text-[11px] text-slate-500">Tanlangan sanalar bo‘yicha kunlik tushum taqsimoti</p>
+            </div>
+            <div class="flex items-center gap-3 text-[11px] font-semibold">
+              <span class="flex items-center gap-1.5 text-emerald-700"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Kassaga tushgan</span>
+              <span class="flex items-center gap-1.5 text-[#5b54e6]"><span class="w-2.5 h-2.5 rounded-full bg-[#5b54e6] inline-block"></span> Hisoblangan</span>
+            </div>
+          </div>
+          <div class="w-full h-56 relative">
+            <canvas id="dailyTrendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- 2 ta Donut Grafik + Tafsilotli Ro'yxat -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div class="bg-white/95 rounded-xl border border-[#d8defa] p-5 shadow-sm flex flex-col items-center"><h4 class="font-bold text-[#131b3a] text-sm mb-4 self-start">💳 To‘lov turlari bo‘yicha tushumlar</h4><div class="w-full max-w-[250px] relative"><canvas id="payChart"></canvas></div></div>
-          <div class="bg-white/95 rounded-xl border border-[#d8defa] p-5 shadow-sm flex flex-col items-center"><h4 class="font-bold text-[#131b3a] text-sm mb-4 self-start">🌐 Bron manbalari bo‘yicha ulush</h4><div class="w-full max-w-[250px] relative"><canvas id="sourceChart"></canvas></div></div>
+          <!-- To'lov turlari -->
+          <div class="fin-chart-card bg-white/95 rounded-2xl border border-[#d8defa] p-5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h4 class="font-bold text-[#131b3a] text-sm">💳 To‘lov turlari bo‘yicha tushumlar</h4>
+                <p class="text-[11px] text-slate-500">Naqd, karta va onlayn to‘lovlar ulushi</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold">Kassa kesimi</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center my-auto">
+              <div class="w-full max-w-[210px] mx-auto relative">
+                <canvas id="payChart"></canvas>
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span class="text-[10px] font-bold uppercase text-slate-400">Jami tushum</span>
+                  <span id="payChartCenterVal" class="text-xs font-extrabold text-[#131b3a] mt-0.5 text-center px-2">0</span>
+                </div>
+              </div>
+              <div id="payBreakdownList" class="space-y-2.5 text-xs"></div>
+            </div>
+          </div>
+
+          <!-- Bron manbalari -->
+          <div class="fin-chart-card bg-white/95 rounded-2xl border border-[#d8defa] p-5 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h4 class="font-bold text-[#131b3a] text-sm">🌐 Bron manbalari bo‘yicha ulush</h4>
+                <p class="text-[11px] text-slate-500">Mijozlar qaysi kanal orqali kelgani</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-[#eef0ff] text-[#5b54e6] text-[11px] font-bold">Kanallar kesimi</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center my-auto">
+              <div class="w-full max-w-[210px] mx-auto relative">
+                <canvas id="sourceChart"></canvas>
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span class="text-[10px] font-bold uppercase text-slate-400">Jami bron</span>
+                  <span id="sourceChartCenterVal" class="text-xs font-extrabold text-[#131b3a] mt-0.5 text-center px-2">0</span>
+                </div>
+              </div>
+              <div id="sourceBreakdownList" class="space-y-2.5 text-xs"></div>
+            </div>
+          </div>
         </div>
       </main>
 
@@ -1178,7 +1324,7 @@
     let currentUser = JSON.parse(sessionStorage.getItem('rh_saas_session')) || null;
     let currentHotelId = sessionStorage.getItem('rh_active_hotel') || DEFAULT_HOTEL_ID;
     let rooms = [], bookings = [], allowedUsers = [], dailyExpenses = [], dailyManualEntries = [], dailyShiftAdmins = {}, auditLogs = [];
-    let activeDrawerBookingId = null, isSyncingNow = false, activeTabName = 'matrix', isDragging = false, dragRoomId = null, dragStartDate = null, dragEndDate = null, payChartInstance = null, sourceChartInstance = null, currentMatrixScale = 64;
+    let activeDrawerBookingId = null, isSyncingNow = false, activeTabName = 'matrix', isDragging = false, dragRoomId = null, dragStartDate = null, dragEndDate = null, payChartInstance = null, sourceChartInstance = null, dailyTrendChartInstance = null, currentMatrixScale = 64;
 
     function isCeoCreator() {
       return Boolean(currentUser && currentUser.isCeo);
@@ -1213,6 +1359,34 @@
     }
 
     function formatMoney(num) { return Number(num || 0).toLocaleString('ru-RU') + ' so‘m'; }
+    function formatCompactMoney(num) {
+      const val = Number(num || 0);
+      if (val >= 1000000) return (val / 1000000).toFixed(val % 1000000 === 0 ? 0 : 1) + ' mln';
+      if (val >= 1000) return Math.round(val / 1000) + ' ming';
+      return val.toLocaleString('ru-RU');
+    }
+
+    function animateCounter(el, targetVal, suffix = ' so‘m', duration = 550) {
+      if (!el) return;
+      const target = Math.round(Number(targetVal) || 0);
+      const prev = Number(el.dataset.val || 0);
+      if (prev === target && el.textContent.trim() !== '') {
+        el.textContent = target.toLocaleString('ru-RU') + suffix;
+        return;
+      }
+      el.dataset.val = target;
+      const startTime = performance.now();
+      function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(prev + (target - prev) * eased);
+        el.textContent = current.toLocaleString('ru-RU') + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target.toLocaleString('ru-RU') + suffix;
+      }
+      requestAnimationFrame(step);
+    }
+
     function getCurrentTimeStr() { const n = new Date(); return `${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`; }
     function getTodayTimePercent() { const n = new Date(); return (((n.getHours() * 60 + n.getMinutes()) / 1440) * 100).toFixed(2); }
     function updateTodayLinePosition() { const p = getTodayTimePercent(); document.querySelectorAll('.today-line').forEach(el => { el.style.left = p + '%'; }); }
@@ -1569,7 +1743,6 @@
         const hotelOwnerEntry = saasRegistry.emailMap[email] || { pin: DEFAULT_MASTER_PIN, name: 'Fayz House Bosh Admini' };
         const allowedHotelAdminPins = [normalizeLegacyPin(hotelOwnerEntry.pin, email), DEFAULT_MASTER_PIN];
 
-        // 1) CEO / Creator sifatida kirish (Mijozlar va litsenziyalar markazi)
         if (pin === ceoStoredPin) {
           if (!saasRegistry.ceo || !saasRegistry.ceo.pin) {
             saasRegistry.ceo = { email: CEO_CREATOR_EMAIL, name: ceoName, pin: DEFAULT_CEO_PIN };
@@ -1592,7 +1765,6 @@
           return;
         }
 
-        // 2) Fayz House Bosh Admini sifatida kirish (Faqat mehmonxona boshqaruvi)
         if (allowedHotelAdminPins.includes(pin)) {
           if (pin === '2026') {
             saasRegistry.emailMap[email] = {
@@ -1827,7 +1999,7 @@
           <td class="p-3.5">${statusBadge}</td>
           <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
             <button onclick="switchActiveHotel('${h.id}'); switchTab('matrix');" class="px-2.5 py-1 rounded bg-[#5b54e6] text-white font-bold hover:bg-[#4942d4] text-[11px]">Kirish →</button>
-            ${(!isMain && isTrial) ? `<button onclick="upgradeHotelToYearly('${h.id}')" class="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px]">📅 1 yil ($99)</button><button onclick="upgradeHotelToLifetime('${h.id}')" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">💎 Umrbod ($299)</button><button onclick="extendHotelTrial('${h.id}', 7)" class="px-2 py-1 rounded bg-indigo-50 text-[#5b54e6] border border-[#5b54e6]/30 font-bold text-[11px]">+7 kun</button>` : ''}
+            ${(!isMain && isTrial) ? `<button onclick="upgradeHotelToYearly('${h.id}')" class="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px]">📅 1 yil ($99)</button><button onclick="upgradeHotelToLifetime('${h.id}')" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">💎 Umrbod ($299)</button><button onclick="extendHotelTrial('${h.id}', 7)" class="px-2.5 py-1 rounded bg-indigo-50 text-[#5b54e6] border border-[#5b54e6]/30 font-bold text-[11px]">+7 kun</button>` : ''}
             ${isMain ? '' : `<button onclick="toggleTenantHotelActive('${h.id}')" class="px-2.5 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 font-bold text-[11px]">${h.active !== false ? 'Bloklash' : 'Faollash'}</button>`}
           </td>
         </tr>`;
@@ -1948,7 +2120,6 @@
       const sb = document.getElementById('sidebar');
       if (!sb) return;
 
-      // Agar sidebar avval hidden bo'lib qolgan bo'lsa, darhol ochamiz
       if (sb.classList.contains('hidden')) {
         sb.classList.remove('hidden');
         sb.classList.add('flex');
@@ -2008,11 +2179,14 @@
         setTimeout(() => renderMatrix(), 120);
       }
     }
+
     function updateKpis() {
       const today = toIsoDate(new Date());
       document.getElementById('kpiStaying').textContent = bookings.filter(b => b.status === 'Band').length;
-      document.getElementById('kpiArrivals').textContent = bookings.filter(b => b.checkIn === today && b.status !== 'Chiqdi' && b.status !== 'Bekor qilingan').length;
-      document.getElementById('kpiDepartures').textContent = bookings.filter(b => b.checkOut === today && b.status === 'Band').length;
+      document.getElementById('kpiArrivals').textContent = bookings.filter(
+        b => toIsoDate(b.checkIn) === today && b.status !== 'Chiqdi' && b.status !== 'Bekor qilingan'
+      ).length;
+      document.getElementById('kpiDepartures').textContent = bookings.filter(b => toIsoDate(b.checkOut) === today && b.status === 'Band').length;
       document.getElementById('kpiDebtors').textContent = bookings.filter(b => isBookingInDebt(b)).length;
     }
 
@@ -2576,27 +2750,224 @@
 
     function setFinanceCurrentMonth() {
       const now = new Date(), y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), last = new Date(y, now.getMonth() + 1, 0).getDate();
-      document.getElementById('finFrom').value = `${y}-${m}-01`; document.getElementById('finTo').value = `${y}-${m}-${String(last).padStart(2, '0')}`; renderFinance();
+      document.getElementById('finFrom').value = `${y}-${m}-01`;
+      document.getElementById('finTo').value = `${y}-${m}-${String(last).padStart(2, '0')}`;
+      renderFinance();
     }
+
+    function setFinancePreset(preset) {
+      const today = toIsoDate(new Date());
+      if (preset === 'today') {
+        document.getElementById('finFrom').value = today;
+        document.getElementById('finTo').value = today;
+      } else if (preset === '7days') {
+        document.getElementById('finFrom').value = addDays(today, -6);
+        document.getElementById('finTo').value = today;
+      } else if (preset === 'prevMonth') {
+        const now = new Date();
+        const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const y = prev.getFullYear(), m = String(prev.getMonth() + 1).padStart(2, '0');
+        const last = new Date(y, prev.getMonth() + 1, 0).getDate();
+        document.getElementById('finFrom').value = `${y}-${m}-01`;
+        document.getElementById('finTo').value = `${y}-${m}-${String(last).padStart(2, '0')}`;
+      }
+      renderFinance();
+    }
+
+    function renderFinanceBreakdown(containerId, entriesMap, paletteColors) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      const items = Object.entries(entriesMap).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+      const sum = items.reduce((s, [, v]) => s + v, 0);
+      if (!items.length || sum <= 0) {
+        el.innerHTML = `<div class="p-4 text-center text-slate-400 bg-slate-50 rounded-xl border border-slate-100">Ushbu davr uchun ma’lumot topilmadi</div>`;
+        return;
+      }
+      el.innerHTML = items.map(([label, val], idx) => {
+        const pct = Math.round((val / sum) * 100);
+        const color = paletteColors[idx % paletteColors.length];
+        return `
+          <div class="p-2 rounded-xl bg-[#f8f9ff] border border-slate-100 hover:border-[#d8defa] transition">
+            <div class="flex items-center justify-between text-[11.5px] mb-1">
+              <span class="flex items-center gap-1.5 font-bold text-[#131b3a] truncate">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${color}"></span>
+                <span class="truncate">${label}</span>
+              </span>
+              <span class="font-extrabold text-[#131b3a] shrink-0">${formatMoney(val)} <span class="text-[10px] font-semibold text-slate-400">(${pct}%)</span></span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-200/70 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-700" style="width:${pct}%; background:${color};"></div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
     function renderFinance() {
       const from = document.getElementById('finFrom').value, to = document.getElementById('finTo').value;
-      const list = bookings.filter(b => b.status !== 'Bekor qilingan' && (!from || b.checkIn >= from) && (!to || b.checkIn <= to));
-      let expected = 0, paid = 0, debt = 0, nights = 0; const byPay = {}, bySrc = {};
-      list.forEach(b => {
-        const n = Number(b.nights) || diffNights(b.checkIn, b.checkOut), t = Number(b.total) || ((n * (Number(b.rate) || 0)) + (Number(b.extra) || 0));
-        const pList = getBookingPayments(b), p = pList.length ? pList.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0);
-        expected += t; paid += p; if (isBookingInDebt(b)) debt += Math.max(0, t - p); nights += n;
-        if (pList.length) pList.forEach(item => { byPay[item.method] = (byPay[item.method] || 0) + Number(item.amount || 0); });
-        else if (p > 0) { const pt = b.payType || 'Naqd pul'; byPay[pt] = (byPay[pt] || 0) + p; }
-        const sr = b.source || "To'g'ridan-to'g'ri"; bySrc[sr] = (bySrc[sr] || 0) + t;
-      });
-      document.getElementById('finTotalExpected').textContent = formatMoney(expected); document.getElementById('finTotalPaid').textContent = formatMoney(paid);
-      document.getElementById('finTotalDebt').textContent = formatMoney(debt); document.getElementById('finTotalNights').textContent = `${nights} tun`;
+      const list = bookings.filter(b => isValidBookingRecord(b) && b.status !== 'Bekor qilingan' && (!from || toIsoDate(b.checkIn) >= from) && (!to || toIsoDate(b.checkIn) <= to));
+      let expected = 0, paid = 0, debt = 0, debtCount = 0, nights = 0;
+      const byPay = {}, bySrc = {}, byDayPaid = {}, byDayExp = {};
 
+      list.forEach(b => {
+        const cIn = toIsoDate(b.checkIn);
+        const n = Math.max(1, Number(b.nights) || diffNights(cIn, toIsoDate(b.checkOut)));
+        const t = Number(b.total) || ((n * (Number(b.rate) || 0)) + (Number(b.extra) || 0));
+        const pList = getBookingPayments(b);
+        const p = pList.length ? pList.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0);
+
+        expected += t;
+        paid += p;
+        nights += n;
+        if (isBookingInDebt(b)) {
+          debt += Math.max(0, t - p);
+          debtCount++;
+        }
+
+        byDayExp[cIn] = (byDayExp[cIn] || 0) + t;
+        byDayPaid[cIn] = (byDayPaid[cIn] || 0) + p;
+
+        if (pList.length) {
+          pList.forEach(item => { byPay[item.method] = (byPay[item.method] || 0) + Number(item.amount || 0); });
+        } else if (p > 0) {
+          const pt = b.payType || 'Naqd pul';
+          byPay[pt] = (byPay[pt] || 0) + p;
+        }
+        const sr = b.source || "To'g'ridan-to'g'ri";
+        bySrc[sr] = (bySrc[sr] || 0) + t;
+      });
+
+      animateCounter(document.getElementById('finTotalExpected'), expected, ' so‘m');
+      animateCounter(document.getElementById('finTotalPaid'), paid, ' so‘m');
+      animateCounter(document.getElementById('finTotalDebt'), debt, ' so‘m');
+      animateCounter(document.getElementById('finTotalNights'), nights, ' tun');
+
+      const avgNight = nights > 0 ? Math.round(expected / nights) : 0;
+      document.getElementById('finAvgPerNight').textContent = `O‘rtacha 1 tun: ${formatMoney(avgNight)}`;
+      const collectPct = expected > 0 ? Math.min(100, Math.round((paid / expected) * 100)) : 0;
+      document.getElementById('finCollectionBadge').textContent = `${collectPct}% yig‘ildi`;
+      document.getElementById('finCollectionBar').style.width = `${collectPct}%`;
+      document.getElementById('finDebtCountText').textContent = `Qarzdor bronlar: ${debtCount} ta`;
+      document.getElementById('finBookingsCountText').textContent = `Jami faol bronlar: ${list.length} ta`;
+
+      document.getElementById('payChartCenterVal').textContent = formatCompactMoney(paid);
+      document.getElementById('sourceChartCenterVal').textContent = formatCompactMoney(expected);
+
+      const payColors = ['#10b981', '#5b54e6', '#8b5cf6', '#f59e0b', '#ec4899', '#06b6d4', '#64748b'];
+      const srcColors = ['#5b54e6', '#14b8a6', '#f43f5e', '#f97316', '#84cc16', '#8b5cf6'];
+
+      renderFinanceBreakdown('payBreakdownList', byPay, payColors);
+      renderFinanceBreakdown('sourceBreakdownList', bySrc, srcColors);
+
+      // Donut 1: To'lov turlari
       if (payChartInstance) payChartInstance.destroy();
-      payChartInstance = new Chart(document.getElementById('payChart').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(byPay).length ? Object.keys(byPay) : ['Yo‘q'], datasets: [{ data: Object.values(byPay).length ? Object.values(byPay) : [1], backgroundColor: Object.values(byPay).length ? ['#10b981', '#5b54e6', '#8b5cf6', '#f59e0b', '#ec4899', '#64748b'] : ['#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } } });
+      payChartInstance = new Chart(document.getElementById('payChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(byPay).length ? Object.keys(byPay) : ['Yo‘q'],
+          datasets: [{
+            data: Object.values(byPay).length ? Object.values(byPay) : [1],
+            backgroundColor: Object.values(byPay).length ? payColors : ['#e2e8f0'],
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          cutout: '72%',
+          animation: { animateRotate: true, animateScale: true, duration: 700 },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // Donut 2: Bron manbalari
       if (sourceChartInstance) sourceChartInstance.destroy();
-      sourceChartInstance = new Chart(document.getElementById('sourceChart').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(bySrc).length ? Object.keys(bySrc) : ['Yo‘q'], datasets: [{ data: Object.values(bySrc).length ? Object.values(bySrc) : [1], backgroundColor: Object.values(bySrc).length ? ['#5b54e6', '#14b8a6', '#f43f5e', '#f97316', '#84cc16'] : ['#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } } });
+      sourceChartInstance = new Chart(document.getElementById('sourceChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(bySrc).length ? Object.keys(bySrc) : ['Yo‘q'],
+          datasets: [{
+            data: Object.values(bySrc).length ? Object.values(bySrc) : [1],
+            backgroundColor: Object.values(bySrc).length ? srcColors : ['#e2e8f0'],
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          cutout: '72%',
+          animation: { animateRotate: true, animateScale: true, duration: 700 },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // Kunlik dinamika grafigi
+      const trendDates = [];
+      if (from && to && from <= to) {
+        let cur = from;
+        let guard = 0;
+        while (cur <= to && guard < 62) {
+          trendDates.push(cur);
+          cur = addDays(cur, 1);
+          guard++;
+        }
+      } else {
+        trendDates.push(...Object.keys(byDayExp).sort());
+      }
+      const trendLabels = trendDates.map(d => `${d.slice(8, 10)}.${d.slice(5, 7)}`);
+      const trendPaidData = trendDates.map(d => byDayPaid[d] || 0);
+      const trendExpData = trendDates.map(d => byDayExp[d] || 0);
+
+      const trendCanvas = document.getElementById('dailyTrendChart');
+      if (trendCanvas) {
+        if (dailyTrendChartInstance) dailyTrendChartInstance.destroy();
+        dailyTrendChartInstance = new Chart(trendCanvas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: trendLabels.length ? trendLabels : ['Ma’lumot yo‘q'],
+            datasets: [
+              {
+                label: 'Kassaga tushgan',
+                data: trendPaidData.length ? trendPaidData : [0],
+                backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                borderRadius: 6,
+                barPercentage: 0.72
+              },
+              {
+                label: 'Hisoblangan daromad',
+                data: trendExpData.length ? trendExpData : [0],
+                backgroundColor: 'rgba(91, 84, 230, 0.35)',
+                borderRadius: 6,
+                barPercentage: 0.72
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ctx => `${ctx.dataset.label}: ${Number(ctx.raw || 0).toLocaleString('ru-RU')} so‘m`
+                }
+              }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' }, color: '#64748b' } },
+              y: {
+                beginAtZero: true,
+                grid: { color: '#f1f5f9' },
+                ticks: {
+                  font: { size: 10 },
+                  color: '#64748b',
+                  callback: v => v >= 1000000 ? (v / 1000000) + 'M' : (v >= 1000 ? (v / 1000) + 'k' : v)
+                }
+              }
+            }
+          }
+        });
+      }
     }
 
     function renderAllowedUsers() {
