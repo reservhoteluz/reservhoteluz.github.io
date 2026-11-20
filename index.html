@@ -1081,7 +1081,7 @@
         <div id="overbookingAlert" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-semibold"></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label class="block font-semibold text-slate-700 mb-1">Xona raqami *</label><select id="formRoom" onchange="recalcBookingTotal()" required class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold"></select></div>
-          <div><label class="block font-semibold text-slate-700 mb-1">Bron holati</label><select id="formStatus" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold"><option value="Band">Band (Check-in qilingan)</option><option value="Bron">Bron (Oldindan band)</option><option value="Chiqdi">Chiqdi (Check-out)</option><option value="Bekor qilingan">Bekor qilingan</option></select></div>
+          <div><label class="block font-semibold text-slate-700 mb-1">Bron holati</label><select id="formStatus" onchange="recalcBookingTotal()" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold"><option value="Bron" selected>Bron (Oldindan band)</option><option value="Band">Band (Check-in qilingan)</option><option value="Chiqdi">Chiqdi (Check-out)</option><option value="Bekor qilingan">Bekor qilingan</option></select></div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label class="block font-semibold text-slate-700 mb-1">Kirish sanasi va vaqti *</label><div class="flex gap-2"><input type="date" id="formCheckIn" onchange="recalcBookingTotal()" required class="flex-1 min-w-0 px-2.5 py-2 border border-slate-300 rounded-lg font-semibold" /><input type="time" id="formCheckInTime" value="14:00" required class="w-28 shrink-0 px-2.5 py-2 border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
@@ -1145,9 +1145,13 @@
             <div><span class="text-rose-600 font-semibold">Sababi:</span> <span id="drawerCancelReason" class="font-bold">-</span></div>
             <div class="text-[10px] text-rose-500" id="drawerCanceledAt"></div>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="quickStatusChange('Band')" class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200">✅ Check-in (Kirish)</button>
-            <button id="drawerCheckoutBtn" onclick="quickStatusChange('Chiqdi')" class="py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-300">🏁 Check-out (Chiqish)</button>
+          <div id="drawerLockedNotice" class="hidden bg-slate-100 border border-slate-300 rounded-xl p-3 text-slate-700 font-semibold text-[11px] flex items-center gap-2">
+            <span>🔒</span>
+            <span>Ushbu bron yopilgan (faqat ko‘rish rejimi). O‘zgartirish uchun mehmonxona glavniy adminiga murojaat qiling.</span>
+          </div>
+          <div id="drawerStatusActions" class="flex gap-2">
+            <button id="drawerCheckinBtn" onclick="quickStatusChange('Band')" class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200">✅ Check-in (Kirish)</button>
+            <button id="drawerCheckoutBtn" onclick="quickStatusChange('Chiqdi')" class="flex-1 py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-300">🏁 Check-out (Chiqish)</button>
           </div>
           <button id="drawerCancelBtn" onclick="openCancelModal()" class="w-full py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold border border-red-200">❌ Bronni bekor qilish (Atmen)</button>
           <div class="bg-[#f5f6ff] rounded-xl p-4 border border-[#d8defa] space-y-2.5">
@@ -1165,7 +1169,7 @@
             <div class="flex justify-between"><span class="text-slate-500">Jami to‘langan:</span> <span id="drawerPaid" class="font-bold text-emerald-600">0 so‘m</span></div>
             <div class="flex justify-between text-sm pt-2 border-t border-slate-200"><span class="font-bold">Qolgan qarz:</span> <span id="drawerDebt" class="font-extrabold text-rose-600">0 so‘m</span></div>
           </div>
-          <div class="bg-[#eef0ff] rounded-xl p-4 border border-[#5b54e6]/25 space-y-2">
+          <div id="drawerQuickPayBox" class="bg-[#eef0ff] rounded-xl p-4 border border-[#5b54e6]/25 space-y-2">
             <label class="block font-bold text-[#131b3a]">Tezkor to‘lov qo‘shish</label>
             <div class="flex gap-2">
               <select id="quickPayMethod" class="px-2.5 py-2 bg-white border border-[#5b54e6]/30 rounded-lg font-semibold text-slate-700"><option value="Naqd pul">Naqd pul</option><option value="Plastik karta (Humo/Uzcard)">Plastik karta</option><option value="Click">Click</option><option value="Payme">Payme</option><option value="QR kod">QR kod</option><option value="Bank o'tkazmasi">Bank o'tkazmasi</option><option value="Booking.com">Booking.com</option></select>
@@ -1176,8 +1180,8 @@
           <div><span class="text-slate-500 font-semibold">Izoh:</span><p id="drawerNotes" class="mt-1 text-slate-700 bg-[#f5f6ff] p-3 rounded-lg border border-[#d8defa]">-</p></div>
         </div>
       </div>
-      <div class="p-4 border-t border-slate-200 bg-[#f8f9ff] flex items-center justify-between gap-2">
-        <button onclick="editCurrentDrawerBooking()" class="flex-1 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-[#131b3a] font-bold rounded-xl text-xs">✏️ Tahrirlash</button>
+      <div id="drawerFooterActions" class="p-4 border-t border-slate-200 bg-[#f8f9ff] flex items-center justify-between gap-2">
+        <button id="drawerEditBtn" onclick="editCurrentDrawerBooking()" class="flex-1 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-[#131b3a] font-bold rounded-xl text-xs">✏️ Tahrirlash</button>
         <button id="drawerDeleteBtn" onclick="deleteCurrentDrawerBooking()" class="py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold rounded-xl text-xs">🗑 O‘chirish</button>
       </div>
     </div>
@@ -2067,12 +2071,17 @@
       if (st === 'Tozalash kerak') return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold text-[10px]">Tozalash</button>`;
       return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px]">Toza</button>`;
     }
+    function getBookingUnpaidAmount(b) {
+      // Faqat Check-in qilingan ("Band") xonalar uchun to'lanmagan aniq summa hisoblanadi; "Bron" ga qarz yozilmaydi
+      if (!b || b.status !== 'Band') return 0;
+      const n = Math.max(1, Number(b.nights) || diffNights(b.checkIn, b.checkOut));
+      const total = Number(b.total) || ((n * (Number(b.rate) || 0)) + (Number(b.extra) || 0));
+      const pList = getBookingPayments(b);
+      const paid = pList.length ? pList.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0);
+      return Math.max(0, total - paid);
+    }
     function isBookingInDebt(b) {
-      if (b.status !== 'Band' || (Number(b.paid) || 0) >= (Number(b.total) || 0)) return false;
-      const elapsed = Math.floor((new Date(toIsoDate(new Date()) + 'T00:00:00') - new Date(b.checkIn + 'T00:00:00')) / 86400000);
-      if (elapsed < 1) return false;
-      const billed = Math.min(elapsed, diffNights(b.checkIn, b.checkOut));
-      return (Number(b.paid) || 0) < ((billed * (Number(b.rate) || 0)) + (Number(b.extra) || 0));
+      return getBookingUnpaidAmount(b) > 0;
     }
     function isTypingInDailyTab() {
       if (activeTabName !== 'daily') return false;
@@ -2540,14 +2549,19 @@
               if (effectiveStartStr === dt.iso) {
                 const drawStartMs = Math.max(bStartMs, viewStartMs), drawEndMs = Math.min(bEndMs, viewEndMs), cellStartMs = getLocalMs(effectiveStartStr, '00:00');
                 const startOffsetPx = ((drawStartMs - cellStartMs) / msPerDay) * scale, widthPx = Math.max(20, (((drawEndMs - drawStartMs) / msPerDay) * scale) - 2);
-                const total = Number(b.total) || 0, paid = Number(b.paid) || 0, inDebt = isBookingInDebt(b);
+                const pListBar = getBookingPayments(b);
+                const paid = pListBar.length ? pListBar.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0);
+                const unpaidAmt = getBookingUnpaidAmount(b);
+                const inDebt = unpaidAmt > 0;
                 let barClass = 'bar-paid';
                 if (b.status === 'Bekor qilingan') barClass = 'bar-canceled';
                 else if (b.status === 'Chiqdi') barClass = 'bar-out';
                 else if (b.status === 'Bron') barClass = 'bar-booked';
                 else if (inDebt && paid <= 0) barClass = 'bar-debt';
                 else if (inDebt && paid > 0) barClass = 'bar-partial';
-                const debtTag = (b.status !== 'Bekor qilingan' && inDebt) ? ` -${Math.round((total - paid)/1000)}k` : '';
+                const debtBadgeHtml = (b.status === 'Band' && unpaidAmt > 0)
+                  ? `<span class="shrink-0 mr-2.5 px-1.5 py-0.5 rounded bg-white/95 text-rose-600 font-extrabold text-[10px] leading-none shadow-xs">-${unpaidAmt.toLocaleString('ru-RU')} so‘m</span>`
+                  : '';
                 const safeName = b.guestName || 'Mehmon', displayLabel = b.status === 'Bekor qilingan' ? `✕ ${safeName}` : safeName;
                 const canDragMove = (b.status === 'Bron' || b.status === 'Band');
                 const canResize = (b.status === 'Band' || b.status === 'Bron');
@@ -2557,7 +2571,7 @@
                 const resizeHandleHtml = canResize
                   ? `<div class="booking-resize-handle" title="O‘ngga cho‘zib kun qo‘shish" onmousedown="startBookingResize(event, '${b.id}')" onclick="event.stopPropagation()"></div>`
                   : '';
-                barHtml += `<div ${dragAttrs} onmousedown="event.stopPropagation()" onclick="event.stopPropagation(); if(!justFinishedResizing) openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}${canDragMove ? ' (Surib ko‘chirish yoki o‘ng chetidan cho‘zib kun qo‘shish mumkin)' : ''}" class="booking-bar ${barClass} ${canDragMove ? 'is-draggable' : ''}" data-booking-id="${b.id}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span><span class="text-[9px] opacity-90 shrink-0 font-bold pr-2">${debtTag}</span>${resizeHandleHtml}</div>`;
+                barHtml += `<div ${dragAttrs} onmousedown="event.stopPropagation()" onclick="event.stopPropagation(); if(!justFinishedResizing) openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}${unpaidAmt > 0 ? ' • Qarz: ' + formatMoney(unpaidAmt) : ''}${canDragMove ? ' (Surib ko‘chirish yoki o‘ng chetidan cho‘zib kun qo‘shish mumkin)' : ''}" class="booking-bar ${barClass} ${canDragMove ? 'is-draggable' : ''}" data-booking-id="${b.id}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span>${debtBadgeHtml}${resizeHandleHtml}</div>`;
               }
             });
             const todayLine = dt.isToday ? `<div class="today-line" style="left:${todayPct}%;"></div>` : '';
@@ -3018,7 +3032,7 @@
         document.getElementById('formCheckOut').value = presetOut || addDays(today, 1); document.getElementById('formCheckOutTime').value = '12:00';
         document.getElementById('formGuestName').value = ''; document.getElementById('formPhone').value = ''; document.getElementById('formPassport').value = '';
         document.getElementById('formGuestsCount').value = 1; document.getElementById('formSource').value = "To'g'ridan-to'g'ri";
-        document.getElementById('formRate').value = roomObj.price; document.getElementById('formExtra').value = 0; document.getElementById('formStatus').value = 'Band'; document.getElementById('formNotes').value = '';
+        document.getElementById('formRate').value = roomObj.price; document.getElementById('formExtra').value = 0; document.getElementById('formStatus').value = 'Bron'; document.getElementById('formNotes').value = '';
         currentExtraServices = []; renderExtraServicesTags(); addModalPaymentRow('Naqd pul', 0);
       }
       recalcBookingTotal(); modal.classList.remove('hidden');
@@ -3031,8 +3045,10 @@
       const cIn = document.getElementById('formCheckIn').value, cOut = document.getElementById('formCheckOut').value;
       const nights = (cIn && cOut) ? diffNights(cIn, cOut) : 1, rate = Number(document.getElementById('formRate').value) || 0, extra = Number(document.getElementById('formExtra').value) || 0;
       const paid = readModalPayments().reduce((s, x) => s + x.amount, 0), total = (nights * rate) + extra;
+      const curStatus = document.getElementById('formStatus').value;
+      const calcDebtVal = (curStatus === 'Bron' || curStatus === 'Bekor qilingan') ? 0 : Math.max(0, total - paid);
       document.getElementById('calcNights').textContent = nights; document.getElementById('calcTotal').textContent = formatMoney(total);
-      document.getElementById('calcPaidSum').textContent = formatMoney(paid); document.getElementById('calcDebt').textContent = formatMoney(Math.max(0, total - paid));
+      document.getElementById('calcPaidSum').textContent = formatMoney(paid); document.getElementById('calcDebt').textContent = formatMoney(calcDebtVal);
     }
 
     function checkOverbooking(roomId, checkIn, checkOut, ignoreId) {
@@ -3094,15 +3110,45 @@
       if (b.status === 'Bron') cancelBtn.classList.remove('hidden');
       else cancelBtn.classList.add('hidden');
 
-      document.getElementById('drawerPaymentsBreakdown').innerHTML = pList.length ? pList.map((p, idx) => `<div class="flex items-center justify-between text-[11px] py-0.5"><span class="font-semibold">${p.method}</span><div class="flex items-center gap-2"><span class="font-bold text-emerald-700">${formatMoney(p.amount)}</span><button onclick="removeSinglePayment(${idx})" class="text-rose-500 font-bold">✕</button></div></div>`).join('') : `<div class="text-[11px] text-slate-400">Hali to‘lov kiritilmagan</div>`;
-      document.getElementById('drawerPaid').textContent = formatMoney(paidVal); document.getElementById('drawerDebt').textContent = formatMoney(debt);
-      document.getElementById('drawerNotes').textContent = b.notes || 'Izoh yo‘q'; document.getElementById('quickPayAmount').value = debt > 0 ? debt : '';
-      if (!isHotelOwnerOrMaster()) document.getElementById('drawerDeleteBtn').classList.add('hidden'); else document.getElementById('drawerDeleteBtn').classList.remove('hidden');
+      const isClosedBooking = (b.status === 'Chiqdi' || b.status === 'Bekor qilingan');
+      const isChief = isHotelChiefAdmin();
+      const isLockedForUser = isClosedBooking && !isChief;
+
+      const lockedNoticeEl = document.getElementById('drawerLockedNotice');
+      const statusActionsEl = document.getElementById('drawerStatusActions');
+      const quickPayBoxEl = document.getElementById('drawerQuickPayBox');
+      const editBtnEl = document.getElementById('drawerEditBtn');
+      const deleteBtnEl = document.getElementById('drawerDeleteBtn');
+      const footerActionsEl = document.getElementById('drawerFooterActions');
+
+      if (lockedNoticeEl) lockedNoticeEl.classList.toggle('hidden', !isLockedForUser);
+      if (statusActionsEl) statusActionsEl.classList.toggle('hidden', isLockedForUser);
+
+      const checkinBtnEl = document.getElementById('drawerCheckinBtn');
+      const checkoutBtnEl = document.getElementById('drawerCheckoutBtn');
+      if (checkinBtnEl) checkinBtnEl.classList.toggle('hidden', b.status === 'Band');
+      if (checkoutBtnEl) checkoutBtnEl.classList.toggle('hidden', b.status === 'Bron' || b.status === 'Chiqdi');
+
+      // Chiqdi bo'lgan bronlarda faqat qarz qolgan bo'lsa xodim to'lov qo'sha oladi; qarz 0 bo'lsa yoki bekor qilingan bo'lsa yopiladi
+      const hideQuickPay = isLockedForUser && !(b.status === 'Chiqdi' && debt > 0);
+      if (quickPayBoxEl) quickPayBoxEl.classList.toggle('hidden', hideQuickPay);
+
+      document.getElementById('drawerPaymentsBreakdown').innerHTML = pList.length
+        ? pList.map((p, idx) => `<div class="flex items-center justify-between text-[11px] py-0.5"><span class="font-semibold">${p.method}</span><div class="flex items-center gap-2"><span class="font-bold text-emerald-700">${formatMoney(p.amount)}</span>${isLockedForUser ? '' : `<button onclick="removeSinglePayment(${idx})" class="text-rose-500 font-bold">✕</button>`}</div></div>`).join('')
+        : `<div class="text-[11px] text-slate-400">Hali to‘lov kiritilmagan</div>`;
+      const displayDebt = (b.status === 'Bron' || b.status === 'Bekor qilingan') ? 0 : debt;
+      document.getElementById('drawerPaid').textContent = formatMoney(paidVal); document.getElementById('drawerDebt').textContent = formatMoney(displayDebt);
+      document.getElementById('drawerNotes').textContent = b.notes || 'Izoh yo‘q'; document.getElementById('quickPayAmount').value = displayDebt > 0 ? displayDebt : '';
+
+      if (editBtnEl) editBtnEl.classList.toggle('hidden', isLockedForUser);
+      if (deleteBtnEl) deleteBtnEl.classList.toggle('hidden', !isChief);
+      if (footerActionsEl) footerActionsEl.classList.toggle('hidden', isLockedForUser && !isChief);
       document.getElementById('guestDrawer').classList.remove('hidden');
     }
     function closeGuestDrawer() { document.getElementById('guestDrawer').classList.add('hidden'); activeDrawerBookingId = null; }
     function quickStatusChange(newStatus) {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
+      if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bron holatini faqat mehmonxona glavniy admini o‘zgartira oladi!'); return; }
       b.status = newStatus; const r = rooms.find(x => x.id === b.room); recordAuditAction('Holat o‘zgartirildi', `№ ${b.room} • ${b.guestName || 'Mehmon'} → ${newStatus}`);
       if (newStatus === 'Band') { b.checkInTime = getCurrentTimeStr(); if (r) { r.clean = 'Band'; r.manualStatus = false; } }
       else if (newStatus === 'Chiqdi') { b.checkOutTime = getCurrentTimeStr(); if (r) { r.clean = 'Tozalash kerak'; r.manualStatus = false; } }
@@ -3117,11 +3163,12 @@
     }
     function removeSinglePayment(idx) {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
+      if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bron to‘lovini faqat mehmonxona glavniy admini o‘chira oladi!'); return; }
       const p = getBookingPayments(b); p.splice(idx, 1);
       b.payments = p; b.paid = p.reduce((s, x) => s + Number(x.amount || 0), 0); b.payType = getBookingSummaryPayType(p);
       saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
     }
-    function editCurrentDrawerBooking() { const id = activeDrawerBookingId; closeGuestDrawer(); openBookingModal(id); }
+    function editCurrentDrawerBooking() { const b = bookings.find(x => x.id === activeDrawerBookingId); if (b && (b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bronni faqat mehmonxona glavniy admini tahrirlay oladi!'); return; } const id = activeDrawerBookingId; closeGuestDrawer(); openBookingModal(id); }
     function deleteCurrentDrawerBooking() {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b || !isHotelOwnerOrMaster()) return;
       if (!confirm('Ushbu bronni o‘chirmoqchimisiz?')) return;
