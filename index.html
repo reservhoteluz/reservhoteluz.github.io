@@ -93,6 +93,32 @@
     .edit-input { width: 100%; border: 1px solid transparent; background: transparent; padding: 4px; border-radius: 4px; transition: 0.2s; }
     .edit-input:hover, .edit-input:focus { border-color: #cbd5e1; background: #fff; outline: none; }
 
+    
+    /* ==================== SMENA ACCORDION ANIMATSIYASI ==================== */
+    .shift-accordion-body {
+      max-height: 2200px;
+      opacity: 1;
+      transform: translateY(0);
+      overflow: hidden;
+      transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease, transform 0.35s ease;
+    }
+    .shift-card.shift-collapsed .shift-accordion-body {
+      max-height: 0px !important;
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+    }
+    .shift-card {
+      transition: box-shadow 0.28s ease, border-color 0.28s ease, transform 0.22s ease;
+    }
+    .shift-card.shift-collapsed {
+      opacity: 0.92;
+    }
+    .shift-card.shift-collapsed:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
     /* ==================== MOLIYA VIZUAL EFFEKTLARI ==================== */
     .fin-kpi-card {
       position: relative;
@@ -501,7 +527,7 @@
         <div class="bg-white/95 rounded-xl border border-[#d8defa] p-4 space-y-3 shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h3 class="font-bold text-[#131b3a] text-base">📊 Kunlik Hisobot va Xarajatlar (2 Smena)</h3>
+              <h3 class="font-bold text-[#131b3a] text-base">📊 Kunlik Hisobot va Xarajatlar</h3>
               <p class="text-xs text-slate-500">1-smena va 2-smena administratorlari har biri o‘z hisobotini qo‘lda kiritadi</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
@@ -518,14 +544,14 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white/95 p-4 rounded-xl border border-[#d8defa] shadow-sm">
-            <div class="text-[11px] font-bold text-slate-500 uppercase">Jami kunlik tushum (2 smena)</div>
+            <div class="text-[11px] font-bold text-slate-500 uppercase">Jami kunlik tushum (Barcha smenalar)</div>
             <div id="dailyKpiTotal" class="text-xl font-extrabold text-[#131b3a] mt-1">0 so‘m</div>
             <div id="dailyKpiNonCash" class="text-[11px] text-[#5b54e6] font-medium mt-1">Karta/Click/Payme/QR: 0 so‘m</div>
           </div>
           <div class="bg-white/95 p-4 rounded-xl border border-emerald-200 shadow-sm">
             <div class="text-[11px] font-bold text-emerald-600 uppercase">💵 Jami Naqd pul tushumi</div>
             <div id="dailyKpiCashIn" class="text-xl font-extrabold text-emerald-600 mt-1">0 so‘m</div>
-            <div class="text-[11px] text-slate-400 mt-1">1-smena + 2-smena naqd pul</div>
+            <div class="text-[11px] text-slate-400 mt-1">Barcha smenalar bo‘yicha naqd pul</div>
           </div>
           <div class="bg-white/95 p-4 rounded-xl border border-rose-200 shadow-sm">
             <div class="text-[11px] font-bold text-rose-600 uppercase">💸 Jami kunlik xarajatlar</div>
@@ -539,105 +565,23 @@
           </div>
         </div>
 
-        <!-- 1-SMENA -->
-        <section class="bg-white/95 rounded-2xl border border-[#5b54e6]/30 shadow-sm overflow-hidden">
-          <div class="bg-gradient-to-r from-[#5b54e6] via-[#4a43d4] to-[#131b3a] p-4 text-white flex flex-wrap items-center justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-3">
-              <span class="px-3 py-1 rounded-lg bg-white/15 font-extrabold text-sm">☀️ 1-SMENA</span>
-              <div class="flex items-center gap-2 bg-white/15 px-3 py-1.5 rounded-xl border border-white/25">
-                <span class="text-xs font-semibold text-indigo-100">👤 Administrator:</span>
-                <input type="text" id="shiftAdminInput_1" placeholder="Ismini yozing..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); saveShiftAdminName(1); }" class="bg-white text-[#131b3a] px-2.5 py-1 rounded-lg text-xs font-bold w-44" />
-                <button type="button" onclick="saveShiftAdminName(1)" class="px-2.5 py-1 bg-amber-400 hover:bg-amber-300 text-[#131b3a] font-extrabold rounded-lg text-[11px]">💾 Saqlash</button>
-              </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold">
-              <span class="px-2.5 py-1 rounded-lg bg-white/15">Jami: <span id="s1Total">0 so‘m</span></span>
-              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/30">Naqd: <span id="s1Cash">0 so‘m</span></span>
-              <span class="px-2.5 py-1 rounded-lg bg-rose-500/30">Xarajat: −<span id="s1Exp">0 so‘m</span></span>
-              <span class="px-2.5 py-1 rounded-lg bg-white text-emerald-700 font-extrabold">Sof naqd: <span id="s1NetCash">0 so‘m</span></span>
-            </div>
+        <!-- SMENALAR BOSHQARUV PANELI (FAQAT MEHMONXONA GLAVNIY ADMINI SMENA QO'SHA/OLA OLADI) -->
+        <div class="bg-white/95 rounded-xl border border-[#d8defa] px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="font-bold text-[#131b3a]">🔄 Smenalar rejimi:</span>
+            <div id="shiftTabsQuickBar" class="flex flex-wrap items-center gap-1.5"></div>
+            <span class="text-[11px] text-slate-400 hidden sm:inline">• Smena sarlavhasini bossangiz, qolgan smenalar 1 qatorga yopiladi</span>
           </div>
-          <div class="grid grid-cols-1 xl:grid-cols-3 divide-y xl:divide-y-0 xl:divide-x divide-slate-200">
-            <div class="xl:col-span-2 flex flex-col">
-              <form onsubmit="addDailyManualEntry(event, 1)" class="p-4 bg-[#f5f6ff] border-b border-[#d8defa] space-y-2.5 text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Xona № *</label><input type="text" id="manRoom_1" required placeholder="105" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-bold" /></div>
-                  <div class="sm:col-span-2"><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Mehmon F.I.SH *</label><input type="text" id="manGuest_1" required placeholder="Mehmon nomi" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" /></div>
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Xona narxi (UZS)</label><input type="number" id="manRate_1" placeholder="250000" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" /></div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">📥 Kirish sanasi va vaqti *</label><div class="flex gap-1.5"><input type="date" id="manInDate_1" required class="flex-1 min-w-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold" /><input type="time" id="manInTime_1" oninput="this.dataset.manual='1'" required class="w-24 shrink-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">📤 Chiqish sanasi va vaqti *</label><div class="flex gap-1.5"><input type="date" id="manOutDate_1" required class="flex-1 min-w-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold" /><input type="time" id="manOutTime_1" value="12:00" required class="w-24 shrink-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
-                  <div><label class="block text-[10px] font-bold text-emerald-700 mb-0.5">To‘langan summa *</label><input type="number" id="manPaid_1" required placeholder="250000" class="w-full px-2.5 py-1.5 bg-white border border-emerald-400 rounded-lg font-bold text-emerald-700" /></div>
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">To‘lov turi</label><select id="manPayType_1" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold"><option value="Naqd pul">💵 Naqd pul</option><option value="Plastik karta (Humo/Uzcard)">💳 Plastik karta</option><option value="Click">🔵 Click</option><option value="Payme">🟢 Payme</option><option value="QR kod">📱 QR kod</option><option value="Bank o'tkazmasi">🏦 Bank o'tkazmasi</option><option value="Booking.com">🌐 Booking.com</option></select></div>
-                  <div><button type="submit" class="w-full py-1.5 rounded-lg bg-[#5b54e6] hover:bg-[#4942d4] text-white font-bold shadow-xs">+ 1-smenaga qo‘shish</button></div>
-                </div>
-              </form>
-              <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-[#f8f9ff] border-b border-slate-200 text-slate-600 uppercase text-[10.5px]"><th class="p-3">Xona</th><th class="p-3">Mehmon nomi</th><th class="p-3">Kirish → Chiqish</th><th class="p-3">Xona narxi</th><th class="p-3">To‘langan</th><th class="p-3">To‘lov turi</th><th class="p-3 text-right">Amal</th></tr></thead><tbody id="shiftTableBody_1" class="divide-y divide-slate-100"></tbody></table></div>
-            </div>
-            <div class="flex flex-col bg-rose-50/15">
-              <div class="p-3.5 border-b border-rose-100 bg-rose-50/50"><div class="font-bold text-rose-900 text-xs">💸 1-smena Xarajatlari (Naqd puldan)</div></div>
-              <form onsubmit="addDailyExpense(event, 1)" class="p-3.5 border-b border-slate-100 space-y-2 text-xs">
-                <input type="text" id="expTitle_1" required placeholder="Nimaga ishlatildi?" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" />
-                <div class="flex gap-2"><input type="number" id="expAmount_1" required min="1" placeholder="Summa (UZS)" class="flex-1 px-2.5 py-1.5 bg-white border border-rose-300 rounded-lg font-bold text-rose-700" /><button type="submit" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg">+ Yozish</button></div>
-              </form>
-              <div id="shiftExpensesList_1" class="divide-y divide-slate-100 max-h-[260px] overflow-y-auto flex-1"></div>
-              <div class="p-3 bg-[#f8f9ff] border-t border-slate-200 flex items-center justify-between text-xs font-bold"><span class="text-slate-600">1-smena xarajati:</span><span id="shiftExpFooter_1" class="text-rose-600">0 so‘m</span></div>
-            </div>
+          <div id="shiftCountAdminControls" class="hidden flex items-center gap-1.5 text-xs">
+            <span class="text-[11px] font-semibold text-slate-500">Smenalar soni:</span>
+            <button type="button" onclick="changeHotelShiftCount(-1)" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[11px] transition">− Smena olish</button>
+            <span id="hotelShiftCountBadge" class="px-2.5 py-1 rounded-lg bg-[#eef0ff] text-[#5b54e6] font-extrabold text-[11px]">2 ta</span>
+            <button type="button" onclick="changeHotelShiftCount(1)" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-[11px] transition">+ Smena qo‘shish</button>
           </div>
-        </section>
+        </div>
 
-        <!-- 2-SMENA -->
-        <section class="bg-white/95 rounded-2xl border border-[#131b3a]/25 shadow-sm overflow-hidden">
-          <div class="bg-gradient-to-r from-[#131b3a] via-[#1f2b5c] to-[#131b3a] p-4 text-white flex flex-wrap items-center justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-3">
-              <span class="px-3 py-1 rounded-lg bg-white/15 font-extrabold text-sm">🌙 2-SMENA</span>
-              <div class="flex items-center gap-2 bg-white/15 px-3 py-1.5 rounded-xl border border-white/25">
-                <span class="text-xs font-semibold text-indigo-100">👤 Administrator:</span>
-                <input type="text" id="shiftAdminInput_2" placeholder="Ismini yozing..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); saveShiftAdminName(2); }" class="bg-white text-[#131b3a] px-2.5 py-1 rounded-lg text-xs font-bold w-44" />
-                <button type="button" onclick="saveShiftAdminName(2)" class="px-2.5 py-1 bg-amber-400 hover:bg-amber-300 text-[#131b3a] font-extrabold rounded-lg text-[11px]">💾 Saqlash</button>
-              </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold">
-              <span class="px-2.5 py-1 rounded-lg bg-white/15">Jami: <span id="s2Total">0 so‘m</span></span>
-              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/30">Naqd: <span id="s2Cash">0 so‘m</span></span>
-              <span class="px-2.5 py-1 rounded-lg bg-rose-500/30">Xarajat: −<span id="s2Exp">0 so‘m</span></span>
-              <span class="px-2.5 py-1 rounded-lg bg-white text-emerald-700 font-extrabold">Sof naqd: <span id="s2NetCash">0 so‘m</span></span>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 xl:grid-cols-3 divide-y xl:divide-y-0 xl:divide-x divide-slate-200">
-            <div class="xl:col-span-2 flex flex-col">
-              <form onsubmit="addDailyManualEntry(event, 2)" class="p-4 bg-[#f5f6ff] border-b border-[#d8defa] space-y-2.5 text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Xona № *</label><input type="text" id="manRoom_2" required placeholder="205" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-bold" /></div>
-                  <div class="sm:col-span-2"><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Mehmon F.I.SH *</label><input type="text" id="manGuest_2" required placeholder="Mehmon nomi" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" /></div>
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Xona narxi (UZS)</label><input type="number" id="manRate_2" placeholder="280000" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" /></div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">📥 Kirish sanasi va vaqti *</label><div class="flex gap-1.5"><input type="date" id="manInDate_2" required class="flex-1 min-w-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold" /><input type="time" id="manInTime_2" oninput="this.dataset.manual='1'" required class="w-24 shrink-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">📤 Chiqish sanasi va vaqti *</label><div class="flex gap-1.5"><input type="date" id="manOutDate_2" required class="flex-1 min-w-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold" /><input type="time" id="manOutTime_2" value="12:00" required class="w-24 shrink-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
-                  <div><label class="block text-[10px] font-bold text-emerald-700 mb-0.5">To‘langan summa *</label><input type="number" id="manPaid_2" required placeholder="280000" class="w-full px-2.5 py-1.5 bg-white border border-emerald-400 rounded-lg font-bold text-emerald-700" /></div>
-                  <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">To‘lov turi</label><select id="manPayType_2" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold"><option value="Naqd pul">💵 Naqd pul</option><option value="Plastik karta (Humo/Uzcard)">💳 Plastik karta</option><option value="Click">🔵 Click</option><option value="Payme">🟢 Payme</option><option value="QR kod">📱 QR kod</option><option value="Bank o'tkazmasi">🏦 Bank o'tkazmasi</option><option value="Booking.com">🌐 Booking.com</option></select></div>
-                  <div><button type="submit" class="w-full py-1.5 rounded-lg bg-[#131b3a] hover:bg-[#090d22] text-white font-bold shadow-xs">+ 2-smenaga qo‘shish</button></div>
-                </div>
-              </form>
-              <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-[#f8f9ff] border-b border-slate-200 text-slate-600 uppercase text-[10.5px]"><th class="p-3">Xona</th><th class="p-3">Mehmon nomi</th><th class="p-3">Kirish → Chiqish</th><th class="p-3">Xona narxi</th><th class="p-3">To‘langan</th><th class="p-3">To‘lov turi</th><th class="p-3 text-right">Amal</th></tr></thead><tbody id="shiftTableBody_2" class="divide-y divide-slate-100"></tbody></table></div>
-            </div>
-            <div class="flex flex-col bg-rose-50/15">
-              <div class="p-3.5 border-b border-rose-100 bg-rose-50/50"><div class="font-bold text-rose-900 text-xs">💸 2-smena Xarajatlari (Naqd puldan)</div></div>
-              <form onsubmit="addDailyExpense(event, 2)" class="p-3.5 border-b border-slate-100 space-y-2 text-xs">
-                <input type="text" id="expTitle_2" required placeholder="Nimaga ishlatildi?" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" />
-                <div class="flex gap-2"><input type="number" id="expAmount_2" required min="1" placeholder="Summa (UZS)" class="flex-1 px-2.5 py-1.5 bg-white border border-rose-300 rounded-lg font-bold text-rose-700" /><button type="submit" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg">+ Yozish</button></div>
-              </form>
-              <div id="shiftExpensesList_2" class="divide-y divide-slate-100 max-h-[260px] overflow-y-auto flex-1"></div>
-              <div class="p-3 bg-[#f8f9ff] border-t border-slate-200 flex items-center justify-between text-xs font-bold"><span class="text-slate-600">2-smena xarajati:</span><span id="shiftExpFooter_2" class="text-rose-600">0 so‘m</span></div>
-            </div>
-          </div>
-        </section>
+        <!-- DINAMIK SMENALAR KONTEYNERI -->
+        <div id="dynamicShiftsContainer" class="space-y-4"></div>
       </main>
 
       <!-- TAB 3: BRONLAR VA AMALLAR TARIXI -->
@@ -1324,7 +1268,7 @@
     let currentUser = JSON.parse(sessionStorage.getItem('rh_saas_session')) || null;
     let currentHotelId = sessionStorage.getItem('rh_active_hotel') || DEFAULT_HOTEL_ID;
     let rooms = [], bookings = [], allowedUsers = [], dailyExpenses = [], dailyManualEntries = [], dailyShiftAdmins = {}, auditLogs = [];
-    let activeDrawerBookingId = null, isSyncingNow = false, activeTabName = 'matrix', isDragging = false, dragRoomId = null, dragStartDate = null, dragEndDate = null, payChartInstance = null, sourceChartInstance = null, dailyTrendChartInstance = null, currentMatrixScale = 64;
+    let activeDrawerBookingId = null, isSyncingNow = false, activeTabName = 'matrix', isDragging = false, dragRoomId = null, dragStartDate = null, dragEndDate = null, payChartInstance = null, sourceChartInstance = null, dailyTrendChartInstance = null, currentMatrixScale = 64, activeDailyShift = 1, hotelShiftCount = 2;
 
     function isCeoCreator() {
       return Boolean(currentUser && currentUser.isCeo);
@@ -1345,6 +1289,7 @@
       dailyManualEntries = JSON.parse(localStorage.getItem(storageKey('daily_manual'))) || [];
       dailyShiftAdmins = JSON.parse(localStorage.getItem(storageKey('daily_shift_admins'))) || {};
       auditLogs = JSON.parse(localStorage.getItem(storageKey('audit_logs'))) || [];
+      hotelShiftCount = Math.min(4, Math.max(1, Number(localStorage.getItem(storageKey('shift_count'))) || 2));
       if (upgradeLegacyUserPins()) saveAllLocal();
     }
 
@@ -1356,6 +1301,7 @@
       localStorage.setItem(storageKey('daily_manual'), JSON.stringify(dailyManualEntries));
       localStorage.setItem(storageKey('daily_shift_admins'), JSON.stringify(dailyShiftAdmins));
       localStorage.setItem(storageKey('audit_logs'), JSON.stringify(auditLogs));
+      localStorage.setItem(storageKey('shift_count'), String(hotelShiftCount));
     }
 
     function formatMoney(num) { return Number(num || 0).toLocaleString('ru-RU') + ' so‘m'; }
@@ -1498,6 +1444,7 @@
           dailyManualEntries = Array.isArray(data.dailyManualEntries) ? data.dailyManualEntries : (data.dailyManualEntries ? Object.values(data.dailyManualEntries) : []);
           dailyShiftAdmins = (data.dailyShiftAdmins && typeof data.dailyShiftAdmins === 'object') ? data.dailyShiftAdmins : {};
           auditLogs = Array.isArray(data.auditLogs) ? data.auditLogs : (data.auditLogs ? Object.values(data.auditLogs) : []);
+          if (data.hotelShiftCount) hotelShiftCount = Math.min(4, Math.max(1, Number(data.hotelShiftCount) || 2));
           const upgradedPins = upgradeLegacyUserPins();
           saveAllLocal();
           if (upgradedPins) {
@@ -1528,7 +1475,7 @@
       try {
         await fetch(`${FIREBASE_DB_URL}/hotels/${currentHotelId}.json`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookings, rooms, users: allowedUsers, dailyExpenses, dailyManualEntries, dailyShiftAdmins, auditLogs, updatedAt: new Date().toISOString() })
+          body: JSON.stringify({ bookings, rooms, users: allowedUsers, dailyExpenses, dailyManualEntries, dailyShiftAdmins, auditLogs, hotelShiftCount, updatedAt: new Date().toISOString() })
         });
         if (syncTextEl) syncTextEl.textContent = 'Firebase: Jonli ulangan ✓';
         if (showAlert) alert('Ma’lumotlar bulutga saqlandi!');
@@ -2071,270 +2018,234 @@
     }
     function syncDailyInTimesLive(force = false) {
       const nowTime = getCurrentTimeStr();
-      [1, 2].forEach(n => {
+      for (let n = 1; n <= hotelShiftCount; n++) {
         const tEl = document.getElementById(`manInTime_${n}`);
-        if (!tEl) return;
+        if (!tEl) continue;
         if (force) { tEl.dataset.manual = ''; tEl.value = nowTime; }
         else if (!tEl.dataset.manual && document.activeElement !== tEl) tEl.value = nowTime;
-      });
+      }
     }
     function syncDailyFormDefaultDates(dateIso, forceTime = false) {
       const nextDay = addDays(dateIso, 1);
-      [1, 2].forEach(n => {
+      for (let n = 1; n <= hotelShiftCount; n++) {
         const inEl = document.getElementById(`manInDate_${n}`), outEl = document.getElementById(`manOutDate_${n}`);
         if (inEl) inEl.value = dateIso; if (outEl) outEl.value = nextDay;
-      });
+      }
       syncDailyInTimesLive(forceTime);
     }
 
-    function refreshAllViews(includeConfig = true) {
-      const totalBeds = rooms.reduce((s, r) => s + (Number(r.beds) || 0), 0);
-      document.getElementById('headerCapacityBadge').textContent = `${rooms.length} xona • ${totalBeds} o‘rin`;
-      updateKpis(); renderMatrix();
-      if (!isTypingInDailyTab()) renderDailyReport();
-      renderBookingsTable(); renderFinance();
-      if (includeConfig) { renderRoomsConfig(); renderAllowedUsers(); if (isMasterAdmin()) renderSaasHotels(); }
-    }
-
-    function switchTab(tabName) {
-      if (tabName === 'users' && !isHotelOwnerOrMaster()) return;
-      if (tabName === 'saas' && !isMasterAdmin()) return;
-      activeTabName = tabName;
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById('tab-' + tabName).classList.remove('hidden');
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-[#5b54e6]', 'text-white');
-        btn.classList.add(btn.id === 'nav-saas' ? 'text-amber-300' : 'text-indigo-100/85');
-      });
-      const activeBtn = document.getElementById('nav-' + tabName);
-      activeBtn.classList.add('bg-[#5b54e6]', 'text-white'); activeBtn.classList.remove('text-indigo-100/85', 'text-amber-300');
-      const titles = { matrix: 'Shaxmatka kalendari', daily: 'Kunlik hisobot (2 Smena)', bookings: 'Bronlar va Mehmonlar', finance: 'Moliya va Kassa', rates: 'Xonalar va Narxlar', users: 'Xodimlar ruxsati', saas: 'Master-Admin • Mijozlar' };
-      document.getElementById('pageTitle').textContent = titles[tabName];
-      if (tabName === 'daily') syncDailyInTimesLive(false);
-      refreshAllViews(true);
-    }
-
-    let isSidebarCollapsed = false;
-
-    function toggleSidebar() {
-      const sb = document.getElementById('sidebar');
-      if (!sb) return;
-
-      if (sb.classList.contains('hidden')) {
-        sb.classList.remove('hidden');
-        sb.classList.add('flex');
-        isSidebarCollapsed = false;
-        sb.classList.remove('w-20');
-        sb.classList.add('w-64');
-        sb.querySelectorAll('nav button span:last-child, #activeHotelNameSidebar, #activeHotelMetaSidebar, #syncText, #currentUserName, #currentUserRole, aside > div:last-child button span:last-child, .rh-brand-text').forEach(el => {
-          el.classList.remove('hidden');
-        });
-        if (typeof isMasterAdmin === 'function' && isMasterAdmin()) {
-          const chev = document.getElementById('switcherChevron');
-          if (chev) chev.classList.remove('hidden');
+    function selectActiveShift(shiftNum) {
+      activeDailyShift = shiftNum;
+      for (let n = 1; n <= hotelShiftCount; n++) {
+        const card = document.getElementById(`shiftCard_${n}`);
+        const badge = document.getElementById(`shiftCollapseIcon_${n}`);
+        if (!card) continue;
+        if (n === activeDailyShift) {
+          card.classList.remove('shift-collapsed');
+          if (badge) badge.textContent = '▾ Ochiq';
+        } else {
+          card.classList.add('shift-collapsed');
+          if (badge) badge.textContent = '▸ Ochish';
         }
-        sb.querySelectorAll('nav button').forEach(btn => {
-          btn.classList.remove('justify-center', 'px-2');
-          btn.classList.add('px-3', 'gap-3');
-        });
-        const swBtn = document.getElementById('hotelSwitcherBtn');
-        if (swBtn) swBtn.classList.remove('justify-center', 'px-1.5');
-        if (typeof renderMatrix === 'function') setTimeout(() => renderMatrix(), 120);
+      }
+      renderShiftQuickTabs();
+    }
+
+    function renderShiftQuickTabs() {
+      const bar = document.getElementById('shiftTabsQuickBar');
+      if (!bar) return;
+      const icons = ['☀️', '🌙', '🌆', '⭐'];
+      let html = '';
+      for (let n = 1; n <= hotelShiftCount; n++) {
+        const isAct = n === activeDailyShift;
+        html += `<button type="button" onclick="selectActiveShift(${n})" class="px-3 py-1 rounded-lg text-xs font-bold transition ${isAct ? 'bg-[#5b54e6] text-white shadow-xs' : 'bg-[#f4f5ff] text-[#131b3a] hover:bg-[#e5e8ff] border border-[#d8defa]'}">${icons[(n - 1) % icons.length]} ${n}-smena</button>`;
+      }
+      bar.innerHTML = html;
+
+      const ctrl = document.getElementById('shiftCountAdminControls');
+      const countBadge = document.getElementById('hotelShiftCountBadge');
+      if (ctrl) {
+        if (isHotelChiefAdmin()) ctrl.classList.remove('hidden');
+        else ctrl.classList.add('hidden');
+      }
+      if (countBadge) countBadge.textContent = `${hotelShiftCount} ta`;
+    }
+
+    function changeHotelShiftCount(delta) {
+      if (!isHotelChiefAdmin()) {
+        alert('⛔ Ruxsat yo‘q: Smenalar sonini faqat mehmonxona glavniy admini o‘zgartira oladi!');
         return;
       }
-
-      isSidebarCollapsed = !isSidebarCollapsed;
-      if (isSidebarCollapsed) {
-        sb.classList.remove('w-64');
-        sb.classList.add('w-20');
-        sb.querySelectorAll('nav button span:last-child, #activeHotelNameSidebar, #activeHotelMetaSidebar, #switcherChevron, #syncText, #currentUserName, #currentUserRole, aside > div:last-child button span:last-child, .rh-brand-text').forEach(el => {
-          el.classList.add('hidden');
-        });
-        sb.querySelectorAll('nav button').forEach(btn => {
-          btn.classList.add('justify-center', 'px-2');
-          btn.classList.remove('px-3', 'gap-3');
-        });
-        const swBtn = document.getElementById('hotelSwitcherBtn');
-        if (swBtn) swBtn.classList.add('justify-center', 'px-1.5');
-        const menu = document.getElementById('hotelSwitcherMenu');
-        if (menu) menu.classList.add('hidden');
-      } else {
-        sb.classList.remove('w-20');
-        sb.classList.add('w-64');
-        sb.querySelectorAll('nav button span:last-child, #activeHotelNameSidebar, #activeHotelMetaSidebar, #syncText, #currentUserName, #currentUserRole, aside > div:last-child button span:last-child, .rh-brand-text').forEach(el => {
-          el.classList.remove('hidden');
-        });
-        if (typeof isMasterAdmin === 'function' && isMasterAdmin()) {
-          const chev = document.getElementById('switcherChevron');
-          if (chev) chev.classList.remove('hidden');
-        }
-        sb.querySelectorAll('nav button').forEach(btn => {
-          btn.classList.remove('justify-center', 'px-2');
-          btn.classList.add('px-3', 'gap-3');
-        });
-        const swBtn = document.getElementById('hotelSwitcherBtn');
-        if (swBtn) swBtn.classList.remove('justify-center', 'px-1.5');
+      const nextCount = hotelShiftCount + delta;
+      if (nextCount < 1 || nextCount > 4) {
+        alert('Smenalar soni kamida 1 ta, ko‘pi bilan 4 ta bo‘lishi mumkin.');
+        return;
       }
-      if (typeof renderMatrix === 'function') {
-        setTimeout(() => renderMatrix(), 120);
+      if (delta < 0 && !confirm(`${hotelShiftCount}-smenani olib tashlamoqchimisiz? (Oldingi kiritilgan ma’lumotlar bazada saqlanib qoladi)`)) {
+        return;
       }
+      hotelShiftCount = nextCount;
+      if (activeDailyShift > hotelShiftCount) activeDailyShift = hotelShiftCount;
+      recordAuditAction('Smenalar soni o‘zgartirildi', `Kunlik hisobot smenalar soni: ${hotelShiftCount} ta`);
+      saveAllLocal();
+      renderDailyReport();
+      pushAllToCloud(false);
     }
 
-    function updateKpis() {
-      const today = toIsoDate(new Date());
-      document.getElementById('kpiStaying').textContent = bookings.filter(b => b.status === 'Band').length;
-      document.getElementById('kpiArrivals').textContent = bookings.filter(
-        b => toIsoDate(b.checkIn) === today && b.status !== 'Chiqdi' && b.status !== 'Bekor qilingan'
-      ).length;
-      document.getElementById('kpiDepartures').textContent = bookings.filter(b => toIsoDate(b.checkOut) === today && b.status === 'Band').length;
-      document.getElementById('kpiDebtors').textContent = bookings.filter(b => isBookingInDebt(b)).length;
-    }
-
-    function shiftStartDate(days) { document.getElementById('matrixStartDate').value = addDays(document.getElementById('matrixStartDate').value, days); renderMatrix(); }
-    function jumpToToday() { document.getElementById('matrixStartDate').value = addDays(toIsoDate(new Date()), -3); renderMatrix(); }
-    function changeMatrixScale() { currentMatrixScale = parseInt(document.getElementById('matrixScale').value) || 64; renderMatrix(); }
-    function getFilteredBookings() { const st = document.getElementById('filterStatus').value; return bookings.filter(b => st === 'ALL' || b.status === st); }
-
-    function renderMatrix() {
-      const startStr = document.getElementById('matrixStartDate').value || toIsoDate(new Date());
-      const daysCount = parseInt(document.getElementById('matrixDaysCount').value, 10) || 90;
-      const scale = currentMatrixScale, todayStr = toIsoDate(new Date()), filteredBookings = getFilteredBookings();
-      const dates = [], uzDays = ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'], uzMonths = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
-      for (let i = 0; i < daysCount; i++) {
-        const dStr = addDays(startStr, i), dObj = new Date(dStr + 'T00:00:00');
-        dates.push({ iso: dStr, dayNum: String(dObj.getDate()).padStart(2, '0'), weekDay: uzDays[dObj.getDay()], isWeekend: dObj.getDay() === 0 || dObj.getDay() === 6, monthLabel: `${uzMonths[dObj.getMonth()]} ${dObj.getFullYear()}`, isToday: dStr === todayStr });
+    function getDefaultShiftHours(shiftNum) {
+      if (hotelShiftCount === 1) return { start: '08:00', end: '08:00' };
+      if (hotelShiftCount === 2) {
+        return shiftNum === 1 ? { start: '08:00', end: '20:00' } : { start: '20:00', end: '08:00' };
       }
-      const monthGroups = [];
-      dates.forEach(dt => { if (!monthGroups.length || monthGroups[monthGroups.length - 1].label !== dt.monthLabel) monthGroups.push({ label: dt.monthLabel, span: 1 }); else monthGroups[monthGroups.length - 1].span++; });
-
-      let theadHtml = `<tr><th rowspan="2" class="sticky-corner bg-[#131b3a] text-white text-xs font-bold px-3 text-left border-r border-white/15" style="width:155px; min-width:155px;">Xona / Qavat</th><th rowspan="2" class="sticky-corner-clean bg-[#131b3a] text-white text-xs font-bold px-2 text-center border-r border-white/15" style="width:75px; min-width:75px;">Holati</th>`;
-      monthGroups.forEach(mg => { theadHtml += `<th colspan="${mg.span}" class="sticky-header-top bg-[#1b2554] text-indigo-200 text-xs font-bold py-1.5 px-2 border-r border-white/15 border-b border-white/15 text-center">${mg.label}</th>`; });
-      theadHtml += `</tr><tr>`;
-      dates.forEach(dt => {
-        const bgClass = dt.isToday ? 'bg-[#5b54e6] text-white' : (dt.isWeekend ? 'bg-[#f5f6ff] text-rose-600' : 'bg-[#f8f9ff] text-[#131b3a]');
-        theadHtml += `<th class="sticky-header-top ${bgClass} border-r border-b border-slate-300 py-1 text-center" style="top:28px; width:${scale}px; min-width:${scale}px; max-width:${scale}px;"><div class="text-[10px] font-semibold opacity-80">${dt.weekDay}</div><div class="text-xs font-extrabold">${dt.dayNum}</div></th>`;
-      });
-      document.getElementById('matrixHead').innerHTML = theadHtml + `</tr>`;
-
-      const floors = [...new Set(rooms.map(r => r.floor || '1-etaj'))];
-      let tbodyHtml = '';
-      const viewStartMs = getLocalMs(dates[0].iso, '00:00'), viewEndMs = getLocalMs(addDays(dates[dates.length - 1].iso, 1), '00:00'), msPerDay = 86400000, todayPct = getTodayTimePercent();
-
-      floors.forEach(fl => {
-        const floorRooms = rooms.filter(r => (r.floor || '1-etaj') === fl);
-        tbodyHtml += `<tr class="bg-[#f2f4ff]"><td class="sticky-col-room bg-[#f2f4ff] font-bold text-xs text-[#131b3a] px-3 py-2 border-b border-slate-300">▼ ${fl} (${floorRooms.length} ta xona)</td><td class="sticky-col-clean bg-[#f2f4ff] border-b border-slate-300"></td>`;
-        dates.forEach(dt => { const freeCount = floorRooms.filter(r => !isRoomOccupiedOnDate(r.id, dt.iso, bookings)).length; tbodyHtml += `<td class="text-center text-[10px] font-bold text-slate-600 border-r border-b border-slate-300 py-1.5" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;">${freeCount} bo‘sh</td>`; });
-        tbodyHtml += `</tr>`;
-
-        floorRooms.forEach(room => {
-          const cleanBadge = getRoomStatusBadgeHtml(room);
-          tbodyHtml += `<tr><td class="sticky-col-room px-3 py-1.5 border-b border-slate-200"><div class="flex items-center justify-between"><span class="font-extrabold text-[#131b3a] text-xs">№ ${room.id}</span><span class="text-[10px] text-slate-400 font-medium">${room.beds} o‘rin</span></div></td><td class="sticky-col-clean text-center border-b border-slate-200">${cleanBadge}</td>`;
-          dates.forEach(dt => {
-            const cellClasses = ['day-cell']; if (dt.isWeekend) cellClasses.push('weekend'); if (dt.isToday) cellClasses.push('today-col');
-            let barHtml = '';
-            filteredBookings.filter(b => b.room === room.id).forEach(b => {
-              const bStartMs = getLocalMs(b.checkIn, b.checkInTime || '14:00'), bEndMs = getLocalMs(b.checkOut, b.checkOutTime || '12:00');
-              if (bEndMs <= viewStartMs || bStartMs >= viewEndMs) return;
-              const effectiveStartStr = (b.checkIn < dates[0].iso) ? dates[0].iso : b.checkIn;
-              if (effectiveStartStr === dt.iso) {
-                const drawStartMs = Math.max(bStartMs, viewStartMs), drawEndMs = Math.min(bEndMs, viewEndMs), cellStartMs = getLocalMs(effectiveStartStr, '00:00');
-                const startOffsetPx = ((drawStartMs - cellStartMs) / msPerDay) * scale, widthPx = Math.max(20, (((drawEndMs - drawStartMs) / msPerDay) * scale) - 2);
-                const total = Number(b.total) || 0, paid = Number(b.paid) || 0, inDebt = isBookingInDebt(b);
-                let barClass = 'bar-paid';
-                if (b.status === 'Bekor qilingan') barClass = 'bar-canceled';
-                else if (b.status === 'Chiqdi') barClass = 'bar-out';
-                else if (b.status === 'Bron') barClass = 'bar-booked';
-                else if (inDebt && paid <= 0) barClass = 'bar-debt';
-                else if (inDebt && paid > 0) barClass = 'bar-partial';
-                const debtTag = (b.status !== 'Bekor qilingan' && inDebt) ? ` -${Math.round((total - paid)/1000)}k` : '';
-                const safeName = b.guestName || 'Mehmon', displayLabel = b.status === 'Bekor qilingan' ? `✕ ${safeName}` : safeName;
-                barHtml += `<div onclick="event.stopPropagation(); openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}" class="booking-bar ${barClass}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span><span class="text-[9px] opacity-90 shrink-0 font-bold">${debtTag}</span></div>`;
-              }
-            });
-            const todayLine = dt.isToday ? `<div class="today-line" style="left:${todayPct}%;"></div>` : '';
-            tbodyHtml += `<td class="${cellClasses.join(' ')}" data-room="${room.id}" data-date="${dt.iso}" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;" onmousedown="startCellDrag('${room.id}', '${dt.iso}')" onmouseenter="moveCellDrag('${room.id}', '${dt.iso}')" onmouseup="endCellDrag('${room.id}', '${dt.iso}')">${todayLine}${barHtml}</td>`;
-          });
-          tbodyHtml += `</tr>`;
-        });
-      });
-      document.getElementById('matrixBody').innerHTML = tbodyHtml;
-
-      let tfootHtml = `<tr><td colspan="2" class="sticky-col-room sticky-footer-bottom font-bold text-xs text-[#131b3a] px-3 py-2 border-r-2 border-slate-400">Band xonalar (Jami: ${rooms.length})</td>`;
-      dates.forEach(dt => {
-        const occ = rooms.filter(r => isRoomOccupiedOnDate(r.id, dt.iso, bookings)).length, pct = rooms.length ? Math.round((occ / rooms.length) * 100) : 0;
-        const bg = dt.isToday ? 'bg-[#5b54e6]/15 text-[#5b54e6]' : 'bg-[#f8f9ff] text-[#131b3a]';
-        tfootHtml += `<td class="sticky-footer-bottom ${bg} text-center border-r border-slate-300 py-1.5" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;"><div class="text-[11px] font-extrabold">${occ} ta</div><div class="text-[10px] text-slate-500">${pct}%</div></td>`;
-      });
-      document.getElementById('matrixFoot').innerHTML = tfootHtml + `</tr>`;
+      if (hotelShiftCount === 3) {
+        if (shiftNum === 1) return { start: '08:00', end: '16:00' };
+        if (shiftNum === 2) return { start: '16:00', end: '00:00' };
+        return { start: '00:00', end: '08:00' };
+      }
+      const starts = ['08:00', '14:00', '20:00', '02:00'];
+      const ends = ['14:00', '20:00', '02:00', '08:00'];
+      return { start: starts[(shiftNum - 1) % 4], end: ends[(shiftNum - 1) % 4] };
     }
 
-    function addNewRoom(e) {
-      e.preventDefault();
-      const floor = document.getElementById('newRoomFloor').value.trim() || '1-etaj', id = document.getElementById('newRoomId').value.trim();
-      const name = document.getElementById('newRoomType').value.trim() || 'Standard', beds = Number(document.getElementById('newRoomBeds').value) || 2, price = Number(document.getElementById('newRoomPrice').value) || 250000;
-      if (!id || rooms.some(r => String(r.id).toLowerCase() === id.toLowerCase())) { alert(`№ ${id} xonasi mavjud yoki noto‘g‘ri!`); return; }
-      rooms.push({ id, floor, name, beds, price, clean: 'Toza' });
-      saveAllLocal(); populateRoomSelect(); refreshAllViews(true); pushAllToCloud(false);
-      document.getElementById('newRoomId').value = '';
-    }
-    function deleteRoomItem(idx) {
-      const target = rooms[idx]; if (!target || !confirm(`№ ${target.id} xonasini o‘chirmoqchimisiz?`)) return;
-      rooms.splice(idx, 1); saveAllLocal(); populateRoomSelect(); refreshAllViews(true); pushAllToCloud(false);
-    }
-    function renderRoomsConfig() {
-      const hotel = saasRegistry.hotels[currentHotelId] || { name: 'Mehmonxona' };
-      document.getElementById('roomsConfigHeaderTitle').textContent = `${hotel.name} — ${rooms.length} ta Xona Ro‘yxati va Tariflar`;
-      document.getElementById('roomsConfigBody').innerHTML = rooms.map((r, idx) => `<tr>
-        <td class="p-3"><input type="text" id="rc_floor_${idx}" value="${r.floor || '1-etaj'}" class="px-2.5 py-1 border border-slate-200 rounded w-28 font-semibold text-slate-600" /></td>
-        <td class="p-3 font-extrabold text-[#131b3a]">№ ${r.id}</td>
-        <td class="p-3"><input type="text" id="rc_name_${idx}" value="${r.name}" class="px-2.5 py-1 border border-slate-200 rounded w-44" /></td>
-        <td class="p-3"><input type="number" id="rc_beds_${idx}" value="${r.beds}" min="1" max="20" class="px-2.5 py-1 border border-slate-200 rounded w-16 font-bold" /></td>
-        <td class="p-3"><input type="number" id="rc_price_${idx}" value="${r.price}" step="10000" class="px-2.5 py-1 border border-slate-200 rounded w-32 font-bold text-[#5b54e6]" /></td>
-        <td class="p-3">${getRoomStatusBadgeHtml(r)}</td>
-        <td class="p-3 text-right"><button type="button" onclick="deleteRoomItem(${idx})" class="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px]">🗑 O‘chirish</button></td>
-      </tr>`).join('');
-    }
-    function saveRoomRates() {
-      rooms.forEach((r, idx) => { r.floor = document.getElementById(`rc_floor_${idx}`).value.trim() || r.floor; r.name = document.getElementById(`rc_name_${idx}`).value.trim() || r.name; r.beds = Number(document.getElementById(`rc_beds_${idx}`).value) || r.beds; r.price = Number(document.getElementById(`rc_price_${idx}`).value) || r.price; });
-      saveAllLocal(); populateRoomSelect(); refreshAllViews(false); pushAllToCloud(false); alert('Barcha xonalar va narxlar saqlandi!');
+    function getShiftMetaInfo(selectedDate, shiftNum) {
+      const raw = dailyShiftAdmins[`${selectedDate}_${shiftNum}`];
+      const def = getDefaultShiftHours(shiftNum);
+      if (raw && typeof raw === 'object') {
+        return {
+          adminName: raw.adminName || '',
+          startTime: raw.startTime || def.start,
+          endTime: raw.endTime || def.end
+        };
+      }
+      return {
+        adminName: typeof raw === 'string' ? raw : '',
+        startTime: def.start,
+        endTime: def.end
+      };
     }
 
-    function openCancelModal() {
-      const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
-      document.getElementById('cancelByInput').value = currentUser ? currentUser.name : '';
-      document.getElementById('cancelReasonInput').value = b.cancelReason || '';
-      document.getElementById('cancelModal').classList.remove('hidden');
-    }
-    function closeCancelModal() { document.getElementById('cancelModal').classList.add('hidden'); }
-    function confirmCancelBooking(e) {
-      e.preventDefault();
-      const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
-      b.status = 'Bekor qilingan'; b.canceledBy = document.getElementById('cancelByInput').value.trim(); b.cancelReason = document.getElementById('cancelReasonInput').value.trim(); b.canceledAt = `${toIsoDate(new Date())} ${getCurrentTimeStr()}`; recordAuditAction('Bron bekor qilindi', `№ ${b.room} • ${b.guestName || 'Mehmon'} — Sabab: ${b.cancelReason}`);
-      const r = rooms.find(x => x.id === b.room);
-      if (r && !isRoomCheckedInToday(b.room) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
-      saveAllLocal(); closeCancelModal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
-    }
-
-    function shiftDailyDate(days) { const next = addDays(document.getElementById('dailyReportDate').value || toIsoDate(new Date()), days); document.getElementById('dailyReportDate').value = next; syncDailyFormDefaultDates(next, true); renderDailyReport(); }
-    function jumpDailyToday() { const t = toIsoDate(new Date()); document.getElementById('dailyReportDate').value = t; syncDailyFormDefaultDates(t, true); renderDailyReport(); }
-    function selectDailyDate(iso) { document.getElementById('dailyReportDate').value = iso; syncDailyFormDefaultDates(iso, true); renderDailyReport(); }
     function saveShiftAdminName(shiftNum) {
       const d = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
       const inp = document.getElementById(`shiftAdminInput_${shiftNum}`);
-      dailyShiftAdmins[`${d}_${shiftNum}`] = (inp.value || '').trim();
-      saveAllLocal(); pushAllToCloud(false); inp.blur(); alert(`${shiftNum}-smena administratori saqlandi!`);
+      const stInp = document.getElementById(`shiftStartInput_${shiftNum}`);
+      const enInp = document.getElementById(`shiftEndInput_${shiftNum}`);
+      const adminName = (inp ? inp.value : '').trim();
+      const startTime = (stInp ? stInp.value : '') || getDefaultShiftHours(shiftNum).start;
+      const endTime = (enInp ? enInp.value : '') || getDefaultShiftHours(shiftNum).end;
+
+      dailyShiftAdmins[`${d}_${shiftNum}`] = { adminName, startTime, endTime };
+      recordAuditAction('Smena ma’lumoti saqlandi', `${d} • ${shiftNum}-smena: ${adminName || 'Admin'} (${startTime} – ${endTime})`);
+      saveAllLocal();
+      pushAllToCloud(false);
+      if (inp) inp.blur();
+      renderDailyReport();
+      alert(`${shiftNum}-smena administratori va vaqti (${startTime} – ${endTime}) saqlandi!`);
     }
+
+    function buildShiftCardSkeleton(n) {
+      const gradients = [
+        'from-[#5b54e6] via-[#4a43d4] to-[#131b3a]',
+        'from-[#131b3a] via-[#1f2b5c] to-[#131b3a]',
+        'from-[#0f766e] via-[#115e59] to-[#131b3a]',
+        'from-[#4338ca] via-[#312e81] to-[#0f172a]'
+      ];
+      const btnBg = n === 1 ? 'bg-[#5b54e6] hover:bg-[#4942d4]' : (n === 2 ? 'bg-[#131b3a] hover:bg-[#090d22]' : 'bg-teal-700 hover:bg-teal-800');
+      const icons = ['☀️', '🌙', '🌆', '⭐'];
+      const isCollapsed = n !== activeDailyShift;
+
+      return `
+        <section id="shiftCard_${n}" class="shift-card ${isCollapsed ? 'shift-collapsed' : ''} bg-white/95 rounded-2xl border border-[#5b54e6]/30 shadow-sm overflow-hidden">
+          <div onclick="if(!event.target.closest('input,button,select')) selectActiveShift(${n})" class="bg-gradient-to-r ${gradients[(n - 1) % gradients.length]} p-3.5 sm:p-4 text-white flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-white/15 font-extrabold text-sm flex items-center gap-1.5">
+                <span>${icons[(n - 1) % icons.length]} ${n}-SMENA</span>
+              </span>
+              <div class="flex flex-wrap items-center gap-2 bg-white/15 px-3 py-1.5 rounded-xl border border-white/25">
+                <span class="text-xs font-semibold text-indigo-100">👤 Admin:</span>
+                <input type="text" id="shiftAdminInput_${n}" placeholder="Ismini yozing..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); saveShiftAdminName(${n}); }" class="bg-white text-[#131b3a] px-2.5 py-1 rounded-lg text-xs font-bold w-36 sm:w-40" />
+                <div class="flex items-center gap-1 text-xs">
+                  <span class="text-indigo-100 font-semibold">🕒</span>
+                  <input type="time" id="shiftStartInput_${n}" title="Smena boshlanish vaqti" class="bg-white text-[#131b3a] px-1.5 py-1 rounded-lg text-xs font-bold text-center w-24" />
+                  <span class="text-indigo-200 font-bold">→</span>
+                  <input type="time" id="shiftEndInput_${n}" title="Smena tugash vaqti" class="bg-white text-[#131b3a] px-1.5 py-1 rounded-lg text-xs font-bold text-center w-24" />
+                </div>
+                <button type="button" onclick="saveShiftAdminName(${n})" class="px-2.5 py-1 bg-amber-400 hover:bg-amber-300 text-[#131b3a] font-extrabold rounded-lg text-[11px]">💾 Saqlash</button>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold">
+              <span class="px-2.5 py-1 rounded-lg bg-white/15">Jami: <span id="s${n}Total">0 so‘m</span></span>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/30">Naqd: <span id="s${n}Cash">0 so‘m</span></span>
+              <span class="px-2.5 py-1 rounded-lg bg-rose-500/30">Xarajat: −<span id="s${n}Exp">0 so‘m</span></span>
+              <span class="px-2.5 py-1 rounded-lg bg-white text-emerald-700 font-extrabold">Sof naqd: <span id="s${n}NetCash">0 so‘m</span></span>
+              <span id="shiftCollapseIcon_${n}" class="px-2.5 py-1 rounded-lg bg-white/20 text-white font-extrabold">${isCollapsed ? '▸ Ochish' : '▾ Ochiq'}</span>
+            </div>
+          </div>
+          <div class="shift-accordion-body">
+            <div class="grid grid-cols-1 xl:grid-cols-3 divide-y xl:divide-y-0 xl:divide-x divide-slate-200">
+              <div class="xl:col-span-2 flex flex-col">
+                <form onsubmit="addDailyManualEntry(event, ${n})" class="p-4 bg-[#f5f6ff] border-b border-[#d8defa] space-y-2.5 text-xs">
+                  <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                    <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Xona № *</label><input type="text" id="manRoom_${n}" required placeholder="105" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-bold" /></div>
+                    <div class="sm:col-span-2"><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Mehmon F.I.SH *</label><input type="text" id="manGuest_${n}" required placeholder="Mehmon nomi" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" /></div>
+                    <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Xona narxi (UZS)</label><input type="number" id="manRate_${n}" placeholder="250000" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" /></div>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">📥 Kirish sanasi va vaqti *</label><div class="flex gap-1.5"><input type="date" id="manInDate_${n}" required class="flex-1 min-w-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold" /><input type="time" id="manInTime_${n}" oninput="this.dataset.manual='1'" required class="w-24 shrink-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
+                    <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">📤 Chiqish sanasi va vaqti *</label><div class="flex gap-1.5"><input type="date" id="manOutDate_${n}" required class="flex-1 min-w-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold" /><input type="time" id="manOutTime_${n}" value="12:00" required class="w-24 shrink-0 px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+                    <div><label class="block text-[10px] font-bold text-emerald-700 mb-0.5">To‘langan summa *</label><input type="number" id="manPaid_${n}" required placeholder="250000" class="w-full px-2.5 py-1.5 bg-white border border-emerald-400 rounded-lg font-bold text-emerald-700" /></div>
+                    <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">To‘lov turi</label><select id="manPayType_${n}" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold"><option value="Naqd pul">💵 Naqd pul</option><option value="Plastik karta (Humo/Uzcard)">💳 Plastik karta</option><option value="Click">🔵 Click</option><option value="Payme">🟢 Payme</option><option value="QR kod">📱 QR kod</option><option value="Bank o'tkazmasi">🏦 Bank o'tkazmasi</option><option value="Booking.com">🌐 Booking.com</option></select></div>
+                    <div><button type="submit" class="w-full py-1.5 rounded-lg ${btnBg} text-white font-bold shadow-xs">+ ${n}-smenaga qo‘shish</button></div>
+                  </div>
+                </form>
+                <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-[#f8f9ff] border-b border-slate-200 text-slate-600 uppercase text-[10.5px]"><th class="p-3">Xona</th><th class="p-3">Mehmon nomi</th><th class="p-3">Kirish → Chiqish</th><th class="p-3">Xona narxi</th><th class="p-3">To‘langan</th><th class="p-3">To‘lov turi</th><th class="p-3 text-right">Amal</th></tr></thead><tbody id="shiftTableBody_${n}" class="divide-y divide-slate-100"></tbody></table></div>
+              </div>
+              <div class="flex flex-col bg-rose-50/15">
+                <div class="p-3.5 border-b border-rose-100 bg-rose-50/50"><div class="font-bold text-rose-900 text-xs">💸 ${n}-smena Xarajatlari (Naqd puldan)</div></div>
+                <form onsubmit="addDailyExpense(event, ${n})" class="p-3.5 border-b border-slate-100 space-y-2 text-xs">
+                  <input type="text" id="expTitle_${n}" required placeholder="Nimaga ishlatildi?" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" />
+                  <div class="flex gap-2"><input type="number" id="expAmount_${n}" required min="1" placeholder="Summa (UZS)" class="flex-1 px-2.5 py-1.5 bg-white border border-rose-300 rounded-lg font-bold text-rose-700" /><button type="submit" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg">+ Yozish</button></div>
+                </form>
+                <div id="shiftExpensesList_${n}" class="divide-y divide-slate-100 max-h-[260px] overflow-y-auto flex-1"></div>
+                <div class="p-3 bg-[#f8f9ff] border-t border-slate-200 flex items-center justify-between text-xs font-bold"><span class="text-slate-600">${n}-smena xarajati:</span><span id="shiftExpFooter_${n}" class="text-rose-600">0 so‘m</span></div>
+              </div>
+            </div>
+          </div>
+        </section>`;
+    }
+
+    function ensureDynamicShiftCards(selectedDate) {
+      const container = document.getElementById('dynamicShiftsContainer');
+      if (!container) return;
+      if (Number(container.dataset.count || 0) !== hotelShiftCount) {
+        let html = '';
+        for (let n = 1; n <= hotelShiftCount; n++) {
+          html += buildShiftCardSkeleton(n);
+        }
+        container.innerHTML = html;
+        container.dataset.count = String(hotelShiftCount);
+        syncDailyFormDefaultDates(selectedDate, true);
+      }
+      renderShiftQuickTabs();
+    }
+
     function addDailyManualEntry(e, shiftNum) {
       e.preventDefault();
       const dateIso = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
       const inDate = document.getElementById(`manInDate_${shiftNum}`).value || dateIso, inTime = document.getElementById(`manInTime_${shiftNum}`).value || getCurrentTimeStr();
       const outDate = document.getElementById(`manOutDate_${shiftNum}`).value || addDays(inDate, 1), outTime = document.getElementById(`manOutTime_${shiftNum}`).value || '12:00';
+      const room = document.getElementById(`manRoom_${shiftNum}`).value.trim();
+      const guestName = document.getElementById(`manGuest_${shiftNum}`).value.trim();
+      const paid = Number(document.getElementById(`manPaid_${shiftNum}`).value) || 0;
+      const payType = document.getElementById(`manPayType_${shiftNum}`).value || 'Naqd pul';
       dailyManualEntries.push({
-        id: 'man_' + Date.now(), date: dateIso, shift: shiftNum, room: document.getElementById(`manRoom_${shiftNum}`).value.trim(), guestName: document.getElementById(`manGuest_${shiftNum}`).value.trim(),
+        id: 'man_' + Date.now(), date: dateIso, shift: shiftNum, room, guestName,
         inDate, inTime, outDate, outTime, datesText: `${inDate} (${inTime}) → ${outDate} (${outTime})`,
-        rate: Number(document.getElementById(`manRate_${shiftNum}`).value) || 0, paid: Number(document.getElementById(`manPaid_${shiftNum}`).value) || 0,
-        payType: document.getElementById(`manPayType_${shiftNum}`).value || 'Naqd pul', createdBy: currentUser ? currentUser.name : 'Admin'
+        rate: Number(document.getElementById(`manRate_${shiftNum}`).value) || 0, paid,
+        payType, createdBy: currentUser ? currentUser.name : 'Admin'
       });
+      recordAuditAction(`${shiftNum}-smena kassa yozuvi`, `№ ${room} • ${guestName} — ${formatMoney(paid)} (${payType})`);
       saveAllLocal(); e.target.reset(); syncDailyFormDefaultDates(dateIso, true); renderDailyReport(); pushAllToCloud(false);
     }
     function deleteDailyManualEntry(id) { if (confirm('O‘chirmoqchimisiz?')) { dailyManualEntries = dailyManualEntries.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); } }
@@ -2343,28 +2254,60 @@
       const dateIso = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
       const title = document.getElementById(`expTitle_${shiftNum}`).value.trim(), amount = Number(document.getElementById(`expAmount_${shiftNum}`).value) || 0;
       if (!title || amount <= 0) return;
-      dailyExpenses.push({ id: 'exp_' + Date.now(), date: dateIso, shift: shiftNum, title, amount, time: getCurrentTimeStr(), createdBy: dailyShiftAdmins[`${dateIso}_${shiftNum}`] || (currentUser ? currentUser.name : 'Admin') });
+      const meta = getShiftMetaInfo(dateIso, shiftNum);
+      dailyExpenses.push({ id: 'exp_' + Date.now(), date: dateIso, shift: shiftNum, title, amount, time: getCurrentTimeStr(), createdBy: meta.adminName || (currentUser ? currentUser.name : 'Admin') });
+      recordAuditAction(`${shiftNum}-smena xarajati`, `${title} — −${formatMoney(amount)}`);
       saveAllLocal(); e.target.reset(); renderDailyReport(); pushAllToCloud(false);
     }
     function deleteDailyExpense(id) { if (confirm('O‘chirmoqchimisiz?')) { dailyExpenses = dailyExpenses.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); } }
 
     function getShiftStats(selectedDate, shiftNum) {
-      const adminName = dailyShiftAdmins[`${selectedDate}_${shiftNum}`] || '';
+      const meta = getShiftMetaInfo(selectedDate, shiftNum);
       const rows = dailyManualEntries.filter(m => m.date === selectedDate && (Number(m.shift) || 1) === shiftNum);
       const expenses = dailyExpenses.filter(x => x.date === selectedDate && (Number(x.shift) || 1) === shiftNum);
       let totalIncome = 0, cashIn = 0, nonCash = 0;
       rows.forEach(r => { const p = Number(r.paid) || 0; totalIncome += p; if (r.payType === 'Naqd pul') cashIn += p; else nonCash += p; });
       const totalExp = expenses.reduce((s, x) => s + Number(x.amount || 0), 0);
-      return { shiftNum, adminName, rows, expenses, totalIncome, cashIn, nonCash, totalExp, netCash: cashIn - totalExp };
+      return {
+        shiftNum,
+        adminName: meta.adminName,
+        startTime: meta.startTime,
+        endTime: meta.endTime,
+        rows,
+        expenses,
+        totalIncome,
+        cashIn,
+        nonCash,
+        totalExp,
+        netCash: cashIn - totalExp
+      };
     }
+
     function getDailyReportData() {
       const selectedDate = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
-      const s1 = getShiftStats(selectedDate, 1), s2 = getShiftStats(selectedDate, 2);
-      return { selectedDate, s1, s2, totalIncome: s1.totalIncome + s2.totalIncome, totalCashIn: s1.cashIn + s2.cashIn, totalNonCash: s1.nonCash + s2.nonCash, totalExp: s1.totalExp + s2.totalExp, netCash: s1.netCash + s2.netCash };
+      const shifts = [];
+      let totalIncome = 0, totalCashIn = 0, totalNonCash = 0, totalExp = 0, netCash = 0;
+      for (let n = 1; n <= hotelShiftCount; n++) {
+        const st = getShiftStats(selectedDate, n);
+        shifts.push(st);
+        totalIncome += st.totalIncome;
+        totalCashIn += st.cashIn;
+        totalNonCash += st.nonCash;
+        totalExp += st.totalExp;
+        netCash += st.netCash;
+      }
+      return { selectedDate, shifts, s1: shifts[0], s2: shifts[1], totalIncome, totalCashIn, totalNonCash, totalExp, netCash };
     }
+
     function renderShiftBlock(s) {
       const n = s.shiftNum;
-      document.getElementById(`shiftAdminInput_${n}`).value = s.adminName;
+      const adminInp = document.getElementById(`shiftAdminInput_${n}`);
+      const startInp = document.getElementById(`shiftStartInput_${n}`);
+      const endInp = document.getElementById(`shiftEndInput_${n}`);
+      if (adminInp && document.activeElement !== adminInp) adminInp.value = s.adminName;
+      if (startInp && document.activeElement !== startInp) startInp.value = s.startTime;
+      if (endInp && document.activeElement !== endInp) endInp.value = s.endTime;
+
       document.getElementById(`s${n}Total`).textContent = formatMoney(s.totalIncome);
       document.getElementById(`s${n}Cash`).textContent = formatMoney(s.cashIn);
       document.getElementById(`s${n}Exp`).textContent = formatMoney(s.totalExp);
@@ -2373,8 +2316,11 @@
       document.getElementById(`shiftTableBody_${n}`).innerHTML = s.rows.length ? s.rows.map(m => `<tr class="hover:bg-slate-50"><td class="p-3 font-extrabold">№ ${m.room}</td><td class="p-3 font-bold">${m.guestName}</td><td class="p-3 text-[11px]">${m.datesText}</td><td class="p-3">${formatMoney(m.rate)}</td><td class="p-3 font-bold text-emerald-600">${formatMoney(m.paid)}</td><td class="p-3 text-[11px]">${m.payType}</td><td class="p-3 text-right"><button onclick="deleteDailyManualEntry('${m.id}')" class="px-2 py-0.5 rounded bg-rose-50 text-rose-600 font-bold">✕</button></td></tr>`).join('') : `<tr><td colspan="7" class="p-6 text-center text-slate-400">${n}-smenada hali yozuv yo‘q.</td></tr>`;
       document.getElementById(`shiftExpensesList_${n}`).innerHTML = s.expenses.length ? s.expenses.map(x => `<div class="p-3 flex items-center justify-between gap-2"><div class="min-w-0"><div class="font-bold text-xs truncate">${x.title}</div><div class="text-[10px] text-slate-400">${x.time || ''} ${x.createdBy ? '• ' + x.createdBy : ''}</div></div><div class="flex items-center gap-2 shrink-0"><span class="font-extrabold text-rose-600 text-xs">−${formatMoney(x.amount)}</span><button onclick="deleteDailyExpense('${x.id}')" class="text-slate-400 hover:text-rose-600 font-bold text-xs">✕</button></div></div>`).join('') : `<div class="p-5 text-center text-xs text-slate-400">Xarajat yo‘q</div>`;
     }
+
     function renderDailyReport() {
-      const data = getDailyReportData(), selectedDate = data.selectedDate, todayStr = toIsoDate(new Date()), uzDays = ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'];
+      const selectedDate = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
+      ensureDynamicShiftCards(selectedDate);
+      const data = getDailyReportData(), todayStr = toIsoDate(new Date()), uzDays = ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'];
       let stripHtml = '';
       for (let offset = -7; offset <= 7; offset++) {
         const iso = addDays(selectedDate, offset), dObj = new Date(iso + 'T00:00:00');
@@ -2387,21 +2333,21 @@
       document.getElementById('dailyKpiCashIn').textContent = formatMoney(data.totalCashIn);
       document.getElementById('dailyKpiExpenses').textContent = formatMoney(data.totalExp);
       document.getElementById('dailyKpiNetCash').textContent = formatMoney(data.netCash);
-      renderShiftBlock(data.s1); renderShiftBlock(data.s2);
+      data.shifts.forEach(s => renderShiftBlock(s));
     }
 
     function exportDailyToExcel() {
       const data = getDailyReportData(), hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
-      const buildShiftExcel = s => `<h3>${s.shiftNum}-SMENA — Admin: ${s.adminName || '-'}</h3><table border="1" cellspacing="0" cellpadding="6"><tr><th>Xona</th><th>Mehmon</th><th>Kirish → Chiqish</th><th>Narxi</th><th>To'langan</th><th>Turi</th></tr>${s.rows.map(r => `<tr><td>№ ${r.room}</td><td>${r.guestName}</td><td>${r.datesText}</td><td>${r.rate}</td><td>${r.paid}</td><td>${r.payType}</td></tr>`).join('') || '<tr><td colspan="6">Yo\'q</td></tr>'}</table><p>Jami: ${s.totalIncome} | Naqd: ${s.cashIn} | Xarajat: ${s.totalExp} | Sof naqd: <b>${s.netCash}</b></p><br/>`;
-      const html = `<html><head><meta charset="UTF-8" /></head><body><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${buildShiftExcel(data.s1)}${buildShiftExcel(data.s2)}</body></html>`;
+      const buildShiftExcel = s => `<h3>${s.shiftNum}-SMENA (${s.startTime} – ${s.endTime}) — Admin: ${s.adminName || '-'}</h3><table border="1" cellspacing="0" cellpadding="6"><tr><th>Xona</th><th>Mehmon</th><th>Kirish → Chiqish</th><th>Narxi</th><th>To'langan</th><th>Turi</th></tr>${s.rows.map(r => `<tr><td>№ ${r.room}</td><td>${r.guestName}</td><td>${r.datesText}</td><td>${r.rate}</td><td>${r.paid}</td><td>${r.payType}</td></tr>`).join('') || '<tr><td colspan="6">Yo\'q</td></tr>'}</table><p>Jami: ${s.totalIncome} | Naqd: ${s.cashIn} | Xarajat: ${s.totalExp} | Sof naqd: <b>${s.netCash}</b></p><br/>`;
+      const html = `<html><head><meta charset="UTF-8" /></head><body><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${data.shifts.map(buildShiftExcel).join('')}</body></html>`;
       const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${hotel.name}_Hisobot_${data.selectedDate}.xls`; a.click();
     }
     function printDailyReport() {
       const data = getDailyReportData(), hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
       const win = window.open('', '_blank', 'width=950,height=750'); if (!win) return;
-      const buildShiftPrint = s => `<div style="border:1px solid #94a3b8;padding:12px;margin-bottom:14px;"><b>${s.shiftNum}-SMENA • Admin: ${s.adminName || '________'}</b> | Jami: ${formatMoney(s.totalIncome)} | Naqd: ${formatMoney(s.cashIn)} | Xarajat: −${formatMoney(s.totalExp)} | <b>Sof naqd: ${formatMoney(s.netCash)}</b><table border="1" cellspacing="0" cellpadding="5" style="width:100%;margin-top:8px;border-collapse:collapse;"><tr><th>Xona</th><th>Mehmon</th><th>Kirish → Chiqish</th><th>Narxi</th><th>To‘langan</th><th>Turi</th></tr>${s.rows.map(r => `<tr><td>№ ${r.room}</td><td>${r.guestName}</td><td>${r.datesText}</td><td>${formatMoney(r.rate)}</td><td>${formatMoney(r.paid)}</td><td>${r.payType}</td></tr>`).join('') || '<tr><td colspan="6">Yozuv yo‘q</td></tr>'}</table></div>`;
-      win.document.write(`<html><head><meta charset="UTF-8" /><title>${hotel.name}</title></head><body style="font-family:Arial;font-size:12px;"><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${buildShiftPrint(data.s1)}${buildShiftPrint(data.s2)}<script>window.onload=function(){window.print();};<\/script></body></html>`);
+      const buildShiftPrint = s => `<div style="border:1px solid #94a3b8;padding:12px;margin-bottom:14px;"><b>${s.shiftNum}-SMENA (${s.startTime} – ${s.endTime}) • Admin: ${s.adminName || '________'}</b> | Jami: ${formatMoney(s.totalIncome)} | Naqd: ${formatMoney(s.cashIn)} | Xarajat: −${formatMoney(s.totalExp)} | <b>Sof naqd: ${formatMoney(s.netCash)}</b><table border="1" cellspacing="0" cellpadding="5" style="width:100%;margin-top:8px;border-collapse:collapse;"><tr><th>Xona</th><th>Mehmon</th><th>Kirish → Chiqish</th><th>Narxi</th><th>To‘langan</th><th>Turi</th></tr>${s.rows.map(r => `<tr><td>№ ${r.room}</td><td>${r.guestName}</td><td>${r.datesText}</td><td>${formatMoney(r.rate)}</td><td>${formatMoney(r.paid)}</td><td>${r.payType}</td></tr>`).join('') || '<tr><td colspan="6">Yozuv yo‘q</td></tr>'}</table></div>`;
+      win.document.write(`<html><head><meta charset="UTF-8" /><title>${hotel.name}</title></head><body style="font-family:Arial;font-size:12px;"><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${data.shifts.map(buildShiftPrint).join('')}<script>window.onload=function(){window.print();};<\/script></body></html>`);
       win.document.close();
     }
 
