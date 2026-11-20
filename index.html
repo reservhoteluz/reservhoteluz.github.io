@@ -1280,9 +1280,11 @@
       return Boolean(currentUser && (currentUser.isCeo || currentUser.isOwner || currentUser.role === 'Admin'));
     }
     function storageKey(s) { return `rh_${currentHotelId}_${s}`; }
+    function getFallbackRooms() { return currentHotelId === DEFAULT_HOTEL_ID ? DEFAULT_FAYZ_ROOMS : DEFAULT_NEW_HOTEL_ROOMS; }
 
     function loadLocalHotelCache() {
-      rooms = JSON.parse(localStorage.getItem(storageKey('rooms'))) || (currentHotelId === DEFAULT_HOTEL_ID ? DEFAULT_FAYZ_ROOMS : DEFAULT_NEW_HOTEL_ROOMS);
+      const cachedRooms = JSON.parse(localStorage.getItem(storageKey('rooms')));
+      rooms = (Array.isArray(cachedRooms) && cachedRooms.length > 0) ? cachedRooms : getFallbackRooms();
       bookings = JSON.parse(localStorage.getItem(storageKey('bookings'))) || [];
       allowedUsers = JSON.parse(localStorage.getItem(storageKey('users'))) || [];
       dailyExpenses = JSON.parse(localStorage.getItem(storageKey('daily_expenses'))) || [];
@@ -2350,6 +2352,212 @@
       win.document.write(`<html><head><meta charset="UTF-8" /><title>${hotel.name}</title></head><body style="font-family:Arial;font-size:12px;"><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${data.shifts.map(buildShiftPrint).join('')}<script>window.onload=function(){window.print();};<\/script></body></html>`);
       win.document.close();
     }
+
+
+    function refreshAllViews(includeConfig = true) {
+      const activeRooms = (Array.isArray(rooms) && rooms.length > 0) ? rooms : getFallbackRooms();
+      rooms = activeRooms;
+      const totalBeds = activeRooms.reduce((s, r) => s + (Number(r.beds) || 0), 0);
+      document.getElementById('headerCapacityBadge').textContent = `${activeRooms.length} xona • ${totalBeds} o‘rin`;
+      updateKpis(); renderMatrix();
+      if (!isTypingInDailyTab()) renderDailyReport();
+      renderBookingsTable(); renderFinance();
+      if (includeConfig) { renderRoomsConfig(); renderAllowedUsers(); if (isMasterAdmin()) renderSaasHotels(); }
+    }
+
+    function switchTab(tabName) {
+      if (tabName === 'users' && !isHotelOwnerOrMaster()) return;
+      if (tabName === 'saas' && !isMasterAdmin()) return;
+      activeTabName = tabName;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-[#5b54e6]', 'text-white');
+        btn.classList.add(btn.id === 'nav-saas' ? 'text-amber-300' : 'text-indigo-100/85');
+      });
+      const activeBtn = document.getElementById('nav-' + tabName);
+      activeBtn.classList.add('bg-[#5b54e6]', 'text-white'); activeBtn.classList.remove('text-indigo-100/85', 'text-amber-300');
+      const titles = { matrix: 'Shaxmatka kalendari', daily: 'Kunlik hisobot', bookings: 'Bronlar va Mehmonlar', finance: 'Moliya va Kassa', rates: 'Xonalar va Narxlar', users: 'Xodimlar ruxsati', saas: 'Master-Admin • Mijozlar' };
+      document.getElementById('pageTitle').textContent = titles[tabName];
+      if (tabName === 'daily') syncDailyInTimesLive(false);
+      refreshAllViews(true);
+    }
+
+    let isSidebarCollapsed = false;
+
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      if (!sb) return;
+      if (sb.classList.contains('hidden')) {
+        sb.classList.remove('hidden'); sb.classList.add('flex'); isSidebarCollapsed = false;
+        sb.classList.remove('w-20'); sb.classList.add('w-64');
+        sb.querySelectorAll('nav button span:last-child, #activeHotelNameSidebar, #activeHotelMetaSidebar, #syncText, #currentUserName, #currentUserRole, aside > div:last-child button span:last-child, .rh-brand-text').forEach(el => el.classList.remove('hidden'));
+        if (typeof isMasterAdmin === 'function' && isMasterAdmin()) {
+          const chev = document.getElementById('switcherChevron'); if (chev) chev.classList.remove('hidden');
+        }
+        sb.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('justify-center', 'px-2'); btn.classList.add('px-3', 'gap-3'); });
+        const swBtn = document.getElementById('hotelSwitcherBtn'); if (swBtn) swBtn.classList.remove('justify-center', 'px-1.5');
+        if (typeof renderMatrix === 'function') setTimeout(() => renderMatrix(), 120);
+        return;
+      }
+      isSidebarCollapsed = !isSidebarCollapsed;
+      if (isSidebarCollapsed) {
+        sb.classList.remove('w-64'); sb.classList.add('w-20');
+        sb.querySelectorAll('nav button span:last-child, #activeHotelNameSidebar, #activeHotelMetaSidebar, #switcherChevron, #syncText, #currentUserName, #currentUserRole, aside > div:last-child button span:last-child, .rh-brand-text').forEach(el => el.classList.add('hidden'));
+        sb.querySelectorAll('nav button').forEach(btn => { btn.classList.add('justify-center', 'px-2'); btn.classList.remove('px-3', 'gap-3'); });
+        const swBtn = document.getElementById('hotelSwitcherBtn'); if (swBtn) swBtn.classList.add('justify-center', 'px-1.5');
+        const menu = document.getElementById('hotelSwitcherMenu'); if (menu) menu.classList.add('hidden');
+      } else {
+        sb.classList.remove('w-20'); sb.classList.add('w-64');
+        sb.querySelectorAll('nav button span:last-child, #activeHotelNameSidebar, #activeHotelMetaSidebar, #syncText, #currentUserName, #currentUserRole, aside > div:last-child button span:last-child, .rh-brand-text').forEach(el => el.classList.remove('hidden'));
+        if (typeof isMasterAdmin === 'function' && isMasterAdmin()) {
+          const chev = document.getElementById('switcherChevron'); if (chev) chev.classList.remove('hidden');
+        }
+        sb.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('justify-center', 'px-2'); btn.classList.add('px-3', 'gap-3'); });
+        const swBtn = document.getElementById('hotelSwitcherBtn'); if (swBtn) swBtn.classList.remove('justify-center', 'px-1.5');
+      }
+      if (typeof renderMatrix === 'function') setTimeout(() => renderMatrix(), 120);
+    }
+
+    function updateKpis() {
+      const today = toIsoDate(new Date());
+      document.getElementById('kpiStaying').textContent = bookings.filter(b => b.status === 'Band').length;
+      // Faqat bugungi sanaga olingan va hali Check-in ("Band") qilinmagan bronlar ("Bron")
+      document.getElementById('kpiArrivals').textContent = bookings.filter(
+        b => toIsoDate(b.checkIn) === today && b.status === 'Bron'
+      ).length;
+      document.getElementById('kpiDepartures').textContent = bookings.filter(b => toIsoDate(b.checkOut) === today && b.status === 'Band').length;
+      document.getElementById('kpiDebtors').textContent = bookings.filter(b => isBookingInDebt(b)).length;
+    }
+
+    function shiftStartDate(days) { document.getElementById('matrixStartDate').value = addDays(document.getElementById('matrixStartDate').value, days); renderMatrix(); }
+    function jumpToToday() { document.getElementById('matrixStartDate').value = addDays(toIsoDate(new Date()), -3); renderMatrix(); }
+    function changeMatrixScale() { currentMatrixScale = parseInt(document.getElementById('matrixScale').value) || 64; renderMatrix(); }
+    function getFilteredBookings() { const st = document.getElementById('filterStatus').value; return bookings.filter(b => st === 'ALL' || b.status === st); }
+
+    function renderMatrix() {
+      const startStr = document.getElementById('matrixStartDate').value || toIsoDate(new Date());
+      const daysCount = parseInt(document.getElementById('matrixDaysCount').value, 10) || 90;
+      const scale = currentMatrixScale, todayStr = toIsoDate(new Date()), filteredBookings = getFilteredBookings();
+      const dates = [], uzDays = ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'], uzMonths = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
+      for (let i = 0; i < daysCount; i++) {
+        const dStr = addDays(startStr, i), dObj = new Date(dStr + 'T00:00:00');
+        dates.push({ iso: dStr, dayNum: String(dObj.getDate()).padStart(2, '0'), weekDay: uzDays[dObj.getDay()], isWeekend: dObj.getDay() === 0 || dObj.getDay() === 6, monthLabel: `${uzMonths[dObj.getMonth()]} ${dObj.getFullYear()}`, isToday: dStr === todayStr });
+      }
+      const monthGroups = [];
+      dates.forEach(dt => { if (!monthGroups.length || monthGroups[monthGroups.length - 1].label !== dt.monthLabel) monthGroups.push({ label: dt.monthLabel, span: 1 }); else monthGroups[monthGroups.length - 1].span++; });
+
+      let theadHtml = `<tr><th rowspan="2" class="sticky-corner bg-[#131b3a] text-white text-xs font-bold px-3 text-left border-r border-white/15" style="width:155px; min-width:155px;">Xona / Qavat</th><th rowspan="2" class="sticky-corner-clean bg-[#131b3a] text-white text-xs font-bold px-2 text-center border-r border-white/15" style="width:75px; min-width:75px;">Holati</th>`;
+      monthGroups.forEach(mg => { theadHtml += `<th colspan="${mg.span}" class="sticky-header-top bg-[#1b2554] text-indigo-200 text-xs font-bold py-1.5 px-2 border-r border-white/15 border-b border-white/15 text-center">${mg.label}</th>`; });
+      theadHtml += `</tr><tr>`;
+      dates.forEach(dt => {
+        const bgClass = dt.isToday ? 'bg-[#5b54e6] text-white' : (dt.isWeekend ? 'bg-[#f5f6ff] text-rose-600' : 'bg-[#f8f9ff] text-[#131b3a]');
+        theadHtml += `<th class="sticky-header-top ${bgClass} border-r border-b border-slate-300 py-1 text-center" style="top:28px; width:${scale}px; min-width:${scale}px; max-width:${scale}px;"><div class="text-[10px] font-semibold opacity-80">${dt.weekDay}</div><div class="text-xs font-extrabold">${dt.dayNum}</div></th>`;
+      });
+      document.getElementById('matrixHead').innerHTML = theadHtml + `</tr>`;
+
+      const floors = [...new Set(rooms.map(r => r.floor || '1-etaj'))];
+      let tbodyHtml = '';
+      const viewStartMs = getLocalMs(dates[0].iso, '00:00'), viewEndMs = getLocalMs(addDays(dates[dates.length - 1].iso, 1), '00:00'), msPerDay = 86400000, todayPct = getTodayTimePercent();
+
+      floors.forEach(fl => {
+        const floorRooms = rooms.filter(r => (r.floor || '1-etaj') === fl);
+        tbodyHtml += `<tr class="bg-[#f2f4ff]"><td class="sticky-col-room bg-[#f2f4ff] font-bold text-xs text-[#131b3a] px-3 py-2 border-b border-slate-300">▼ ${fl} (${floorRooms.length} ta xona)</td><td class="sticky-col-clean bg-[#f2f4ff] border-b border-slate-300"></td>`;
+        dates.forEach(dt => { const freeCount = floorRooms.filter(r => !isRoomOccupiedOnDate(r.id, dt.iso, bookings)).length; tbodyHtml += `<td class="text-center text-[10px] font-bold text-slate-600 border-r border-b border-slate-300 py-1.5" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;">${freeCount} bo‘sh</td>`; });
+        tbodyHtml += `</tr>`;
+
+        floorRooms.forEach(room => {
+          const cleanBadge = getRoomStatusBadgeHtml(room);
+          tbodyHtml += `<tr><td class="sticky-col-room px-3 py-1.5 border-b border-slate-200"><div class="flex items-center justify-between"><span class="font-extrabold text-[#131b3a] text-xs">№ ${room.id}</span><span class="text-[10px] text-slate-400 font-medium">${room.beds} o‘rin</span></div></td><td class="sticky-col-clean text-center border-b border-slate-200">${cleanBadge}</td>`;
+          dates.forEach(dt => {
+            const cellClasses = ['day-cell']; if (dt.isWeekend) cellClasses.push('weekend'); if (dt.isToday) cellClasses.push('today-col');
+            let barHtml = '';
+            filteredBookings.filter(b => b.room === room.id).forEach(b => {
+              const bStartMs = getLocalMs(b.checkIn, b.checkInTime || '14:00'), bEndMs = getLocalMs(b.checkOut, b.checkOutTime || '12:00');
+              if (bEndMs <= viewStartMs || bStartMs >= viewEndMs) return;
+              const effectiveStartStr = (b.checkIn < dates[0].iso) ? dates[0].iso : b.checkIn;
+              if (effectiveStartStr === dt.iso) {
+                const drawStartMs = Math.max(bStartMs, viewStartMs), drawEndMs = Math.min(bEndMs, viewEndMs), cellStartMs = getLocalMs(effectiveStartStr, '00:00');
+                const startOffsetPx = ((drawStartMs - cellStartMs) / msPerDay) * scale, widthPx = Math.max(20, (((drawEndMs - drawStartMs) / msPerDay) * scale) - 2);
+                const total = Number(b.total) || 0, paid = Number(b.paid) || 0, inDebt = isBookingInDebt(b);
+                let barClass = 'bar-paid';
+                if (b.status === 'Bekor qilingan') barClass = 'bar-canceled';
+                else if (b.status === 'Chiqdi') barClass = 'bar-out';
+                else if (b.status === 'Bron') barClass = 'bar-booked';
+                else if (inDebt && paid <= 0) barClass = 'bar-debt';
+                else if (inDebt && paid > 0) barClass = 'bar-partial';
+                const debtTag = (b.status !== 'Bekor qilingan' && inDebt) ? ` -${Math.round((total - paid)/1000)}k` : '';
+                const safeName = b.guestName || 'Mehmon', displayLabel = b.status === 'Bekor qilingan' ? `✕ ${safeName}` : safeName;
+                barHtml += `<div onclick="event.stopPropagation(); openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}" class="booking-bar ${barClass}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span><span class="text-[9px] opacity-90 shrink-0 font-bold">${debtTag}</span></div>`;
+              }
+            });
+            const todayLine = dt.isToday ? `<div class="today-line" style="left:${todayPct}%;"></div>` : '';
+            tbodyHtml += `<td class="${cellClasses.join(' ')}" data-room="${room.id}" data-date="${dt.iso}" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;" onmousedown="startCellDrag('${room.id}', '${dt.iso}')" onmouseenter="moveCellDrag('${room.id}', '${dt.iso}')" onmouseup="endCellDrag('${room.id}', '${dt.iso}')">${todayLine}${barHtml}</td>`;
+          });
+          tbodyHtml += `</tr>`;
+        });
+      });
+      document.getElementById('matrixBody').innerHTML = tbodyHtml;
+
+      let tfootHtml = `<tr><td colspan="2" class="sticky-col-room sticky-footer-bottom font-bold text-xs text-[#131b3a] px-3 py-2 border-r-2 border-slate-400">Band xonalar (Jami: ${rooms.length})</td>`;
+      dates.forEach(dt => {
+        const occ = rooms.filter(r => isRoomOccupiedOnDate(r.id, dt.iso, bookings)).length, pct = rooms.length ? Math.round((occ / rooms.length) * 100) : 0;
+        const bg = dt.isToday ? 'bg-[#5b54e6]/15 text-[#5b54e6]' : 'bg-[#f8f9ff] text-[#131b3a]';
+        tfootHtml += `<td class="sticky-footer-bottom ${bg} text-center border-r border-slate-300 py-1.5" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;"><div class="text-[11px] font-extrabold">${occ} ta</div><div class="text-[10px] text-slate-500">${pct}%</div></td>`;
+      });
+      document.getElementById('matrixFoot').innerHTML = tfootHtml + `</tr>`;
+    }
+
+    function addNewRoom(e) {
+      e.preventDefault();
+      const floor = document.getElementById('newRoomFloor').value.trim() || '1-etaj', id = document.getElementById('newRoomId').value.trim();
+      const name = document.getElementById('newRoomType').value.trim() || 'Standard', beds = Number(document.getElementById('newRoomBeds').value) || 2, price = Number(document.getElementById('newRoomPrice').value) || 250000;
+      if (!id || rooms.some(r => String(r.id).toLowerCase() === id.toLowerCase())) { alert(`№ ${id} xonasi mavjud yoki noto‘g‘ri!`); return; }
+      rooms.push({ id, floor, name, beds, price, clean: 'Toza' });
+      saveAllLocal(); populateRoomSelect(); refreshAllViews(true); pushAllToCloud(false);
+      document.getElementById('newRoomId').value = '';
+    }
+    function deleteRoomItem(idx) {
+      const target = rooms[idx]; if (!target || !confirm(`№ ${target.id} xonasini o‘chirmoqchimisiz?`)) return;
+      rooms.splice(idx, 1); saveAllLocal(); populateRoomSelect(); refreshAllViews(true); pushAllToCloud(false);
+    }
+    function renderRoomsConfig() {
+      const hotel = saasRegistry.hotels[currentHotelId] || { name: 'Mehmonxona' };
+      document.getElementById('roomsConfigHeaderTitle').textContent = `${hotel.name} — ${rooms.length} ta Xona Ro‘yxati va Tariflar`;
+      document.getElementById('roomsConfigBody').innerHTML = rooms.map((r, idx) => `<tr>
+        <td class="p-3"><input type="text" id="rc_floor_${idx}" value="${r.floor || '1-etaj'}" class="px-2.5 py-1 border border-slate-200 rounded w-28 font-semibold text-slate-600" /></td>
+        <td class="p-3 font-extrabold text-[#131b3a]">№ ${r.id}</td>
+        <td class="p-3"><input type="text" id="rc_name_${idx}" value="${r.name}" class="px-2.5 py-1 border border-slate-200 rounded w-44" /></td>
+        <td class="p-3"><input type="number" id="rc_beds_${idx}" value="${r.beds}" min="1" max="20" class="px-2.5 py-1 border border-slate-200 rounded w-16 font-bold" /></td>
+        <td class="p-3"><input type="number" id="rc_price_${idx}" value="${r.price}" step="10000" class="px-2.5 py-1 border border-slate-200 rounded w-32 font-bold text-[#5b54e6]" /></td>
+        <td class="p-3">${getRoomStatusBadgeHtml(r)}</td>
+        <td class="p-3 text-right"><button type="button" onclick="deleteRoomItem(${idx})" class="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px]">🗑 O‘chirish</button></td>
+      </tr>`).join('');
+    }
+    function saveRoomRates() {
+      rooms.forEach((r, idx) => { r.floor = document.getElementById(`rc_floor_${idx}`).value.trim() || r.floor; r.name = document.getElementById(`rc_name_${idx}`).value.trim() || r.name; r.beds = Number(document.getElementById(`rc_beds_${idx}`).value) || r.beds; r.price = Number(document.getElementById(`rc_price_${idx}`).value) || r.price; });
+      saveAllLocal(); populateRoomSelect(); refreshAllViews(false); pushAllToCloud(false); alert('Barcha xonalar va narxlar saqlandi!');
+    }
+
+    function openCancelModal() {
+      const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
+      document.getElementById('cancelByInput').value = currentUser ? currentUser.name : '';
+      document.getElementById('cancelReasonInput').value = b.cancelReason || '';
+      document.getElementById('cancelModal').classList.remove('hidden');
+    }
+    function closeCancelModal() { document.getElementById('cancelModal').classList.add('hidden'); }
+    function confirmCancelBooking(e) {
+      e.preventDefault();
+      const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
+      b.status = 'Bekor qilingan'; b.canceledBy = document.getElementById('cancelByInput').value.trim(); b.cancelReason = document.getElementById('cancelReasonInput').value.trim(); b.canceledAt = `${toIsoDate(new Date())} ${getCurrentTimeStr()}`; recordAuditAction('Bron bekor qilindi', `№ ${b.room} • ${b.guestName || 'Mehmon'} — Sabab: ${b.cancelReason}`);
+      const r = rooms.find(x => x.id === b.room);
+      if (r && !isRoomCheckedInToday(b.room) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
+      saveAllLocal(); closeCancelModal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
+    }
+
+    function shiftDailyDate(days) { const next = addDays(document.getElementById('dailyReportDate').value || toIsoDate(new Date()), days); document.getElementById('dailyReportDate').value = next; syncDailyFormDefaultDates(next, true); renderDailyReport(); }
+    function jumpDailyToday() { const t = toIsoDate(new Date()); document.getElementById('dailyReportDate').value = t; syncDailyFormDefaultDates(t, true); renderDailyReport(); }
+    function selectDailyDate(iso) { document.getElementById('dailyReportDate').value = iso; syncDailyFormDefaultDates(iso, true); renderDailyReport(); }
 
     function isRoomOccupiedOnDate(roomId, dateIso, list) { return list.some(b => b.room === roomId && b.status !== 'Chiqdi' && b.status !== 'Bekor qilingan' && b.checkIn <= dateIso && b.checkOut > dateIso); }
     function toggleRoomClean(roomId) {
