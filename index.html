@@ -36,6 +36,8 @@
     .day-cell:hover { background-color: #eef2ff; }
     .day-cell.weekend { background-color: #f8f9ff; }
     .day-cell.today-col { background-color: #e6eaff; }
+    .day-cell.past-col { cursor: not-allowed; background-color: #f8fafc; }
+    .day-cell.past-col:hover { background-color: #f1f5f9; }
     .day-cell.drag-selected { background-color: rgba(91, 84, 230, 0.08) !important; }
     .drag-preview-bar {
       position: absolute;
@@ -2529,7 +2531,7 @@
           const cleanBadge = getRoomStatusBadgeHtml(room);
           tbodyHtml += `<tr><td class="sticky-col-room px-3 py-1.5 border-b border-slate-200"><div class="flex items-center justify-between"><span class="font-extrabold text-[#131b3a] text-xs">№ ${room.id}</span><span class="text-[10px] text-slate-400 font-medium">${room.beds} o‘rin</span></div></td><td class="sticky-col-clean text-center border-b border-slate-200">${cleanBadge}</td>`;
           dates.forEach(dt => {
-            const cellClasses = ['day-cell']; if (dt.isWeekend) cellClasses.push('weekend'); if (dt.isToday) cellClasses.push('today-col');
+            const cellClasses = ['day-cell']; if (dt.isWeekend) cellClasses.push('weekend'); if (dt.isToday) cellClasses.push('today-col'); if (dt.iso < todayStr) cellClasses.push('past-col');
             let barHtml = '';
             filteredBookings.filter(b => b.room === room.id).forEach(b => {
               const bStartMs = getLocalMs(b.checkIn, b.checkInTime || '14:00'), bEndMs = getLocalMs(b.checkOut, b.checkOutTime || '12:00');
@@ -2792,9 +2794,11 @@
       e.preventDefault();
       const b = bookings.find(x => x.id === draggedBookingId);
       if (!b) return;
+      const todayStr = toIsoDate(new Date());
       const nights = Math.max(1, Number(b.nights) || diffNights(b.checkIn, b.checkOut));
       const newOut = addDays(targetDateIso, nights);
-      const conflict = checkOverbooking(targetRoomId, targetDateIso, newOut, b.id);
+      const isPast = targetDateIso < todayStr;
+      const conflict = isPast || Boolean(checkOverbooking(targetRoomId, targetDateIso, newOut, b.id));
       e.dataTransfer.dropEffect = conflict ? 'none' : 'move';
       e.currentTarget.classList.remove('drop-target-valid', 'drop-target-invalid');
       e.currentTarget.classList.add(conflict ? 'drop-target-invalid' : 'drop-target-valid');
@@ -2820,6 +2824,11 @@
         return;
       }
 
+      const todayStr = toIsoDate(new Date());
+      if (targetDateIso < todayStr) {
+        alert('⛔ O‘tgan sanalarga bronni ko‘chirib bo‘lmaydi!');
+        return;
+      }
       const nights = Math.max(1, Number(b.nights) || diffNights(b.checkIn, b.checkOut));
       const newCheckIn = targetDateIso;
       const newCheckOut = addDays(targetDateIso, nights);
@@ -2857,9 +2866,36 @@
       pushAllToCloud(false);
     }
 
+    function isCellBlockedForNewBooking(roomId, dateIso) {
+      const todayStr = toIsoDate(new Date());
+      // 1. O'tgan sanalarga (real-time chizig'idan ortda qolgan kunlarga) bron qo'yib bo'lmaydi
+      if (dateIso < todayStr) return true;
+      // 2. Bron, Band va Chiqdi (Check-out) turgan kataklarga ustma-ust tortib bo'lmaydi
+      return bookings.some(b => {
+        if (b.room !== roomId || b.status === 'Bekor qilingan') return false;
+        const cIn = toIsoDate(b.checkIn);
+        const cOut = toIsoDate(b.checkOut);
+        if (b.status === 'Chiqdi') {
+          return (cIn <= dateIso && cOut > dateIso) || cIn === dateIso;
+        }
+        return cIn <= dateIso && cOut > dateIso;
+      });
+    }
+
+    function isRangeBlockedForNewBooking(roomId, d1, d2) {
+      let cur = d1;
+      let guard = 0;
+      while (cur <= d2 && guard < 400) {
+        if (isCellBlockedForNewBooking(roomId, cur)) return true;
+        cur = addDays(cur, 1);
+        guard++;
+      }
+      return false;
+    }
+
     function startCellDrag(roomId, dateIso) {
-      // Band katak ustidan yangi bron boshlashni taqiqlash
-      if (isRoomOccupiedOnDate(roomId, dateIso, bookings)) return;
+      // O'tgan sana yoki band/bron/check-out katak ustidan yangi bron boshlashni taqiqlash
+      if (isCellBlockedForNewBooking(roomId, dateIso)) return;
       isDragging = true;
       dragRoomId = roomId;
       dragStartDate = dateIso;
@@ -2869,6 +2905,10 @@
 
     function moveCellDrag(roomId, dateIso) {
       if (!isDragging || roomId !== dragRoomId) return;
+      const d1 = dragStartDate <= dateIso ? dragStartDate : dateIso;
+      const d2 = dragStartDate <= dateIso ? dateIso : dragStartDate;
+      // Agar tortilayotgan oraliqda o'tgan sana yoki bron/band/chiqdi katak bo'lsa, undan o'tib ketmaydi
+      if (isRangeBlockedForNewBooking(roomId, d1, d2)) return;
       dragEndDate = dateIso;
       highlightDragCells();
     }
@@ -2879,6 +2919,7 @@
       clearDragPreview();
       const d1 = dragStartDate <= dragEndDate ? dragStartDate : dragEndDate;
       const d2 = dragStartDate <= dragEndDate ? dragEndDate : dragStartDate;
+      if (isRangeBlockedForNewBooking(dragRoomId, d1, d2)) return;
       const checkOut = addDays(d2, 1);
       const conflict = checkOverbooking(dragRoomId, d1, checkOut, null);
       if (conflict) {
