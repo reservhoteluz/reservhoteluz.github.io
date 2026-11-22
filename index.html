@@ -2268,6 +2268,7 @@
               <span class="px-2.5 py-1 rounded-lg bg-emerald-500/30">Naqd: <span id="s${n}Cash">0 so‘m</span></span>
               <span class="px-2.5 py-1 rounded-lg bg-rose-500/30">Xarajat: −<span id="s${n}Exp">0 so‘m</span></span>
               <span class="px-2.5 py-1 rounded-lg bg-white text-emerald-700 font-extrabold">Sof naqd: <span id="s${n}NetCash">0 so‘m</span></span>
+              <button type="button" onclick="event.stopPropagation(); printSingleShiftReport(${n})" class="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/35 text-white font-extrabold transition" title="Faqat ${n}-smena hisobotini chop etish">🖨️ Print (${n}-smena)</button>
               <span id="shiftCollapseIcon_${n}" class="px-2.5 py-1 rounded-lg bg-white/20 text-white font-extrabold">${isCollapsed ? '▸ Ochish' : '▾ Ochiq'}</span>
             </div>
           </div>
@@ -2434,11 +2435,142 @@
       const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${hotel.name}_Hisobot_${data.selectedDate}.xls`; a.click();
     }
+    function buildShiftPrintHtml(s) {
+      const rowsHtml = s.rows.length
+        ? s.rows.map((r, idx) => `
+            <tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="font-weight:bold;">№ ${r.room}</td>
+              <td style="font-weight:bold;">${r.guestName}</td>
+              <td>${r.datesText}</td>
+              <td>${formatMoney(r.rate)}</td>
+              <td style="font-weight:bold;color:#047857;">${formatMoney(r.paid)}</td>
+              <td>${r.payType}</td>
+            </tr>`).join('')
+        : `<tr><td colspan="7" style="text-align:center;color:#64748b;padding:10px;">Ushbu smenada tushum yozuvlari yo‘q</td></tr>`;
+
+      const expRowsHtml = s.expenses.length
+        ? s.expenses.map((x, idx) => `
+            <tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="font-weight:bold;">${x.title}</td>
+              <td style="text-align:center;">${x.time || '-'}</td>
+              <td>${x.createdBy || '-'}</td>
+              <td style="font-weight:bold;color:#dc2626;text-align:right;">−${formatMoney(x.amount)}</td>
+            </tr>`).join('')
+        : `<tr><td colspan="5" style="text-align:center;color:#64748b;padding:8px;">Xarajatlar kiritilmagan</td></tr>`;
+
+      return `
+        <div class="shift-sheet" style="border:2px solid #1e293b;border-radius:10px;padding:16px;margin-bottom:22px;page-break-inside:avoid;">
+          <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #cbd5e1;padding-bottom:10px;margin-bottom:12px;">
+            <div>
+              <div style="font-size:17px;font-weight:800;color:#0f172a;">${s.shiftNum}-SMENA HISOBOTI</div>
+              <div style="font-size:12px;color:#475569;margin-top:2px;">Ish vaqti: <b>${s.startTime} – ${s.endTime}</b></div>
+            </div>
+            <div style="text-align:right;font-size:13px;">
+              <div>Mas’ul administrator: <b style="font-size:14px;">${s.adminName || '____________________'}</b></div>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:6px;">1. Qabul qilingan to‘lovlar va mehmonlar ro‘yxati:</div>
+          <table border="1" cellspacing="0" cellpadding="6" style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;">
+            <thead>
+              <tr style="background:#f1f5f9;">
+                <th style="width:32px;">№</th>
+                <th>Xona</th>
+                <th>Mehmon F.I.SH</th>
+                <th>Kirish → Chiqish</th>
+                <th>Xona narxi</th>
+                <th>To‘langan</th>
+                <th>To‘lov turi</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+
+          <div style="font-size:13px;font-weight:800;color:#991b1b;margin-bottom:6px;">2. Xarajatlar tafsiloti (Nima uchun sarflangani):</div>
+          <table border="1" cellspacing="0" cellpadding="6" style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
+            <thead>
+              <tr style="background:#fef2f2;color:#991b1b;">
+                <th style="width:32px;">№</th>
+                <th>Xarajat nomi / Sababi (Nimaga ishlatildi)</th>
+                <th style="width:70px;">Vaqti</th>
+                <th style="width:140px;">Kim yozdi</th>
+                <th style="width:140px;text-align:right;">Summa</th>
+              </tr>
+            </thead>
+            <tbody>${expRowsHtml}</tbody>
+          </table>
+
+          <div style="border-top:2px solid #0f172a;padding-top:12px;background:#f8fafc;border-radius:8px;padding:12px;">
+            <div style="font-size:13px;font-weight:800;text-transform:uppercase;color:#334155;margin-bottom:8px;">
+              ${s.shiftNum}-SMENA YAKUNIY HISOB-KITOBI:
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:15px;">
+              <tr>
+                <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#ffffff;">Jami tushum (Barcha to‘lovlar):</td>
+                <td style="padding:5px 10px;border:1px solid #cbd5e1;background:#ffffff;font-weight:800;text-align:right;font-size:16px;">${formatMoney(s.totalIncome)}</td>
+              </tr>
+              <tr>
+                <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#ffffff;">Karta / Click / Payme / QR / Bank:</td>
+                <td style="padding:5px 10px;border:1px solid #cbd5e1;background:#ffffff;font-weight:800;text-align:right;font-size:16px;color:#4338ca;">${formatMoney(s.nonCash)}</td>
+              </tr>
+              <tr>
+                <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#ffffff;">Naqd pul tushumi:</td>
+                <td style="padding:5px 10px;border:1px solid #cbd5e1;background:#ffffff;font-weight:800;text-align:right;font-size:16px;color:#047857;">${formatMoney(s.cashIn)}</td>
+              </tr>
+              <tr>
+                <td style="padding:5px 8px;border:1px solid #cbd5e1;background:#fef2f2;color:#991b1b;">Jami xarajatlar (Naqd puldan):</td>
+                <td style="padding:5px 10px;border:1px solid #cbd5e1;background:#fef2f2;font-weight:800;text-align:right;font-size:16px;color:#dc2626;">−${formatMoney(s.totalExp)}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 10px;border:2px solid #047857;background:#ecfdf5;font-weight:800;font-size:16px;color:#065f46;">KASSADA QOLGAN SOF NAQD PUL:</td>
+                <td style="padding:8px 12px;border:2px solid #047857;background:#ecfdf5;font-weight:900;text-align:right;font-size:19px;color:#047857;">${formatMoney(s.netCash)}</td>
+              </tr>
+            </table>
+            <div style="display:flex;justify-content:space-between;margin-top:16px;font-size:12px;color:#334155;">
+              <div>Topshirdi (${s.adminName || 'Admin'}): ___________________</div>
+              <div>Qabul qildi: ___________________</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function printSingleShiftReport(shiftNum) {
+      const data = getDailyReportData();
+      const hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
+      const targetShift = data.shifts.find(x => x.shiftNum === shiftNum);
+      if (!targetShift) return;
+      const win = window.open('', '_blank', 'width=950,height=780');
+      if (!win) return;
+      win.document.write(`<html><head><meta charset="UTF-8" /><title>${hotel.name} — ${shiftNum}-smena (${data.selectedDate})</title></head><body style="font-family:Arial,sans-serif;font-size:12px;padding:14px;color:#0f172a;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h2 style="margin:0;font-size:18px;">${hotel.name} — Kunlik Smena Hisoboti</h2>
+          <div style="font-size:14px;font-weight:bold;">Sana: ${data.selectedDate}</div>
+        </div>
+        ${buildShiftPrintHtml(targetShift)}
+        <script>window.onload=function(){window.print();};<\/script>
+      </body></html>`);
+      win.document.close();
+    }
+
     function printDailyReport() {
       const data = getDailyReportData(), hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
-      const win = window.open('', '_blank', 'width=950,height=750'); if (!win) return;
-      const buildShiftPrint = s => `<div style="border:1px solid #94a3b8;padding:12px;margin-bottom:14px;"><b>${s.shiftNum}-SMENA (${s.startTime} – ${s.endTime}) • Admin: ${s.adminName || '________'}</b> | Jami: ${formatMoney(s.totalIncome)} | Naqd: ${formatMoney(s.cashIn)} | Xarajat: −${formatMoney(s.totalExp)} | <b>Sof naqd: ${formatMoney(s.netCash)}</b><table border="1" cellspacing="0" cellpadding="5" style="width:100%;margin-top:8px;border-collapse:collapse;"><tr><th>Xona</th><th>Mehmon</th><th>Kirish → Chiqish</th><th>Narxi</th><th>To‘langan</th><th>Turi</th></tr>${s.rows.map(r => `<tr><td>№ ${r.room}</td><td>${r.guestName}</td><td>${r.datesText}</td><td>${formatMoney(r.rate)}</td><td>${formatMoney(r.paid)}</td><td>${r.payType}</td></tr>`).join('') || '<tr><td colspan="6">Yozuv yo‘q</td></tr>'}</table></div>`;
-      win.document.write(`<html><head><meta charset="UTF-8" /><title>${hotel.name}</title></head><body style="font-family:Arial;font-size:12px;"><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${data.shifts.map(buildShiftPrint).join('')}<script>window.onload=function(){window.print();};<\/script></body></html>`);
+      const activeShiftObj = data.shifts.find(x => x.shiftNum === activeDailyShift) || data.shifts[0];
+      const printAll = confirm(`Hozir ${activeShiftObj ? activeShiftObj.shiftNum + '-smena' : '1-smena'} ochiq.
+
+• OK — Barcha smenalarni umumiy chop etish
+• Bekor qilish (Cancel) — Faqat ${activeShiftObj ? activeShiftObj.shiftNum + '-smenaning' : '1-smenaning'} o‘zini chop etish`);
+      const shiftsToPrint = printAll ? data.shifts : (activeShiftObj ? [activeShiftObj] : data.shifts);
+      const win = window.open('', '_blank', 'width=950,height=780'); if (!win) return;
+      win.document.write(`<html><head><meta charset="UTF-8" /><title>${hotel.name} — Hisobot (${data.selectedDate})</title></head><body style="font-family:Arial,sans-serif;font-size:12px;padding:14px;color:#0f172a;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h2 style="margin:0;font-size:18px;">${hotel.name} — Kunlik Hisobot</h2>
+          <div style="font-size:14px;font-weight:bold;">Sana: ${data.selectedDate}</div>
+        </div>
+        ${shiftsToPrint.map(buildShiftPrintHtml).join('')}
+        <script>window.onload=function(){window.print();};<\/script>
+      </body></html>`);
       win.document.close();
     }
 
@@ -2668,16 +2800,22 @@
     function selectDailyDate(iso) { document.getElementById('dailyReportDate').value = iso; syncDailyFormDefaultDates(iso, true); renderDailyReport(); }
 
     function isRoomOccupiedOnDate(roomId, dateIso, list) {
+      // Mehmonxona hisob-kitob kuni: tanlangan sana 12:00 dan keyingi kun 12:00 gacha.
+      // Ya'ni 23.11.2026 soat 12:00 gacha kirgan mehmonlar 22.11.2026 hisobiga kiradi;
+      // 23.11.2026 hisobi esa soat 12:00 dan keyin boshlanadi.
+      const dayStartMs = getLocalMs(dateIso, '12:00');
+      const dayEndMs = getLocalMs(addDays(dateIso, 1), '12:00');
       return list.some(b => {
         if (b.room !== roomId || b.status === 'Bekor qilingan') return false;
         const cIn = toIsoDate(b.checkIn);
         const cOut = toIsoDate(b.checkOut);
         if (!cIn || !cOut) return false;
-        // Chiqdi (Check-out) bo'lgan bronlar ham yashab o'tgan tunlari uchun bandlik foizida saqlanadi
-        if (cIn <= dateIso && cOut > dateIso) return true;
-        // Bir kun ichida kirib-chiqib ketgan (day-use) mehmon ham o'sha kun statistikasida qoladi
-        if (b.status === 'Chiqdi' && cIn === cOut && cIn === dateIso) return true;
-        return false;
+        const bStartMs = getLocalMs(cIn, b.checkInTime || '14:00');
+        let bEndMs = getLocalMs(cOut, b.checkOutTime || '12:00');
+        if (bEndMs <= bStartMs) {
+          bEndMs = bStartMs + 60000;
+        }
+        return bStartMs < dayEndMs && bEndMs > dayStartMs;
       });
     }
     function toggleRoomClean(roomId) {
@@ -3726,6 +3864,10 @@
         '◀ Oldingi': '◀ Назад',
         'Keyingi ▶': 'Вперёд ▶',
         '🖨️ Chop etish': '🖨️ Печать',
+        '🖨️ Print (1-smena)': '🖨️ Печать (1-смена)',
+        '🖨️ Print (2-smena)': '🖨️ Печать (2-смена)',
+        '🖨️ Print (3-smena)': '🖨️ Печать (3-смена)',
+        '🖨️ Print (4-smena)': '🖨️ Печать (4-смена)',
         'Jami kunlik tushum (Barcha smenalar)': 'Общая выручка за день (Все смены)',
         '💵 Jami Naqd pul tushumi': '💵 Всего наличными',
         'Barcha smenalar bo‘yicha naqd pul': 'Наличные по всем сменам',
