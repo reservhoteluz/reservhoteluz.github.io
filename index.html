@@ -149,7 +149,203 @@
     }
 
 
-    .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #5b54e6; z-index: 10; pointer-events: none; opacity: 0.72; }
+    .today-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, #5b54e6 0%, #818cf8 100%);
+      z-index: 12;
+      pointer-events: none;
+      box-shadow: 0 0 8px rgba(91, 84, 230, 0.55);
+    }
+    .today-line::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: -3.5px;
+      width: 9px;
+      height: 9px;
+      border-radius: 9999px;
+      background: #5b54e6;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 0 0 0 rgba(91, 84, 230, 0.7);
+      animation: liveBeaconPulse 2s infinite;
+    }
+    @keyframes liveBeaconPulse {
+      0% { box-shadow: 0 0 0 0 rgba(91, 84, 230, 0.75); }
+      70% { box-shadow: 0 0 0 7px rgba(91, 84, 230, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(91, 84, 230, 0); }
+    }
+    .today-clock-badge {
+      position: sticky;
+      top: 52px;
+      z-index: 35;
+      pointer-events: none;
+    }
+
+    /* Qarzdor kataklar uchun yumshoq nafas oluvchi ogohlantirish nuri */
+    @keyframes debtGlowPulse {
+      0%, 100% { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25); }
+      50% { box-shadow: 0 0 14px 2px rgba(239, 68, 68, 0.62); }
+    }
+    .bar-debt {
+      animation: debtGlowPulse 2.4s ease-in-out infinite;
+    }
+
+    /* Glassmorphism & Premium Elevation */
+    header {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .booking-bar:hover {
+      box-shadow: 0 8px 20px -4px rgba(91, 84, 230, 0.42), 0 0 0 1.5px rgba(255, 255, 255, 0.55);
+    }
+
+    /* Tab almashganda silliq suzib chiqish */
+    @keyframes tabFadeSlideIn {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .tab-animate-in {
+      animation: tabFadeSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* O'ngdan silliq prujinasimon ochiluvchi Mehmon Kartasi (Spring Slide-Over) */
+    #guestDrawer {
+      transition: opacity 0.25s ease;
+    }
+    #guestDrawerPanel {
+      transform: translateX(100%);
+      transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #guestDrawer.drawer-open #guestDrawerPanel {
+      transform: translateX(0);
+    }
+
+    /* Zamonaviy Toast Bildirishnomalar */
+    #rhToastContainer {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      max-width: 360px;
+    }
+    @keyframes toastSlideIn {
+      0% { opacity: 0; transform: translateX(30px) scale(0.95); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes toastFadeOut {
+      0% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(24px); }
+    }
+    .rh-toast {
+      pointer-events: auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 15px;
+      border-radius: 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: 0 14px 32px -6px rgba(9, 13, 34, 0.28);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      animation: toastSlideIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .rh-toast.hiding {
+      animation: toastFadeOut 0.25s ease forwards;
+    }
+    .rh-toast-success { background: linear-gradient(135deg, rgba(16, 185, 129, 0.96), rgba(5, 150, 105, 0.96)); color: #fff; }
+    .rh-toast-error { background: linear-gradient(135deg, rgba(239, 68, 68, 0.96), rgba(185, 28, 28, 0.96)); color: #fff; }
+    .rh-toast-info { background: linear-gradient(135deg, rgba(19, 27, 58, 0.96), rgba(91, 84, 230, 0.96)); color: #fff; }
+
+    /* ==================== TUNGI SMENA REJIMI (DARK / NIGHT SHIFT MODE) ==================== */
+    body.dark-mode {
+      background: linear-gradient(160deg, #070b19 0%, #0b1024 55%, #111836 100%) !important;
+      color: #e2e8f0 !important;
+    }
+    body.dark-mode .flex-1.flex.flex-col.min-w-0 {
+      background: linear-gradient(160deg, #080c1d 0%, #0d132b 52%, #111836 100%) !important;
+    }
+    body.dark-mode header {
+      background: rgba(15, 22, 48, 0.88) !important;
+      border-color: rgba(91, 84, 230, 0.32) !important;
+    }
+    body.dark-mode #pageTitle,
+    body.dark-mode .text-\[\#131b3a\] {
+      color: #f1f5f9 !important;
+    }
+    body.dark-mode .text-slate-600,
+    body.dark-mode .text-slate-500,
+    body.dark-mode .text-slate-700 {
+      color: #94a3b8 !important;
+    }
+    body.dark-mode .bg-white,
+    body.dark-mode .bg-white\/95,
+    body.dark-mode .bg-\[\#f8f9ff\],
+    body.dark-mode .bg-\[\#f5f6ff\],
+    body.dark-mode .bg-\[\#f4f5ff\],
+    body.dark-mode .bg-\[\#f2f4ff\],
+    body.dark-mode .bg-\[\#f7f8ff\],
+    body.dark-mode .fin-kpi-card,
+    body.dark-mode .fin-chart-card,
+    body.dark-mode .shift-card {
+      background: #121a3a !important;
+      border-color: rgba(99, 102, 241, 0.25) !important;
+      color: #e2e8f0 !important;
+    }
+    body.dark-mode .matrix-container {
+      background: #0f1632 !important;
+      border-color: rgba(99, 102, 241, 0.3) !important;
+    }
+    body.dark-mode .sticky-col-room,
+    body.dark-mode .sticky-col-clean {
+      background: #131c40 !important;
+      border-color: rgba(99, 102, 241, 0.28) !important;
+    }
+    body.dark-mode .sticky-footer-bottom {
+      background: #16204a !important;
+      border-color: rgba(99, 102, 241, 0.35) !important;
+    }
+    body.dark-mode .day-cell {
+      border-color: rgba(148, 163, 184, 0.14) !important;
+      background-color: #0f1632;
+    }
+    body.dark-mode .day-cell.weekend {
+      background-color: #131b3d !important;
+    }
+    body.dark-mode .day-cell.today-col {
+      background-color: rgba(91, 84, 230, 0.18) !important;
+    }
+    body.dark-mode .day-cell.past-col {
+      background-color: #0b1024 !important;
+    }
+    body.dark-mode .day-cell:hover {
+      background-color: rgba(91, 84, 230, 0.26) !important;
+    }
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea {
+      background-color: #0b1024 !important;
+      color: #f8fafc !important;
+      border-color: rgba(99, 102, 241, 0.35) !important;
+    }
+    body.dark-mode table thead tr {
+      background-color: #18224a !important;
+      color: #e2e8f0 !important;
+    }
+    body.dark-mode table tbody tr:hover {
+      background-color: rgba(91, 84, 230, 0.15) !important;
+    }
+    body.dark-mode .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+    body.dark-mode .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+      border-color: rgba(148, 163, 184, 0.14) !important;
+    }
     
     .edit-input { width: 100%; border: 1px solid transparent; background: transparent; padding: 4px; border-radius: 4px; transition: 0.2s; }
     .edit-input:hover, .edit-input:focus { border-color: #cbd5e1; background: #fff; outline: none; }
@@ -487,6 +683,14 @@
           <div id="currentUserName" class="font-semibold text-white truncate">Admin</div>
           <div id="currentUserRole" class="text-[11px] text-indigo-200/70 truncate">Bosh Administrator</div>
         </div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button type="button" onclick="downloadFullBackupJson()" title="To'liq JSON zaxira nusxa yuklab olish" class="py-1.5 px-2 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-200 font-semibold text-center flex items-center justify-center gap-1 border border-indigo-400/20">
+            <span>💾</span> <span>Backup</span>
+          </button>
+          <button type="button" onclick="exportFullExcelArchive()" title="Barcha ma'lumotlarni Excel faylga eksport qilish" class="py-1.5 px-2 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 font-semibold text-center flex items-center justify-center gap-1 border border-emerald-400/20">
+            <span>📊</span> <span>Excel</span>
+          </button>
+        </div>
         <button onclick="logout()" class="w-full py-2 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-medium text-left flex items-center gap-2">
           <span>🚪</span> <span>Chiqish</span>
         </button>
@@ -521,6 +725,9 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <button type="button" id="themeToggleBtn" onclick="toggleDarkMode()" title="Kunduzgi / Tungi smena rejimi" class="p-2 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-bold transition">
+            🌙
+          </button>
           <div class="flex items-center gap-0.5 bg-[#f4f5ff] p-1 rounded-lg border border-[#d8defa] text-[11px] font-bold">
             <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2 py-1 rounded transition">UZ</button>
             <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-2 py-1 rounded transition">RU</button>
@@ -1098,8 +1305,15 @@
           <div><label class="block font-semibold text-slate-700 mb-1">Chiqish sanasi va vaqti *</label><div class="flex gap-2"><input type="date" id="formCheckOut" onchange="recalcBookingTotal()" required class="flex-1 min-w-0 px-2.5 py-2 border border-slate-300 rounded-lg font-semibold" /><input type="time" id="formCheckOutTime" value="12:00" required class="w-28 shrink-0 px-2.5 py-2 border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="sm:col-span-2"><label class="block font-semibold text-slate-700 mb-1">Mehmon F.I.SH *</label><input type="text" id="formGuestName" required placeholder="Karimov Anvar" class="w-full px-3 py-2 border border-slate-300 rounded-lg" /></div>
-          <div><label class="block font-semibold text-slate-700 mb-1">Telefon raqami</label><input type="text" id="formPhone" placeholder="+998 90 123 45 67" class="w-full px-3 py-2 border border-slate-300 rounded-lg" /></div>
+          <div class="sm:col-span-2 relative">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block font-semibold text-slate-700">Mehmon F.I.SH *</label>
+              <span id="returningGuestBadge" class="hidden px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-extrabold text-[10px]">⭐ Doimiy mehmon</span>
+            </div>
+            <input type="text" id="formGuestName" required autocomplete="off" oninput="handleGuestAutocomplete(this.value)" onfocus="handleGuestAutocomplete(this.value)" placeholder="Karimov Anvar (oldin kelgan bo‘lsa chiqadi)" class="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+            <div id="guestSuggestDropdown" class="hidden absolute left-0 right-0 top-[62px] z-50 bg-white border border-[#5b54e6]/40 rounded-xl shadow-xl max-h-48 overflow-y-auto divide-y divide-slate-100"></div>
+          </div>
+          <div><label class="block font-semibold text-slate-700 mb-1">Telefon raqami</label><input type="text" id="formPhone" oninput="handleGuestAutocomplete(this.value, true)" placeholder="+998 90 123 45 67" class="w-full px-3 py-2 border border-slate-300 rounded-lg" /></div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div><label class="block font-semibold text-slate-700 mb-1">Pasport / ID</label><input type="text" id="formPassport" placeholder="AA1234567" class="w-full px-3 py-2 border border-slate-300 rounded-lg" /></div>
@@ -1141,8 +1355,8 @@
   </div>
 
   <!-- MODAL 2: MEHMON KARTASI -->
-  <div id="guestDrawer" class="fixed inset-0 z-50 hidden bg-[#090d22]/50 backdrop-blur-xs flex justify-end">
-    <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between overflow-y-auto">
+  <div id="guestDrawer" onclick="if(event.target===this) closeGuestDrawer()" class="fixed inset-0 z-50 hidden bg-[#090d22]/50 backdrop-blur-xs flex justify-end">
+    <div id="guestDrawerPanel" class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between overflow-y-auto">
       <div>
         <div class="p-6 bg-gradient-to-r from-[#131b3a] to-[#5b54e6] text-white flex items-start justify-between">
           <div><span id="drawerStatusBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white">Band</span><h3 id="drawerGuestName" class="text-lg font-bold mt-2">Mehmon ismi</h3><p id="drawerRoomInfo" class="text-xs text-indigo-100 mt-0.5">Xona № 102</p></div>
@@ -1190,7 +1404,12 @@
           <div><span class="text-slate-500 font-semibold">Izoh:</span><p id="drawerNotes" class="mt-1 text-slate-700 bg-[#f5f6ff] p-3 rounded-lg border border-[#d8defa]">-</p></div>
         </div>
       </div>
-      <div id="drawerFooterActions" class="p-4 border-t border-slate-200 bg-[#f8f9ff] flex items-center justify-between gap-2">
+      <div class="px-4 pt-3 pb-1 border-t border-slate-200 bg-[#f8f9ff]">
+        <button type="button" onclick="printGuestReceipt()" class="w-full py-2.5 bg-gradient-to-r from-[#131b3a] to-[#5b54e6] hover:opacity-95 text-white font-bold rounded-xl text-xs shadow-xs flex items-center justify-center gap-1.5">
+          <span>🧾</span> <span>Kvitansiya (Chek) chiqarish</span>
+        </button>
+      </div>
+      <div id="drawerFooterActions" class="p-4 pt-2 bg-[#f8f9ff] flex items-center justify-between gap-2">
         <button id="drawerEditBtn" onclick="editCurrentDrawerBooking()" class="flex-1 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-[#131b3a] font-bold rounded-xl text-xs">✏️ Tahrirlash</button>
         <button id="drawerDeleteBtn" onclick="deleteCurrentDrawerBooking()" class="py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold rounded-xl text-xs">🗑 O‘chirish</button>
       </div>
@@ -1342,7 +1561,7 @@
 
     let currentUser = JSON.parse(sessionStorage.getItem('rh_saas_session')) || null;
     let currentHotelId = sessionStorage.getItem('rh_active_hotel') || DEFAULT_HOTEL_ID;
-    let rooms = [], bookings = [], allowedUsers = [], dailyExpenses = [], dailyManualEntries = [], dailyShiftAdmins = {}, auditLogs = [];
+    let rooms = [], bookings = [], allowedUsers = [], dailyExpenses = [], dailyManualEntries = [], dailyShiftAdmins = {}, dailyShiftLocks = {}, auditLogs = [];
     let activeDrawerBookingId = null, isSyncingNow = false, isPushingNow = false, lastLocalWriteAt = 0, activeTabName = 'matrix', isDragging = false, dragRoomId = null, dragStartDate = null, dragEndDate = null, payChartInstance = null, sourceChartInstance = null, dailyTrendChartInstance = null, currentMatrixScale = 64, activeDailyShift = 1, hotelShiftCount = 2;
 
     function isCeoCreator() {
@@ -1365,6 +1584,7 @@
       dailyExpenses = JSON.parse(localStorage.getItem(storageKey('daily_expenses'))) || [];
       dailyManualEntries = JSON.parse(localStorage.getItem(storageKey('daily_manual'))) || [];
       dailyShiftAdmins = JSON.parse(localStorage.getItem(storageKey('daily_shift_admins'))) || {};
+      dailyShiftLocks = JSON.parse(localStorage.getItem(storageKey('daily_shift_locks'))) || {};
       auditLogs = JSON.parse(localStorage.getItem(storageKey('audit_logs'))) || [];
       hotelShiftCount = Math.min(4, Math.max(1, Number(localStorage.getItem(storageKey('shift_count'))) || 2));
       if (upgradeLegacyUserPins()) saveAllLocal();
@@ -1377,6 +1597,7 @@
       localStorage.setItem(storageKey('daily_expenses'), JSON.stringify(dailyExpenses));
       localStorage.setItem(storageKey('daily_manual'), JSON.stringify(dailyManualEntries));
       localStorage.setItem(storageKey('daily_shift_admins'), JSON.stringify(dailyShiftAdmins));
+      localStorage.setItem(storageKey('daily_shift_locks'), JSON.stringify(dailyShiftLocks));
       localStorage.setItem(storageKey('audit_logs'), JSON.stringify(auditLogs));
       localStorage.setItem(storageKey('shift_count'), String(hotelShiftCount));
     }
@@ -1522,6 +1743,7 @@
           dailyExpenses = Array.isArray(data.dailyExpenses) ? data.dailyExpenses : (data.dailyExpenses ? Object.values(data.dailyExpenses) : []);
           dailyManualEntries = Array.isArray(data.dailyManualEntries) ? data.dailyManualEntries : (data.dailyManualEntries ? Object.values(data.dailyManualEntries) : []);
           dailyShiftAdmins = (data.dailyShiftAdmins && typeof data.dailyShiftAdmins === 'object') ? data.dailyShiftAdmins : {};
+          dailyShiftLocks = (data.dailyShiftLocks && typeof data.dailyShiftLocks === 'object') ? data.dailyShiftLocks : {};
           auditLogs = Array.isArray(data.auditLogs) ? data.auditLogs : (data.auditLogs ? Object.values(data.auditLogs) : []);
           if (data.hotelShiftCount) hotelShiftCount = Math.min(4, Math.max(1, Number(data.hotelShiftCount) || 2));
           const upgradedPins = upgradeLegacyUserPins();
@@ -1535,7 +1757,7 @@
           rooms = currentHotelId === DEFAULT_HOTEL_ID ? DEFAULT_FAYZ_ROOMS : DEFAULT_NEW_HOTEL_ROOMS;
           bookings = [];
           allowedUsers = hotelMeta ? [{ email: hotelMeta.ownerEmail, name: hotelMeta.ownerName, role: 'Admin', pin: hotelMeta.ownerPin, active: true, isOwner: true }] : [];
-          dailyExpenses = []; dailyManualEntries = []; dailyShiftAdmins = {}; auditLogs = [];
+          dailyExpenses = []; dailyManualEntries = []; dailyShiftAdmins = {}; dailyShiftLocks = {}; auditLogs = [];
           saveAllLocal();
           await pushAllToCloud(false);
         }
@@ -1556,7 +1778,7 @@
       try {
         await fetch(`${FIREBASE_DB_URL}/hotels/${currentHotelId}.json`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookings, rooms, users: allowedUsers, dailyExpenses, dailyManualEntries, dailyShiftAdmins, auditLogs, hotelShiftCount, updatedAt: new Date().toISOString() })
+          body: JSON.stringify({ bookings, rooms, users: allowedUsers, dailyExpenses, dailyManualEntries, dailyShiftAdmins, dailyShiftLocks, auditLogs, hotelShiftCount, updatedAt: new Date().toISOString() })
         });
         lastLocalWriteAt = Date.now();
         if (syncTextEl) syncTextEl.textContent = 'Firebase: Jonli ulangan ✓';
@@ -2268,14 +2490,19 @@
               <span class="px-2.5 py-1 rounded-lg bg-emerald-500/30">Naqd: <span id="s${n}Cash">0 so‘m</span></span>
               <span class="px-2.5 py-1 rounded-lg bg-rose-500/30">Xarajat: −<span id="s${n}Exp">0 so‘m</span></span>
               <span class="px-2.5 py-1 rounded-lg bg-white text-emerald-700 font-extrabold">Sof naqd: <span id="s${n}NetCash">0 so‘m</span></span>
+              <button type="button" id="shiftLockBtn_${n}" onclick="event.stopPropagation(); toggleShiftLock(${n})" class="px-2.5 py-1 rounded-lg bg-amber-400/90 hover:bg-amber-300 text-[#131b3a] font-extrabold transition">🔓 Smenani yopish</button>
               <button type="button" onclick="event.stopPropagation(); printSingleShiftReport(${n})" class="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/35 text-white font-extrabold transition" title="Faqat ${n}-smena hisobotini chop etish">🖨️ Print (${n}-smena)</button>
               <span id="shiftCollapseIcon_${n}" class="px-2.5 py-1 rounded-lg bg-white/20 text-white font-extrabold">${isCollapsed ? '▸ Ochish' : '▾ Ochiq'}</span>
             </div>
           </div>
           <div class="shift-accordion-body">
+            <div id="shiftLockedBanner_${n}" class="hidden px-4 py-2.5 bg-amber-50 border-b border-amber-200 text-amber-900 text-xs font-bold flex flex-wrap items-center justify-between gap-2">
+              <span id="shiftLockedBannerText_${n}">🔒 Ushbu smena yopilgan va qulflangan (Z-hisobot).</span>
+              <span class="text-[11px] font-normal text-amber-700">Faqat mehmonxona glavniy admini qayta ocha oladi</span>
+            </div>
             <div class="grid grid-cols-1 xl:grid-cols-3 divide-y xl:divide-y-0 xl:divide-x divide-slate-200">
               <div class="xl:col-span-2 flex flex-col">
-                <form onsubmit="addDailyManualEntry(event, ${n})" class="p-4 bg-[#f5f6ff] border-b border-[#d8defa] space-y-2.5 text-xs">
+                <form id="shiftEntryForm_${n}" onsubmit="addDailyManualEntry(event, ${n})" class="p-4 bg-[#f5f6ff] border-b border-[#d8defa] space-y-2.5 text-xs">
                   <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                     <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Xona № *</label><input type="text" id="manRoom_${n}" required placeholder="105" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-bold" /></div>
                     <div class="sm:col-span-2"><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Mehmon F.I.SH *</label><input type="text" id="manGuest_${n}" required placeholder="Mehmon nomi" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" /></div>
@@ -2295,7 +2522,7 @@
               </div>
               <div class="flex flex-col bg-rose-50/15">
                 <div class="p-3.5 border-b border-rose-100 bg-rose-50/50"><div class="font-bold text-rose-900 text-xs">💸 ${n}-smena Xarajatlari (Naqd puldan)</div></div>
-                <form onsubmit="addDailyExpense(event, ${n})" class="p-3.5 border-b border-slate-100 space-y-2 text-xs">
+                <form id="shiftExpenseForm_${n}" onsubmit="addDailyExpense(event, ${n})" class="p-3.5 border-b border-slate-100 space-y-2 text-xs">
                   <input type="text" id="expTitle_${n}" required placeholder="Nimaga ishlatildi?" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg" />
                   <div class="flex gap-2"><input type="number" id="expAmount_${n}" required min="1" placeholder="Summa (UZS)" class="flex-1 px-2.5 py-1.5 bg-white border border-rose-300 rounded-lg font-bold text-rose-700" /><button type="submit" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg">+ Yozish</button></div>
                 </form>
@@ -2322,9 +2549,98 @@
       renderShiftQuickTabs();
     }
 
+    function isShiftLocked(dateIso, shiftNum) {
+      return Boolean(dailyShiftLocks && dailyShiftLocks[`${dateIso}_${shiftNum}`]);
+    }
+
+    function getCurrentActiveShiftForNow() {
+      const nowTime = getCurrentTimeStr();
+      const todayIso = toIsoDate(new Date());
+      for (let n = 1; n <= hotelShiftCount; n++) {
+        if (isShiftLocked(todayIso, n)) continue;
+        const meta = getShiftMetaInfo(todayIso, n);
+        const st = meta.startTime || '08:00';
+        const en = meta.endTime || '20:00';
+        if (st === en) return n;
+        if (st < en) {
+          if (nowTime >= st && nowTime < en) return n;
+        } else {
+          if (nowTime >= st || nowTime < en) return n;
+        }
+      }
+      for (let n = 1; n <= hotelShiftCount; n++) {
+        if (!isShiftLocked(todayIso, n)) return n;
+      }
+      return 1;
+    }
+
+    function syncBookingPaymentsToDailyCash(bookingObj, paymentsList, actionLabel = 'Shaxmatka') {
+      if (!bookingObj || bookingObj.status === 'Bekor qilingan') return;
+      const list = Array.isArray(paymentsList) ? paymentsList.filter(p => Number(p.amount) > 0) : [];
+      if (!list.length) return;
+      const todayIso = toIsoDate(new Date());
+      const targetShift = getCurrentActiveShiftForNow();
+      const cIn = toIsoDate(bookingObj.checkIn) || todayIso;
+      const cOut = toIsoDate(bookingObj.checkOut) || addDays(cIn, 1);
+      const datesText = `${cIn} (${bookingObj.checkInTime || '14:00'}) → ${cOut} (${bookingObj.checkOutTime || '12:00'})`;
+      list.forEach((p, idx) => {
+        const amt = Number(p.amount) || 0;
+        if (amt <= 0) return;
+        dailyManualEntries.push({
+          id: `auto_${bookingObj.id}_${Date.now()}_${idx}`,
+          date: todayIso,
+          shift: targetShift,
+          room: bookingObj.room,
+          guestName: bookingObj.guestName || 'Mehmon',
+          inDate: cIn,
+          inTime: bookingObj.checkInTime || '14:00',
+          outDate: cOut,
+          outTime: bookingObj.checkOutTime || '12:00',
+          datesText,
+          rate: Number(bookingObj.rate) || 0,
+          paid: amt,
+          payType: p.method || 'Naqd pul',
+          autoFromBookingId: bookingObj.id,
+          createdBy: `${currentUser ? currentUser.name : 'Admin'} (${actionLabel})`
+        });
+      });
+    }
+
+    function toggleShiftLock(shiftNum) {
+      const dateIso = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
+      const key = `${dateIso}_${shiftNum}`;
+      const currentlyLocked = Boolean(dailyShiftLocks[key]);
+      if (currentlyLocked) {
+        if (!isHotelChiefAdmin()) {
+          alert('🔒 Ruxsat yo‘q: Yopilgan smenani faqat mehmonxona glavniy admini qayta ocha oladi!');
+          return;
+        }
+        if (!confirm(`${dateIso} • ${shiftNum}-smenani qayta ochmoqchimisiz?`)) return;
+        delete dailyShiftLocks[key];
+        recordAuditAction('Smena qayta ochildi', `${dateIso} • ${shiftNum}-smena qulfdan chiqarildi`);
+      } else {
+        if (!confirm(`${dateIso} • ${shiftNum}-smenani yopib topshirmoqchimisiz?
+
+Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
+        dailyShiftLocks[key] = {
+          lockedBy: currentUser ? currentUser.name : 'Admin',
+          lockedAt: `${toIsoDate(new Date())} ${getCurrentTimeStr()}`
+        };
+        recordAuditAction('Smena yopildi (Z-hisobot)', `${dateIso} • ${shiftNum}-smena yopildi va qulflandi`);
+      }
+      lastLocalWriteAt = Date.now();
+      saveAllLocal();
+      renderDailyReport();
+      pushAllToCloud(false);
+    }
+
     function addDailyManualEntry(e, shiftNum) {
       e.preventDefault();
       const dateIso = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
+      if (isShiftLocked(dateIso, shiftNum)) {
+        alert('🔒 Ushbu smena yopilgan! Yangi yozuv qo‘shib bo‘lmaydi.');
+        return;
+      }
       const inDate = document.getElementById(`manInDate_${shiftNum}`).value || dateIso, inTime = document.getElementById(`manInTime_${shiftNum}`).value || getCurrentTimeStr();
       const outDate = document.getElementById(`manOutDate_${shiftNum}`).value || addDays(inDate, 1), outTime = document.getElementById(`manOutTime_${shiftNum}`).value || '12:00';
       const room = document.getElementById(`manRoom_${shiftNum}`).value.trim();
@@ -2340,10 +2656,21 @@
       recordAuditAction(`${shiftNum}-smena kassa yozuvi`, `№ ${room} • ${guestName} — ${formatMoney(paid)} (${payType})`);
       saveAllLocal(); e.target.reset(); syncDailyFormDefaultDates(dateIso, true); renderDailyReport(); pushAllToCloud(false);
     }
-    function deleteDailyManualEntry(id) { if (confirm('O‘chirmoqchimisiz?')) { dailyManualEntries = dailyManualEntries.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); } }
+    function deleteDailyManualEntry(id) {
+      const target = dailyManualEntries.find(x => x.id === id);
+      if (target && isShiftLocked(target.date, target.shift) && !isHotelChiefAdmin()) {
+        alert('🔒 Yopilgan smena yozuvini o‘chirib bo‘lmaydi!');
+        return;
+      }
+      if (confirm('O‘chirmoqchimisiz?')) { dailyManualEntries = dailyManualEntries.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); }
+    }
     function addDailyExpense(e, shiftNum) {
       e.preventDefault();
       const dateIso = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
+      if (isShiftLocked(dateIso, shiftNum)) {
+        alert('🔒 Ushbu smena yopilgan! Xarajat qo‘shib bo‘lmaydi.');
+        return;
+      }
       const title = document.getElementById(`expTitle_${shiftNum}`).value.trim(), amount = Number(document.getElementById(`expAmount_${shiftNum}`).value) || 0;
       if (!title || amount <= 0) return;
       const meta = getShiftMetaInfo(dateIso, shiftNum);
@@ -2351,7 +2678,14 @@
       recordAuditAction(`${shiftNum}-smena xarajati`, `${title} — −${formatMoney(amount)}`);
       saveAllLocal(); e.target.reset(); renderDailyReport(); pushAllToCloud(false);
     }
-    function deleteDailyExpense(id) { if (confirm('O‘chirmoqchimisiz?')) { dailyExpenses = dailyExpenses.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); } }
+    function deleteDailyExpense(id) {
+      const target = dailyExpenses.find(x => x.id === id);
+      if (target && isShiftLocked(target.date, target.shift) && !isHotelChiefAdmin()) {
+        alert('🔒 Yopilgan smena xarajatini o‘chirib bo‘lmaydi!');
+        return;
+      }
+      if (confirm('O‘chirmoqchimisiz?')) { dailyExpenses = dailyExpenses.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); }
+    }
 
     function getShiftStats(selectedDate, shiftNum) {
       const meta = getShiftMetaInfo(selectedDate, shiftNum);
@@ -2393,6 +2727,11 @@
 
     function renderShiftBlock(s) {
       const n = s.shiftNum;
+      const selectedDate = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
+      const lockInfo = dailyShiftLocks[`${selectedDate}_${n}`];
+      const locked = Boolean(lockInfo);
+      const canModify = !locked || isHotelChiefAdmin();
+
       const adminInp = document.getElementById(`shiftAdminInput_${n}`);
       const startInp = document.getElementById(`shiftStartInput_${n}`);
       const endInp = document.getElementById(`shiftEndInput_${n}`);
@@ -2400,13 +2739,43 @@
       if (startInp && document.activeElement !== startInp) startInp.value = s.startTime;
       if (endInp && document.activeElement !== endInp) endInp.value = s.endTime;
 
+      const lockBtn = document.getElementById(`shiftLockBtn_${n}`);
+      const lockBanner = document.getElementById(`shiftLockedBanner_${n}`);
+      const lockBannerText = document.getElementById(`shiftLockedBannerText_${n}`);
+      const entryForm = document.getElementById(`shiftEntryForm_${n}`);
+      const expForm = document.getElementById(`shiftExpenseForm_${n}`);
+
+      if (lockBtn) {
+        if (locked) {
+          lockBtn.textContent = isHotelChiefAdmin() ? '🔒 Qulflangan (Ochish)' : '🔒 Yopilgan';
+          lockBtn.className = 'px-2.5 py-1 rounded-lg bg-rose-500 text-white font-extrabold transition';
+        } else {
+          lockBtn.textContent = '🔓 Smenani yopish';
+          lockBtn.className = 'px-2.5 py-1 rounded-lg bg-amber-400/90 hover:bg-amber-300 text-[#131b3a] font-extrabold transition';
+        }
+      }
+      if (lockBanner) lockBanner.classList.toggle('hidden', !locked);
+      if (lockBannerText && locked) {
+        lockBannerText.textContent = `🔒 ${n}-smena yopilgan (${lockInfo.lockedBy || 'Admin'} • ${lockInfo.lockedAt || ''})`;
+      }
+      if (entryForm) entryForm.classList.toggle('hidden', locked);
+      if (expForm) expForm.classList.toggle('hidden', locked);
+
       document.getElementById(`s${n}Total`).textContent = formatMoney(s.totalIncome);
       document.getElementById(`s${n}Cash`).textContent = formatMoney(s.cashIn);
       document.getElementById(`s${n}Exp`).textContent = formatMoney(s.totalExp);
       document.getElementById(`s${n}NetCash`).textContent = formatMoney(s.netCash);
       document.getElementById(`shiftExpFooter_${n}`).textContent = formatMoney(s.totalExp);
-      document.getElementById(`shiftTableBody_${n}`).innerHTML = s.rows.length ? s.rows.map(m => `<tr class="hover:bg-slate-50"><td class="p-3 font-extrabold">№ ${m.room}</td><td class="p-3 font-bold">${m.guestName}</td><td class="p-3 text-[11px]">${m.datesText}</td><td class="p-3">${formatMoney(m.rate)}</td><td class="p-3 font-bold text-emerald-600">${formatMoney(m.paid)}</td><td class="p-3 text-[11px]">${m.payType}</td><td class="p-3 text-right"><button onclick="deleteDailyManualEntry('${m.id}')" class="px-2 py-0.5 rounded bg-rose-50 text-rose-600 font-bold">✕</button></td></tr>`).join('') : `<tr><td colspan="7" class="p-6 text-center text-slate-400">${n}-smenada hali yozuv yo‘q.</td></tr>`;
-      document.getElementById(`shiftExpensesList_${n}`).innerHTML = s.expenses.length ? s.expenses.map(x => `<div class="p-3 flex items-center justify-between gap-2"><div class="min-w-0"><div class="font-bold text-xs truncate">${x.title}</div><div class="text-[10px] text-slate-400">${x.time || ''} ${x.createdBy ? '• ' + x.createdBy : ''}</div></div><div class="flex items-center gap-2 shrink-0"><span class="font-extrabold text-rose-600 text-xs">−${formatMoney(x.amount)}</span><button onclick="deleteDailyExpense('${x.id}')" class="text-slate-400 hover:text-rose-600 font-bold text-xs">✕</button></div></div>`).join('') : `<div class="p-5 text-center text-xs text-slate-400">Xarajat yo‘q</div>`;
+      document.getElementById(`shiftTableBody_${n}`).innerHTML = s.rows.length ? s.rows.map(m => {
+        const autoTag = m.autoFromBookingId ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-indigo-100 text-[#5b54e6] font-extrabold text-[9.5px]">Avto</span>` : '';
+        const delBtn = canModify ? `<button onclick="deleteDailyManualEntry('${m.id}')" class="px-2 py-0.5 rounded bg-rose-50 text-rose-600 font-bold">✕</button>` : `<span class="text-slate-300">🔒</span>`;
+        return `<tr class="hover:bg-slate-50"><td class="p-3 font-extrabold">№ ${m.room}</td><td class="p-3 font-bold">${m.guestName}${autoTag}</td><td class="p-3 text-[11px]">${m.datesText}</td><td class="p-3">${formatMoney(m.rate)}</td><td class="p-3 font-bold text-emerald-600">${formatMoney(m.paid)}</td><td class="p-3 text-[11px]">${m.payType}</td><td class="p-3 text-right">${delBtn}</td></tr>`;
+      }).join('') : `<tr><td colspan="7" class="p-6 text-center text-slate-400">${n}-smenada hali yozuv yo‘q.</td></tr>`;
+
+      document.getElementById(`shiftExpensesList_${n}`).innerHTML = s.expenses.length ? s.expenses.map(x => {
+        const delExp = canModify ? `<button onclick="deleteDailyExpense('${x.id}')" class="text-slate-400 hover:text-rose-600 font-bold text-xs">✕</button>` : '';
+        return `<div class="p-3 flex items-center justify-between gap-2"><div class="min-w-0"><div class="font-bold text-xs truncate">${x.title}</div><div class="text-[10px] text-slate-400">${x.time || ''} ${x.createdBy ? '• ' + x.createdBy : ''}</div></div><div class="flex items-center gap-2 shrink-0"><span class="font-extrabold text-rose-600 text-xs">−${formatMoney(x.amount)}</span>${delExp}</div></div>`;
+      }).join('') : `<div class="p-5 text-center text-xs text-slate-400">Xarajat yo‘q</div>`;
     }
 
     function renderDailyReport() {
@@ -2591,7 +2960,10 @@
       if (tabName === 'saas' && !isMasterAdmin()) return;
       activeTabName = tabName;
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      const activeTabEl = document.getElementById('tab-' + tabName);
+      activeTabEl.classList.remove('hidden', 'tab-animate-in');
+      void activeTabEl.offsetWidth;
+      activeTabEl.classList.add('tab-animate-in');
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('bg-[#5b54e6]', 'text-white');
         btn.classList.add(btn.id === 'nav-saas' ? 'text-amber-300' : 'text-indigo-100/85');
@@ -3146,9 +3518,12 @@
         bar.className = 'drag-preview-bar' + (hasConflict ? ' drag-conflict' : '');
         bar.style.left = '0px';
         bar.style.width = `${previewWidth}px`;
+        const roomObjDrag = rooms.find(r => r.id === dragRoomId);
+        const estSum = roomObjDrag ? (spanDays * (Number(roomObjDrag.price) || 0)) : 0;
+        const estLabel = estSum > 0 ? ` • ${estSum.toLocaleString('ru-RU')} so‘m` : '';
         bar.innerHTML = hasConflict
           ? `<span class="truncate">⛔ Band! Ustma-ust tushdi</span><span class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-extrabold shrink-0">✕</span>`
-          : `<span class="truncate">+ Yangi bron</span><span class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-extrabold shrink-0">${spanDays} tun</span>`;
+          : `<span class="truncate">+ Yangi bron${estLabel}</span><span class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-extrabold shrink-0">${spanDays} tun</span>`;
         startCell.appendChild(bar);
       }
     }
@@ -3184,6 +3559,8 @@
       if (!rooms.length) { alert('Avval «Xonalar va Narxlar» bo‘limidan kamida 1 ta xona qo‘shing!'); switchTab('rates'); return; }
       const modal = document.getElementById('bookingModal');
       document.getElementById('overbookingAlert').classList.add('hidden');
+      const rgBadge = document.getElementById('returningGuestBadge'); if (rgBadge) rgBadge.classList.add('hidden');
+      const gDrop = document.getElementById('guestSuggestDropdown'); if (gDrop) gDrop.classList.add('hidden');
       document.getElementById('modalPaymentsList').innerHTML = '';
       populateRoomSelect();
 
@@ -3272,7 +3649,23 @@
         status, notes: document.getElementById('formNotes').value.trim(), createdBy: currentUser.email,
         canceledBy: existing ? (existing.canceledBy || '') : '', cancelReason: existing ? (existing.cancelReason || '') : '', canceledAt: existing ? (existing.canceledAt || '') : ''
       };
-      if (editId) { const idx = bookings.findIndex(x => x.id === editId); if (idx > -1) bookings[idx] = payload; recordAuditAction('Bron tahrirlandi', `№ ${room} • ${payload.guestName} (${checkIn} → ${checkOut}, ${status})`); } else { bookings.push(payload); recordAuditAction('Yangi bron yaratildi', `№ ${room} • ${payload.guestName} (${checkIn} → ${checkOut}, ${formatMoney(total)})`); }
+      if (editId) {
+        const idx = bookings.findIndex(x => x.id === editId);
+        const prevPaid = idx > -1 ? (Number(bookings[idx].paid) || 0) : 0;
+        if (idx > -1) bookings[idx] = payload;
+        recordAuditAction('Bron tahrirlandi', `№ ${room} • ${payload.guestName} (${checkIn} → ${checkOut}, ${status})`);
+        if (paid > prevPaid && status !== 'Bekor qilingan') {
+          const diffAmt = paid - prevPaid;
+          const lastMethod = payments.length ? payments[payments.length - 1].method : 'Naqd pul';
+          syncBookingPaymentsToDailyCash(payload, [{ method: lastMethod, amount: diffAmt }], 'Shaxmatka tahrir');
+        }
+      } else {
+        bookings.push(payload);
+        recordAuditAction('Yangi bron yaratildi', `№ ${room} • ${payload.guestName} (${checkIn} → ${checkOut}, ${formatMoney(total)})`);
+        if (paid > 0 && status !== 'Bekor qilingan') {
+          syncBookingPaymentsToDailyCash(payload, payments, 'Yangi bron');
+        }
+      }
       const rObj = rooms.find(x => x.id === room);
       if (rObj) { rObj.manualStatus = false; if (status === 'Chiqdi') rObj.clean = 'Tozalash kerak'; else if (isRoomCheckedInToday(room)) rObj.clean = 'Band'; else if (rObj.clean === 'Band') rObj.clean = 'Toza'; }
       saveAllLocal(); closeBookingModal(); refreshAllViews(false); pushAllToCloud(false);
@@ -3337,9 +3730,17 @@
       if (editBtnEl) editBtnEl.classList.toggle('hidden', isLockedForUser);
       if (deleteBtnEl) deleteBtnEl.classList.toggle('hidden', !isChief);
       if (footerActionsEl) footerActionsEl.classList.toggle('hidden', isLockedForUser && !isChief);
-      document.getElementById('guestDrawer').classList.remove('hidden');
+      const gd = document.getElementById('guestDrawer');
+      gd.classList.remove('hidden');
+      requestAnimationFrame(() => gd.classList.add('drawer-open'));
     }
-    function closeGuestDrawer() { document.getElementById('guestDrawer').classList.add('hidden'); activeDrawerBookingId = null; }
+    function closeGuestDrawer() {
+      const gd = document.getElementById('guestDrawer');
+      if (!gd) return;
+      gd.classList.remove('drawer-open');
+      setTimeout(() => { gd.classList.add('hidden'); }, 260);
+      activeDrawerBookingId = null;
+    }
     function quickStatusChange(newStatus) {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
       if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bron holatini faqat mehmonxona glavniy admini o‘zgartira oladi!'); return; }
@@ -3380,8 +3781,11 @@
     function applyQuickPayment() {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
       const amt = Number(document.getElementById('quickPayAmount').value) || 0; if (amt <= 0) return;
-      const p = getBookingPayments(b); p.push({ method: document.getElementById('quickPayMethod').value || 'Naqd pul', amount: amt });
-      b.payments = p; b.paid = p.reduce((s, x) => s + Number(x.amount || 0), 0); b.payType = getBookingSummaryPayType(p); recordAuditAction('To‘lov qo‘shildi', `№ ${b.room} • ${b.guestName || 'Mehmon'} — +${formatMoney(amt)} (${document.getElementById('quickPayMethod').value})`);
+      const method = document.getElementById('quickPayMethod').value || 'Naqd pul';
+      const p = getBookingPayments(b); p.push({ method, amount: amt });
+      b.payments = p; b.paid = p.reduce((s, x) => s + Number(x.amount || 0), 0); b.payType = getBookingSummaryPayType(p);
+      recordAuditAction('To‘lov qo‘shildi', `№ ${b.room} • ${b.guestName || 'Mehmon'} — +${formatMoney(amt)} (${method})`);
+      syncBookingPaymentsToDailyCash(b, [{ method, amount: amt }], 'Tezkor to‘lov');
       saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
     }
     function removeSinglePayment(idx) {
@@ -3798,6 +4202,266 @@
       saveAllLocal(); renderAllowedUsers(); await saveSaasRegistry(); await pushAllToCloud(false);
     }
 
+
+
+    // ==================== DOIMIY MEHMON AVTO-TO'LDIRISH ====================
+    function getUniqueGuestProfiles() {
+      const map = new Map();
+      bookings.forEach(b => {
+        if (!isValidBookingRecord(b)) return;
+        const name = String(b.guestName || '').trim();
+        if (!name) return;
+        const phone = String(b.phone || '').trim();
+        const passport = String(b.passport || '').trim();
+        const key = `${name.toLowerCase()}|${passport.toLowerCase() || phone}`;
+        if (!map.has(key)) {
+          map.set(key, { guestName: name, phone, passport, source: b.source || "To'g'ridan-to'g'ri", visits: 1, lastDate: toIsoDate(b.checkIn) });
+        } else {
+          const item = map.get(key);
+          item.visits++;
+          if (!item.phone && phone) item.phone = phone;
+          if (!item.passport && passport) item.passport = passport;
+          if (toIsoDate(b.checkIn) > item.lastDate) item.lastDate = toIsoDate(b.checkIn);
+        }
+      });
+      return [...map.values()];
+    }
+
+    function handleGuestAutocomplete(query, isPhoneField = false) {
+      const dd = document.getElementById('guestSuggestDropdown');
+      const badge = document.getElementById('returningGuestBadge');
+      if (!dd) return;
+      const q = String(query || '').trim().toLowerCase();
+      if (q.length < 2) {
+        dd.classList.add('hidden');
+        if (badge && !isPhoneField) badge.classList.add('hidden');
+        return;
+      }
+      const profiles = getUniqueGuestProfiles();
+      const matches = profiles.filter(p =>
+        p.guestName.toLowerCase().includes(q) ||
+        (p.phone && p.phone.toLowerCase().includes(q)) ||
+        (p.passport && p.passport.toLowerCase().includes(q))
+      ).slice(0, 6);
+
+      if (!matches.length) {
+        dd.classList.add('hidden');
+        return;
+      }
+
+      window._rhGuestMatches = matches;
+      dd.innerHTML = matches.map((m, idx) => `
+        <button type="button" onmousedown="selectReturningGuest(${idx})" class="w-full px-3 py-2 text-left hover:bg-[#eef0ff] flex items-center justify-between gap-2 transition">
+          <div class="min-w-0">
+            <div class="font-bold text-[#131b3a] text-xs truncate">${m.guestName}</div>
+            <div class="text-[10.5px] text-slate-500 truncate">${m.phone || 'Tel yo‘q'} ${m.passport ? '• ID: ' + m.passport : ''}</div>
+          </div>
+          <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-extrabold text-[10px]">${m.visits}x kelgan</span>
+        </button>
+      `).join('');
+      dd.classList.remove('hidden');
+    }
+
+    function selectReturningGuest(idx) {
+      const list = window._rhGuestMatches || [];
+      const m = list[idx];
+      const dd = document.getElementById('guestSuggestDropdown');
+      if (dd) dd.classList.add('hidden');
+      if (!m) return;
+      document.getElementById('formGuestName').value = m.guestName;
+      if (m.phone) document.getElementById('formPhone').value = m.phone;
+      if (m.passport) document.getElementById('formPassport').value = m.passport;
+      if (m.source) document.getElementById('formSource').value = m.source;
+      const badge = document.getElementById('returningGuestBadge');
+      if (badge) {
+        badge.textContent = `⭐ Doimiy mehmon (${m.visits} marta kelgan)`;
+        badge.classList.remove('hidden');
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const dd = document.getElementById('guestSuggestDropdown');
+      if (dd && !e.target.closest('#formGuestName') && !e.target.closest('#formPhone') && !e.target.closest('#guestSuggestDropdown')) {
+        dd.classList.add('hidden');
+      }
+    });
+
+    // ==================== MEHMON KVITANSIYASI (CHEK PRINT) ====================
+    function printGuestReceipt() {
+      const b = bookings.find(x => x.id === activeDrawerBookingId);
+      if (!b) return;
+      const hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
+      const roomObj = rooms.find(r => r.id === b.room) || { name: '', floor: '' };
+      const nightsCount = Math.max(1, Number(b.nights) || diffNights(b.checkIn, b.checkOut));
+      const totalVal = Number(b.total) || ((nightsCount * (Number(b.rate) || 0)) + (Number(b.extra) || 0));
+      const pList = getBookingPayments(b);
+      const paidVal = pList.length ? pList.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0);
+      const debtVal = (b.status === 'Bron' || b.status === 'Bekor qilingan') ? 0 : Math.max(0, totalVal - paidVal);
+      const receiptNo = String(b.id || '').replace(/\D/g, '').slice(-6) || Date.now().toString().slice(-6);
+
+      const payRows = pList.length
+        ? pList.map(p => `<tr><td style="padding:4px 0;color:#475569;">${p.method}</td><td style="padding:4px 0;text-align:right;font-weight:bold;">${formatMoney(p.amount)}</td></tr>`).join('')
+        : `<tr><td style="padding:4px 0;color:#94a3b8;">To‘lov kiritilmagan</td><td style="padding:4px 0;text-align:right;">0 so‘m</td></tr>`;
+
+      const win = window.open('', '_blank', 'width=520,height=740');
+      if (!win) return;
+      win.document.write(`
+        <html>
+        <head>
+          <meta charset="UTF-8" />
+          <title>Kvitansiya #${receiptNo} — ${hotel.name}</title>
+          <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; padding: 20px; color: #0f172a; }
+            .receipt { max-width: 390px; margin: 0 auto; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+            .center { text-align: center; }
+            .dashed { border-top: 1.5px dashed #cbd5e1; margin: 12px 0; }
+            table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+            td { padding: 4px 0; }
+            @media print { body { background: #fff; padding: 0; } .receipt { box-shadow: none; border: 1px solid #94a3b8; } }
+          </style>
+        </head>
+        <body>
+          <div class="receipt">
+            <div class="center">
+              <div style="font-size:20px;font-weight:900;letter-spacing:0.5px;">${hotel.name}</div>
+              <div style="font-size:11px;color:#64748b;margin-top:2px;">MEHMONXONA TO‘LOV KVITANSIYASI</div>
+              <div style="font-size:11px;font-weight:700;color:#4338ca;margin-top:4px;">Chek № ${receiptNo} • ${toIsoDate(new Date())} ${getCurrentTimeStr()}</div>
+            </div>
+            <div class="dashed"></div>
+            <table>
+              <tr><td style="color:#64748b;">Mehmon:</td><td style="text-align:right;font-weight:800;">${b.guestName || 'Mehmon'}</td></tr>
+              ${b.phone ? `<tr><td style="color:#64748b;">Telefon:</td><td style="text-align:right;font-weight:600;">${b.phone}</td></tr>` : ''}
+              ${b.passport ? `<tr><td style="color:#64748b;">Pasport / ID:</td><td style="text-align:right;font-weight:600;">${b.passport}</td></tr>` : ''}
+              <tr><td style="color:#64748b;">Xona:</td><td style="text-align:right;font-weight:800;">№ ${b.room} ${roomObj.name ? '(' + roomObj.name + ')' : ''}</td></tr>
+              <tr><td style="color:#64748b;">Kirish:</td><td style="text-align:right;font-weight:600;">${b.checkIn} (${b.checkInTime || '14:00'})</td></tr>
+              <tr><td style="color:#64748b;">Chiqish:</td><td style="text-align:right;font-weight:600;">${b.checkOut} (${b.checkOutTime || '12:00'})</td></tr>
+              <tr><td style="color:#64748b;">Muddat:</td><td style="text-align:right;font-weight:700;">${nightsCount} tun • ${b.guestsCount || 1} kishi</td></tr>
+            </table>
+            <div class="dashed"></div>
+            <table>
+              <tr><td style="color:#64748b;">1 sutka narxi:</td><td style="text-align:right;">${formatMoney(b.rate)}</td></tr>
+              <tr><td style="color:#64748b;">Yashash (${nightsCount} tun):</td><td style="text-align:right;font-weight:600;">${formatMoney(nightsCount * (Number(b.rate) || 0))}</td></tr>
+              ${Number(b.extra) > 0 ? `<tr><td style="color:#64748b;">Qo‘shimcha xizmatlar:</td><td style="text-align:right;">${formatMoney(b.extra)}</td></tr>` : ''}
+              <tr style="font-size:14px;"><td style="padding-top:8px;font-weight:800;">JAMI HISOB:</td><td style="padding-top:8px;text-align:right;font-weight:900;">${formatMoney(totalVal)}</td></tr>
+            </table>
+            <div class="dashed"></div>
+            <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;">TO‘LOVLAR TAFSILOTI:</div>
+            <table>${payRows}</table>
+            <div class="dashed"></div>
+            <table>
+              <tr style="font-size:14px;color:#047857;"><td style="font-weight:800;">TO‘LANGAN:</td><td style="text-align:right;font-weight:900;">${formatMoney(paidVal)}</td></tr>
+              <tr style="font-size:13px;color:${debtVal > 0 ? '#dc2626' : '#64748b'};"><td style="font-weight:700;">QOLGAN QARZ:</td><td style="text-align:right;font-weight:800;">${formatMoney(debtVal)}</td></tr>
+            </table>
+            <div class="dashed"></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#475569;margin-top:16px;">
+              <div>Administrator: <b>${currentUser ? currentUser.name : ''}</b></div>
+              <div>Imzo / Muhr: _________</div>
+            </div>
+            <div class="center" style="font-size:11px;color:#64748b;margin-top:14px;">Tashrifingiz uchun rahmat! • ReservHotel PMS</div>
+          </div>
+          <script>window.onload=function(){window.print();};<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    // ==================== TO'LIQ BAZA BACKUP (JSON VA EXCEL) ====================
+    function downloadFullBackupJson() {
+      const hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
+      const dateStr = toIsoDate(new Date());
+      const backupPayload = {
+        system: 'ReservHotel Cloud PMS',
+        exportedAt: new Date().toISOString(),
+        hotelId: currentHotelId,
+        hotelName: hotel.name,
+        rooms,
+        bookings,
+        dailyManualEntries,
+        dailyExpenses,
+        dailyShiftAdmins,
+        dailyShiftLocks,
+        allowedUsers,
+        auditLogs
+      };
+      const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${hotel.name}_Backup_${dateStr}.json`;
+      a.click();
+    }
+
+    function exportFullExcelArchive() {
+      const hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
+      const dateStr = toIsoDate(new Date());
+      const validBookings = bookings.filter(isValidBookingRecord);
+      const bkRows = validBookings.map((b, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>№ ${b.room}</td>
+          <td>${b.guestName || ''}</td>
+          <td>${b.phone || ''}</td>
+          <td>${b.passport || ''}</td>
+          <td>${b.source || ''}</td>
+          <td>${b.checkIn} ${b.checkInTime || ''}</td>
+          <td>${b.checkOut} ${b.checkOutTime || ''}</td>
+          <td>${b.nights || 1}</td>
+          <td>${b.total || 0}</td>
+          <td>${b.paid || 0}</td>
+          <td>${getBookingUnpaidAmount(b)}</td>
+          <td>${b.payType || ''}</td>
+          <td>${b.status || ''}</td>
+        </tr>`).join('');
+
+      const cashRows = dailyManualEntries.map((m, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${m.date}</td>
+          <td>${m.shift}-smena</td>
+          <td>№ ${m.room}</td>
+          <td>${m.guestName}</td>
+          <td>${m.datesText}</td>
+          <td>${m.paid}</td>
+          <td>${m.payType}</td>
+          <td>${m.createdBy || ''}</td>
+        </tr>`).join('');
+
+      const expRows = dailyExpenses.map((x, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${x.date}</td>
+          <td>${x.shift}-smena</td>
+          <td>${x.title}</td>
+          <td>${x.amount}</td>
+          <td>${x.time || ''}</td>
+          <td>${x.createdBy || ''}</td>
+        </tr>`).join('');
+
+      const html = `
+        <html><head><meta charset="UTF-8" /></head><body>
+          <h2>${hotel.name} — To‘liq Baza Arxivi (${dateStr})</h2>
+          <h3>1. Barcha Bronlar va Mehmonlar (${validBookings.length} ta)</h3>
+          <table border="1" cellspacing="0" cellpadding="5">
+            <tr><th>№</th><th>Xona</th><th>Mehmon F.I.SH</th><th>Telefon</th><th>Pasport</th><th>Manba</th><th>Kirish</th><th>Chiqish</th><th>Tun</th><th>Jami</th><th>To‘langan</th><th>Qarz</th><th>To‘lov turi</th><th>Holati</th></tr>
+            ${bkRows || '<tr><td colspan="14">Ma’lumot yo‘q</td></tr>'}
+          </table><br/>
+          <h3>2. Kunlik Kassa Tushumlari (${dailyManualEntries.length} ta)</h3>
+          <table border="1" cellspacing="0" cellpadding="5">
+            <tr><th>№</th><th>Sana</th><th>Smena</th><th>Xona</th><th>Mehmon</th><th>Sanalar</th><th>To‘langan</th><th>Turi</th><th>Kiritdi</th></tr>
+            ${cashRows || '<tr><td colspan="9">Ma’lumot yo‘q</td></tr>'}
+          </table><br/>
+          <h3>3. Kunlik Xarajatlar (${dailyExpenses.length} ta)</h3>
+          <table border="1" cellspacing="0" cellpadding="5">
+            <tr><th>№</th><th>Sana</th><th>Smena</th><th>Xarajat nomi / Sababi</th><th>Summa</th><th>Vaqt</th><th>Kiritdi</th></tr>
+            ${expRows || '<tr><td colspan="7">Ma’lumot yo‘q</td></tr>'}
+          </table>
+        </body></html>`;
+      const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${hotel.name}_Toliq_Arxiv_${dateStr}.xls`;
+      a.click();
+    }
 
     // ==================== KO'P TILLILIK (UZ / RU / EN) ====================
     let currentLang = localStorage.getItem('rh_lang') || 'uz';
@@ -4286,6 +4950,63 @@
       updateLangButtonsUI();
       if (currentLang !== 'uz') applyLanguageToSubtree(document.body);
       i18nObserver.observe(document.body, { childList: true, subtree: true });
+    });
+
+
+    // ==================== ZAMONAVIY TOAST BILDIRISHNOMALAR & DARK MODE ====================
+    function showToast(message, type = 'info', duration = 3600) {
+      let container = document.getElementById('rhToastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'rhToastContainer';
+        document.body.appendChild(container);
+      }
+      const msgStr = String(message || '').trim();
+      if (!msgStr) return;
+      let detectedType = type;
+      if (detectedType === 'info') {
+        if (msgStr.includes('⛔') || msgStr.includes('⚠️') || msgStr.includes('🔒') || msgStr.toLowerCase().includes('xato') || msgStr.toLowerCase().includes('noto‘g‘ri') || msgStr.toLowerCase().includes('rad etildi')) {
+          detectedType = 'error';
+        } else if (msgStr.includes('✅') || msgStr.includes('💎') || msgStr.includes('saqlandi') || msgStr.includes('yangilandi') || msgStr.includes('yaratildi') || msgStr.includes('almashtirildi')) {
+          detectedType = 'success';
+        }
+      }
+      const icon = detectedType === 'success' ? '✨' : (detectedType === 'error' ? '⚠️' : '🔔');
+      const toast = document.createElement('div');
+      toast.className = `rh-toast rh-toast-${detectedType}`;
+      toast.innerHTML = `<span class="text-base leading-none shrink-0">${icon}</span><div class="leading-snug">${msgStr.replace(/\n/g, '<br/>')}</div>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 260);
+      }, duration);
+    }
+
+    // Brauzerning oddiy alert() oynasini chiroyli Toast xabarnomaga o'tkazish
+    window.alert = function(msg) {
+      showToast(msg, 'info', 4000);
+    };
+
+    function applyThemeMode(isDark) {
+      document.body.classList.toggle('dark-mode', isDark);
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) {
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title = isDark ? 'Kunduzgi rejimga o‘tish' : 'Tungi smena rejimiga o‘tish';
+      }
+    }
+
+    function toggleDarkMode() {
+      const nextDark = !document.body.classList.contains('dark-mode');
+      localStorage.setItem('rh_dark_mode', nextDark ? '1' : '0');
+      applyThemeMode(nextDark);
+      showToast(nextDark ? '🌙 Tungi smena rejimi yoqildi' : '☀️ Kunduzgi rejim yoqildi', 'info', 2200);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('rh_dark_mode') === '1') {
+        applyThemeMode(true);
+      }
     });
 
     if (currentUser) initApp();
