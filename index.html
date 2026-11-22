@@ -32,8 +32,11 @@
     .sticky-corner-clean { position: sticky; top: 0; left: 155px; z-index: 40; }
     .sticky-footer-bottom { position: sticky; bottom: 0; z-index: 28; background: #f2f4ff; border-top: 2px solid #cbd5e1; }
 
-    .day-cell { height: 46px; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; position: relative; user-select: none; cursor: crosshair; transition: background-color 0.1s; }
+    .day-cell { height: 46px; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; position: relative; user-select: none; cursor: crosshair; }
     .day-cell:hover { background-color: #eef2ff; }
+    body.is-fast-dragging .day-cell:hover { background-color: inherit; }
+    body.is-fast-dragging .booking-bar { pointer-events: none !important; transition: none !important; }
+    body.is-fast-dragging .matrix-container { will-change: scroll-position; }
     .day-cell.weekend { background-color: #f8f9ff; }
     .day-cell.today-col { background-color: #e6eaff; }
     .day-cell.past-col { cursor: not-allowed; background-color: #f8fafc; }
@@ -683,7 +686,7 @@
           <div id="currentUserName" class="font-semibold text-white truncate">Admin</div>
           <div id="currentUserRole" class="text-[11px] text-indigo-200/70 truncate">Bosh Administrator</div>
         </div>
-        <div class="grid grid-cols-2 gap-1.5">
+        <div id="ownerArchiveExportBox" class="hidden grid-cols-2 gap-1.5">
           <button type="button" onclick="downloadFullBackupJson()" title="To'liq JSON zaxira nusxa yuklab olish" class="py-1.5 px-2 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-200 font-semibold text-center flex items-center justify-center gap-1 border border-indigo-400/20">
             <span>💾</span> <span>Backup</span>
           </button>
@@ -2274,6 +2277,12 @@
       document.getElementById('currentUserName').textContent = currentUser.name;
       document.getElementById('currentUserRole').textContent = `${currentUser.role} • ${currentUser.email}`;
 
+      const canExportArchive = isHotelChiefAdmin();
+      const archiveBox = document.getElementById('ownerArchiveExportBox');
+      if (archiveBox) {
+        archiveBox.classList.toggle('hidden', !canExportArchive);
+        archiveBox.classList.toggle('grid', canExportArchive);
+      }
       if (isHotelOwnerOrMaster()) document.getElementById('nav-users').classList.remove('hidden');
       else document.getElementById('nav-users').classList.add('hidden');
       if (isMasterAdmin()) document.getElementById('nav-saas').classList.remove('hidden');
@@ -3094,17 +3103,17 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
                 const safeName = b.guestName || 'Mehmon', displayLabel = b.status === 'Bekor qilingan' ? `✕ ${safeName}` : safeName;
                 const canDragMove = (b.status === 'Bron' || b.status === 'Band');
                 const canResize = (b.status === 'Band' || b.status === 'Bron');
-                const dragAttrs = canDragMove
-                  ? `draggable="true" ondragstart="startBookingMoveDrag(event, '${b.id}')" ondragend="endBookingMoveDrag(event)"`
-                  : `draggable="false"`;
+                const downHandler = canDragMove
+                  ? `onpointerdown="startBookingMovePointer(event, '${b.id}')"`
+                  : `onmousedown="event.stopPropagation()"`;
                 const resizeHandleHtml = canResize
                   ? `<div class="booking-resize-handle" title="O‘ngga cho‘zib kun qo‘shish" onmousedown="startBookingResize(event, '${b.id}')" onclick="event.stopPropagation()"></div>`
                   : '';
-                barHtml += `<div ${dragAttrs} onmousedown="event.stopPropagation()" onclick="event.stopPropagation(); if(!justFinishedResizing) openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}${unpaidAmt > 0 ? ' • Qarz: ' + formatMoney(unpaidAmt) : ''}${canDragMove ? ' (Surib ko‘chirish yoki o‘ng chetidan cho‘zib kun qo‘shish mumkin)' : ''}" class="booking-bar ${barClass} ${canDragMove ? 'is-draggable' : ''}" data-booking-id="${b.id}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span>${debtBadgeHtml}${resizeHandleHtml}</div>`;
+                barHtml += `<div draggable="false" ${downHandler} onclick="event.stopPropagation(); if(!justFinishedResizing && !justFinishedMoving) openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}${unpaidAmt > 0 ? ' • Qarz: ' + formatMoney(unpaidAmt) : ''}${canDragMove ? ' (Surib ko‘chirish yoki o‘ng chetidan cho‘zib kun qo‘shish mumkin)' : ''}" class="booking-bar ${barClass} ${canDragMove ? 'is-draggable' : ''}" data-booking-id="${b.id}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span>${debtBadgeHtml}${resizeHandleHtml}</div>`;
               }
             });
             const todayLine = dt.isToday ? `<div class="today-line" style="left:${todayPct}%;"></div>` : '';
-            tbodyHtml += `<td class="${cellClasses.join(' ')}" data-room="${room.id}" data-date="${dt.iso}" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;" onmousedown="startCellDrag('${room.id}', '${dt.iso}')" onmouseenter="moveCellDrag('${room.id}', '${dt.iso}')" onmouseup="endCellDrag('${room.id}', '${dt.iso}')" ondragover="handleBookingDragOver(event, '${room.id}', '${dt.iso}')" ondragleave="handleBookingDragLeave(event)" ondrop="handleBookingDrop(event, '${room.id}', '${dt.iso}')">${todayLine}${barHtml}</td>`;
+            tbodyHtml += `<td class="${cellClasses.join(' ')}" data-room="${room.id}" data-date="${dt.iso}" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;" onmousedown="startCellDrag('${room.id}', '${dt.iso}')" onmouseenter="moveCellDrag('${room.id}', '${dt.iso}')" onmouseup="endCellDrag('${room.id}', '${dt.iso}')">${todayLine}${barHtml}</td>`;
           });
           tbodyHtml += `</tr>`;
         });
@@ -3327,78 +3336,244 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       }
     });
 
-    let draggedBookingId = null;
+    let justFinishedMoving = false;
+    let moveDragState = null;
 
-    function startBookingMoveDrag(e, bookingId) {
-      if (isResizingBooking) { e.preventDefault(); return; }
+    function cleanupMoveDragVisuals() {
+      document.body.classList.remove('is-fast-dragging');
+      if (moveDragState) {
+        if (moveDragState.ghostEl) moveDragState.ghostEl.remove();
+        if (moveDragState.sourceBar) moveDragState.sourceBar.classList.remove('is-dragging');
+        if (moveDragState.highlightedCells) {
+          for (let i = 0; i < moveDragState.highlightedCells.length; i++) {
+            moveDragState.highlightedCells[i].classList.remove('drop-target-valid', 'drop-target-invalid');
+          }
+        }
+      }
+      isDragging = false;
+      moveDragState = null;
+    }
+
+    function startBookingMovePointer(e, bookingId) {
+      if (e.button !== 0 || isResizingBooking) return;
+      e.preventDefault();
+      e.stopPropagation();
+
       const b = bookings.find(x => x.id === bookingId);
-      if (!b || (b.status !== 'Bron' && b.status !== 'Band')) {
-        e.preventDefault();
-        return;
-      }
-      draggedBookingId = bookingId;
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', bookingId);
-      if (e.currentTarget) e.currentTarget.classList.add('is-dragging');
-    }
+      if (!b || (b.status !== 'Bron' && b.status !== 'Band')) return;
 
-    function endBookingMoveDrag(e) {
-      draggedBookingId = null;
-      if (e.currentTarget) e.currentTarget.classList.remove('is-dragging');
-      document.querySelectorAll('.drop-target-valid, .drop-target-invalid').forEach(el => {
-        el.classList.remove('drop-target-valid', 'drop-target-invalid');
-      });
-    }
-
-    function handleBookingDragOver(e, targetRoomId, targetDateIso) {
-      if (!draggedBookingId) return;
-      e.preventDefault();
-      const b = bookings.find(x => x.id === draggedBookingId);
-      if (!b) return;
-      const todayStr = toIsoDate(new Date());
+      const sourceBar = e.currentTarget;
+      const rect = sourceBar.getBoundingClientRect();
       const nights = Math.max(1, Number(b.nights) || diffNights(b.checkIn, b.checkOut));
-      const newOut = addDays(targetDateIso, nights);
-      const isPast = targetDateIso < todayStr;
-      const conflict = isPast || Boolean(checkOverbooking(targetRoomId, targetDateIso, newOut, b.id));
-      e.dataTransfer.dropEffect = conflict ? 'none' : 'move';
-      e.currentTarget.classList.remove('drop-target-valid', 'drop-target-invalid');
-      e.currentTarget.classList.add(conflict ? 'drop-target-invalid' : 'drop-target-valid');
+      const wrapper = document.getElementById('matrixWrapper');
+      const wrapRect = wrapper ? wrapper.getBoundingClientRect() : { left: 0, top: 0 };
+
+      // Pre-calculate row Y coordinates and date X coordinates once (0ms math during 120fps drag!)
+      const rowBands = [];
+      const rowsEls = document.querySelectorAll('#matrixBody tr');
+      for (let i = 0; i < rowsEls.length; i++) {
+        const firstDayCell = rowsEls[i].querySelector('td.day-cell');
+        if (!firstDayCell) continue;
+        const rRect = firstDayCell.getBoundingClientRect();
+        rowBands.push({
+          roomId: firstDayCell.dataset.room,
+          top: rRect.top,
+          bottom: rRect.bottom
+        });
+      }
+
+      const colCols = [];
+      const firstRowCells = document.querySelectorAll('#matrixBody tr td.day-cell');
+      const seenDates = new Set();
+      for (let i = 0; i < firstRowCells.length; i++) {
+        const c = firstRowCells[i];
+        const dIso = c.dataset.date;
+        if (seenDates.has(dIso)) break;
+        seenDates.add(dIso);
+        const cRect = c.getBoundingClientRect();
+        colCols.push({
+          dateIso: dIso,
+          left: cRect.left,
+          right: cRect.right
+        });
+      }
+
+      const cellMap = new Map();
+      for (let i = 0; i < firstRowCells.length; i++) {
+        const c = firstRowCells[i];
+        cellMap.set(c.dataset.room + '|' + c.dataset.date, c);
+      }
+
+      moveDragState = {
+        bookingId,
+        b,
+        nights,
+        sourceBar,
+        startX: e.clientX,
+        startY: e.clientY,
+        offsetX: e.clientX - rect.left,
+        offsetY: e.clientY - rect.top,
+        width: rect.width,
+        height: rect.height,
+        started: false,
+        ghostEl: null,
+        lastKey: '',
+        targetRoomId: null,
+        targetDateIso: null,
+        isValidDrop: false,
+        highlightedCells: [],
+        cellMap,
+        rowBands,
+        colCols,
+        stickyLeftBoundary: wrapRect.left + 230,
+        todayStr: toIsoDate(new Date()),
+        lastClientX: e.clientX,
+        lastClientY: e.clientY
+      };
     }
 
-    function handleBookingDragLeave(e) {
-      if (e.currentTarget) {
-        e.currentTarget.classList.remove('drop-target-valid', 'drop-target-invalid');
+    function processMoveDragPosition(x, y) {
+      const st = moveDragState;
+      if (!st) return;
+
+      if (!st.started) {
+        if (Math.abs(x - st.startX) < 4 && Math.abs(y - st.startY) < 4) return;
+        st.started = true;
+        isDragging = true;
+        document.body.classList.add('is-fast-dragging');
+        st.sourceBar.classList.add('is-dragging');
+
+        const ghost = document.createElement('div');
+        ghost.style.cssText = `
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: ${st.width}px;
+          height: ${st.height}px;
+          border-radius: 7px;
+          z-index: 99999;
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 9px;
+          font-size: 11.5px;
+          font-weight: 700;
+          color: #ffffff;
+          background: linear-gradient(135deg, #5b54e6, #131b3a);
+          box-shadow: 0 10px 24px rgba(19, 27, 58, 0.35);
+          border: 1.5px solid rgba(255,255,255,0.9);
+          will-change: transform;
+          contain: layout style paint;
+          white-space: nowrap;
+          overflow: hidden;
+        `;
+        ghost.innerHTML = `<span class="truncate">${st.b.guestName || 'Mehmon'}</span><span class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-extrabold shrink-0">${st.nights} tun</span>`;
+        document.body.appendChild(ghost);
+        st.ghostEl = ghost;
+      }
+
+      // Direct hardware-composited GPU transform on every pointer event (supports 120Hz / 144Hz / 240Hz!)
+      if (st.ghostEl) {
+        st.ghostEl.style.transform = `translate3d(${(x - st.offsetX).toFixed(1)}px, ${(y - st.offsetY).toFixed(1)}px, 0)`;
+      }
+
+      // Pure O(1)/O(N_rows) math lookup — zero DOM reflow or elementFromPoint!
+      const probeX = Math.max(st.stickyLeftBoundary + 4, x - st.offsetX + 16);
+      let targetRoomId = null;
+      for (let i = 0; i < st.rowBands.length; i++) {
+        const rb = st.rowBands[i];
+        if (y >= rb.top && y <= rb.bottom) {
+          targetRoomId = rb.roomId;
+          break;
+        }
+      }
+
+      let targetDateIso = null;
+      if (targetRoomId) {
+        for (let i = 0; i < st.colCols.length; i++) {
+          const cc = st.colCols[i];
+          if (probeX >= cc.left && probeX < cc.right) {
+            targetDateIso = cc.dateIso;
+            break;
+          }
+        }
+      }
+
+      const key = (targetRoomId && targetDateIso) ? (targetRoomId + '|' + targetDateIso) : '';
+      if (key === st.lastKey) return;
+      st.lastKey = key;
+
+      for (let i = 0; i < st.highlightedCells.length; i++) {
+        st.highlightedCells[i].classList.remove('drop-target-valid', 'drop-target-invalid');
+      }
+      st.highlightedCells.length = 0;
+      st.targetRoomId = targetRoomId;
+      st.targetDateIso = targetDateIso;
+      st.isValidDrop = false;
+
+      if (!targetRoomId || !targetDateIso) return;
+
+      const newOut = addDays(targetDateIso, st.nights);
+      const isPast = targetDateIso < st.todayStr;
+      const conflict = isPast || Boolean(checkOverbooking(targetRoomId, targetDateIso, newOut, st.bookingId));
+      st.isValidDrop = !conflict;
+
+      const cls = conflict ? 'drop-target-invalid' : 'drop-target-valid';
+      for (let d = 0; d < st.nights; d++) {
+        const dIso = d === 0 ? targetDateIso : addDays(targetDateIso, d);
+        const c = st.cellMap.get(targetRoomId + '|' + dIso);
+        if (c) {
+          c.classList.add(cls);
+          st.highlightedCells.push(c);
+        }
+      }
+
+      if (st.ghostEl) {
+        st.ghostEl.style.background = conflict
+          ? 'linear-gradient(135deg, #dc2626, #991b1b)'
+          : 'linear-gradient(135deg, #10b981, #059669)';
       }
     }
 
-    function handleBookingDrop(e, targetRoomId, targetDateIso) {
-      e.preventDefault();
-      if (e.currentTarget) e.currentTarget.classList.remove('drop-target-valid', 'drop-target-invalid');
-      const bId = draggedBookingId || e.dataTransfer.getData('text/plain');
-      draggedBookingId = null;
-      if (!bId) return;
+    window.addEventListener('pointermove', (e) => {
+      if (!moveDragState) return;
+      processMoveDragPosition(e.clientX, e.clientY);
+    }, { passive: true });
 
-      const b = bookings.find(x => x.id === bId);
-      if (!b) return;
-      if (b.status !== 'Bron' && b.status !== 'Band') {
-        alert('⛔ Chiqib ketgan yoki bekor qilingan bronlarni boshqa xonaga ko‘chirib bo‘lmaydi!');
-        return;
-      }
+    window.addEventListener('pointerup', () => {
+      if (!moveDragState) return;
+      const st = moveDragState;
+      const wasStarted = st.started;
+      const targetRoomId = st.targetRoomId;
+      const targetDateIso = st.targetDateIso;
+      const isValidDrop = st.isValidDrop;
+      const b = st.b;
+      const nights = st.nights;
 
-      const todayStr = toIsoDate(new Date());
-      if (targetDateIso < todayStr) {
-        alert('⛔ O‘tgan sanalarga bronni ko‘chirib bo‘lmaydi!');
-        return;
-      }
-      const nights = Math.max(1, Number(b.nights) || diffNights(b.checkIn, b.checkOut));
+      cleanupMoveDragVisuals();
+
+      if (!wasStarted) return;
+
+      justFinishedMoving = true;
+      setTimeout(() => { justFinishedMoving = false; }, 160);
+
+      if (!targetRoomId || !targetDateIso) return;
+
       const newCheckIn = targetDateIso;
       const newCheckOut = addDays(targetDateIso, nights);
 
       if (b.room === targetRoomId && b.checkIn === newCheckIn) return;
 
-      const conflict = checkOverbooking(targetRoomId, newCheckIn, newCheckOut, b.id);
-      if (conflict) {
-        alert(`⛔ OVERBOOKING: № ${targetRoomId} xonasi ${conflict.checkIn} — ${conflict.checkOut} sanalarida band! Boshqa bo‘sh xonaga yoki sanaga qo‘ying.`);
+      if (targetDateIso < st.todayStr) {
+        showToast('⛔ O‘tgan sanalarga bronni ko‘chirib bo‘lmaydi!', 'error');
+        return;
+      }
+
+      if (!isValidDrop) {
+        const conflict = checkOverbooking(targetRoomId, newCheckIn, newCheckOut, b.id);
+        const info = conflict ? `${conflict.checkIn} — ${conflict.checkOut}` : `${newCheckIn} — ${newCheckOut}`;
+        showToast(`⛔ OVERBOOKING: № ${targetRoomId} xonasi ${info} sanalarida band!`, 'error');
         return;
       }
 
@@ -3409,7 +3584,6 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       b.checkOut = newCheckOut;
       b.nights = nights;
 
-      // Eski va yangi xona holatini yangilash
       const oldRoomObj = rooms.find(r => r.id === oldRoomId);
       if (oldRoomObj && !isRoomCheckedInToday(oldRoomId) && oldRoomObj.clean === 'Band') {
         oldRoomObj.clean = 'Toza';
@@ -3421,11 +3595,13 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
         newRoomObj.manualStatus = false;
       }
 
+      lastLocalWriteAt = Date.now();
       recordAuditAction('Bron ko‘chirildi', `${b.guestName || 'Mehmon'}: № ${oldRoomId} (${oldDates}) → № ${targetRoomId} (${newCheckIn} → ${newCheckOut})`);
       saveAllLocal();
       refreshAllViews(false);
       pushAllToCloud(false);
-    }
+      showToast(`✅ ${b.guestName || 'Mehmon'} № ${targetRoomId} xonasiga ko‘chirildi`, 'success', 2400);
+    });
 
     function isCellBlockedForNewBooking(roomId, dateIso) {
       const todayStr = toIsoDate(new Date());
@@ -4368,6 +4544,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
 
     // ==================== TO'LIQ BAZA BACKUP (JSON VA EXCEL) ====================
     function downloadFullBackupJson() {
+      if (!isHotelChiefAdmin()) { showToast('🔒 To‘liq baza Backup faqat glavniy admin uchun!', 'error'); return; }
       const hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
       const dateStr = toIsoDate(new Date());
       const backupPayload = {
@@ -4392,6 +4569,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
     }
 
     function exportFullExcelArchive() {
+      if (!isHotelChiefAdmin()) { showToast('🔒 To‘liq Excel arxiv faqat glavniy admin uchun!', 'error'); return; }
       const hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
       const dateStr = toIsoDate(new Date());
       const validBookings = bookings.filter(isValidBookingRecord);
@@ -4942,9 +5120,9 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
 
     let i18nObserverTimer = null;
     const i18nObserver = new MutationObserver(() => {
-      if (isApplyingI18n || currentLang === 'uz') return;
+      if (isApplyingI18n || currentLang === 'uz' || isDragging || moveDragState || isResizingBooking) return;
       clearTimeout(i18nObserverTimer);
-      i18nObserverTimer = setTimeout(() => applyLanguageToSubtree(document.body), 40);
+      i18nObserverTimer = setTimeout(() => applyLanguageToSubtree(document.body), 120);
     });
     window.addEventListener('DOMContentLoaded', () => {
       updateLangButtonsUI();
