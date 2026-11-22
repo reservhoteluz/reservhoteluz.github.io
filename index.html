@@ -2642,7 +2642,19 @@
     function jumpDailyToday() { const t = toIsoDate(new Date()); document.getElementById('dailyReportDate').value = t; syncDailyFormDefaultDates(t, true); renderDailyReport(); }
     function selectDailyDate(iso) { document.getElementById('dailyReportDate').value = iso; syncDailyFormDefaultDates(iso, true); renderDailyReport(); }
 
-    function isRoomOccupiedOnDate(roomId, dateIso, list) { return list.some(b => b.room === roomId && b.status !== 'Chiqdi' && b.status !== 'Bekor qilingan' && b.checkIn <= dateIso && b.checkOut > dateIso); }
+    function isRoomOccupiedOnDate(roomId, dateIso, list) {
+      return list.some(b => {
+        if (b.room !== roomId || b.status === 'Bekor qilingan') return false;
+        const cIn = toIsoDate(b.checkIn);
+        const cOut = toIsoDate(b.checkOut);
+        if (!cIn || !cOut) return false;
+        // Chiqdi (Check-out) bo'lgan bronlar ham yashab o'tgan tunlari uchun bandlik foizida saqlanadi
+        if (cIn <= dateIso && cOut > dateIso) return true;
+        // Bir kun ichida kirib-chiqib ketgan (day-use) mehmon ham o'sha kun statistikasida qoladi
+        if (b.status === 'Chiqdi' && cIn === cOut && cIn === dateIso) return true;
+        return false;
+      });
+    }
     function toggleRoomClean(roomId) {
       const r = rooms.find(x => x.id === roomId); if (!r) return;
       const cur = getEffectiveRoomStatus(r);
