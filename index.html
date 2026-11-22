@@ -317,7 +317,12 @@
   <!-- ==================== 1. YOPIQ KIRISH EKRANI (INSTAGRAM USLUBIDA) ==================== -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-[#090d22] via-[#131b3a] to-[#1b2554] backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-[#5b54e6]/25">
-      <div class="bg-gradient-to-r from-[#090d22] via-[#131b3a] to-[#1b2554] p-7 text-center text-white flex flex-col items-center">
+      <div class="bg-gradient-to-r from-[#090d22] via-[#131b3a] to-[#1b2554] p-7 text-center text-white flex flex-col items-center relative">
+        <div class="absolute top-3 right-3 flex items-center gap-1 bg-white/10 p-1 rounded-lg border border-white/15 text-[10px] font-bold">
+          <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2 py-0.5 rounded transition">UZ</button>
+          <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-2 py-0.5 rounded transition">RU</button>
+          <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-2 py-0.5 rounded transition">EN</button>
+        </div>
         <svg class="rh-logo-svg w-16 h-16 mb-3" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M26 16 H67 C89 16 101 29 101 47 C101 61 93 71 80 76 L71 63 C80 60 85 55 85 47 C85 37 78 30 66 30 H42 V58 H26 V16 Z" fill="#5b54e6"/>
           <g class="rh-part-building">
@@ -516,6 +521,11 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <div class="flex items-center gap-0.5 bg-[#f4f5ff] p-1 rounded-lg border border-[#d8defa] text-[11px] font-bold">
+            <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2 py-1 rounded transition">UZ</button>
+            <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-2 py-1 rounded transition">RU</button>
+            <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-2 py-1 rounded transition">EN</button>
+          </div>
           <button onclick="syncFromCloud(true)" title="Bazani yangilash" class="p-2 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold">
             🔄
           </button>
@@ -3649,6 +3659,492 @@
       const em = String(allowedUsers[idx].email || '').toLowerCase(); delete saasRegistry.emailMap[em]; allowedUsers.splice(idx, 1);
       saveAllLocal(); renderAllowedUsers(); await saveSaasRegistry(); await pushAllToCloud(false);
     }
+
+
+    // ==================== KO'P TILLILIK (UZ / RU / EN) ====================
+    let currentLang = localStorage.getItem('rh_lang') || 'uz';
+    let isApplyingI18n = false;
+
+    const I18N_MAP = {
+      ru: {
+        // Login
+        'Har bir mehmonxona uchun alohida yopiq bulutli tizim': 'Закрытая облачная система для каждого отеля',
+        'Gmail manzilingiz': 'Ваш Gmail адрес',
+        'Kirish kodi (kamida 6 belgi)': 'Код входа (минимум 6 символов)',
+        'Tizimga kirish →': 'Войти в систему →',
+        'Texnik yordam yoki tizim sotib olish uchun bog‘lanish:': 'Техподдержка и покупка системы:',
+        // Sidebar & Nav
+        'Mehmonxonalar ro‘yxati': 'Список отелей',
+        'Yangi mehmonxona qo‘shish': 'Добавить новый отель',
+        'Shaxmatka kalendari': 'Шахматка (Календарь)',
+        'Kunlik hisobot': 'Ежедневный отчёт',
+        'Bronlar va Mehmonlar': 'Брони и Гости',
+        'Moliya va Kassa': 'Финансы и Касса',
+        'Xonalar va Narxlar': 'Номера и Цены',
+        'Xodimlar ruxsati': 'Доступ сотрудников',
+        'Mijozlar (SaaS Admin)': 'Клиенты (SaaS Админ)',
+        'Chiqish': 'Выйти',
+        'Firebase: Jonli ulangan ✓': 'Firebase: Подключено ✓',
+        'Firebase: Ulanmoqda...': 'Firebase: Подключение...',
+        'Firebase: Saqlanmoqda...': 'Firebase: Сохранение...',
+        // Header & KPIs
+        '🛏️ Yashamoqda:': '🛏️ Проживают:',
+        '📥 Bugun keladi:': '📥 Заезд сегодня:',
+        '📤 Bugun ketadi:': '📤 Выезд сегодня:',
+        '⚠️ Qarzdorlar:': '⚠️ Должники:',
+        'Bron yaratish': 'Создать бронь',
+        // Matrix controls & legend
+        '🕒 Bugun': '🕒 Сегодня',
+        '30 kun (1 oy)': '30 дней (1 мес)',
+        '60 kun (2 oy)': '60 дней (2 мес)',
+        '90 kun (3 oy)': '90 дней (3 мес)',
+        '180 kun (6 oy)': '180 дней (6 мес)',
+        '365 kun (1 yil)': '365 дней (1 год)',
+        '🔎 48px (Kichik)': '🔎 48px (Мелкий)',
+        '🔎 64px (Standart)': '🔎 64px (Стандарт)',
+        '🔎 96px (Katta)': '🔎 96px (Крупный)',
+        '🔎 128px (Keng)': '🔎 128px (Широкий)',
+        'Holat: Barchasi': 'Статус: Все',
+        'Band (Check-in)': 'Заселён (Check-in)',
+        'Bron qilingan': 'Забронировано',
+        'Chiqdi (Check-out)': 'Выехал (Check-out)',
+        'Bekor qilingan': 'Отменено',
+        'Band (To‘langan)': 'Заселён (Оплачено)',
+        'Qisman to‘langan': 'Частично оплачено',
+        'Qarzdor': 'Должник',
+        'Bron': 'Бронь',
+        'Chiqdi': 'Выехал',
+        '💡 Holat tugmasini bosib qo‘lda ham (Toza / Tozalash / Band) o‘zgartirishingiz mumkin': '💡 Нажмите на статус номера, чтобы вручную изменить (Чисто / Уборка / Занято)',
+        'Xona / Qavat': 'Номер / Этаж',
+        'Holati': 'Статус',
+        'Toza': 'Чисто',
+        'Tozalash': 'Уборка',
+        'Band': 'Занято',
+        // Daily report
+        '📊 Kunlik Hisobot va Xarajatlar': '📊 Ежедневный отчёт и расходы',
+        '1-smena va 2-smena administratorlari har biri o‘z hisobotini qo‘lda kiritadi': 'Администраторы смен ведут свой кассовый отчёт вручную',
+        '◀ Oldingi': '◀ Назад',
+        'Keyingi ▶': 'Вперёд ▶',
+        '🖨️ Chop etish': '🖨️ Печать',
+        'Jami kunlik tushum (Barcha smenalar)': 'Общая выручка за день (Все смены)',
+        '💵 Jami Naqd pul tushumi': '💵 Всего наличными',
+        'Barcha smenalar bo‘yicha naqd pul': 'Наличные по всем сменам',
+        '💸 Jami kunlik xarajatlar': '💸 Расходы за день',
+        'Naqd pul tushumidan yechiladi': 'Вычитается из наличной кассы',
+        '💰 Kassada qolgan jami sof naqd': '💰 Чистый остаток наличных',
+        'Jami naqd − Jami xarajatlar': 'Наличные − Расходы',
+        '🔄 Smenalar rejimi:': '🔄 Режим смен:',
+        'Smenalar soni:': 'Кол-во смен:',
+        '− Smena olish': '− Убрать смену',
+        '+ Smena qo‘shish': '+ Добавить смену',
+        '💾 Saqlash': '💾 Сохранить',
+        'Xarajat yo‘q': 'Расходов нет',
+        // Bookings tab
+        'Barcha Bronlar va Mehmonlar Ro‘yxati': 'Список всех броней и гостей',
+        'Istalgan mehmon ustiga bosib to‘lov qabul qiling yoki tahrirlang': 'Нажмите на любого гостя для оплаты или редактирования',
+        '+ Yangi mehmon': '+ Новый гость',
+        'Xona': 'Номер',
+        'Mehmon F.I.SH': 'Ф.И.О. гостя',
+        'Telefon / Manba': 'Телефон / Источник',
+        'Kirish': 'Заезд',
+        'Chiqish': 'Выезд',
+        'Tun': 'Ночей',
+        'Jami Summa': 'Итого',
+        'To‘langan': 'Оплачено',
+        'Qarz': 'Долг',
+        'To‘lov turi': 'Способ оплаты',
+        'Amal': 'Действие',
+        'Ochish →': 'Открыть →',
+        '🛡️ Amallar tarixi': '🛡️ История действий',
+        '🗑 Tarixni tozalash': '🗑 Очистить историю',
+        'Vaqt': 'Время',
+        'Kim bajardi': 'Кто выполнил',
+        'Amal turi': 'Тип действия',
+        'Tafsilot (Xona / Mehmon / Summa)': 'Подробности (Номер / Гость / Сумма)',
+        // Finance tab
+        'Moliyaviy Hisobot va Kassa Kesimi': 'Финансовый отчёт и Касса',
+        'To‘lov turlari, bron manbalari va kunlik tushum dinamikasi': 'Способы оплаты, источники броней и динамика выручки',
+        'Bugun': 'Сегодня',
+        '7 kun': '7 дней',
+        'Joriy oy': 'Текущий месяц',
+        'O‘tgan oy': 'Прошлый месяц',
+        'Jami hisoblangan daromad': 'Начисленный доход',
+        'Kassaga tushgan (To‘langan)': 'Поступило в кассу (Оплачено)',
+        'Umumiy qarzdorlik': 'Общая задолженность',
+        'Sotilgan xona-kunlar': 'Продано номеро-ночей',
+        '📈 Kunlik tushum va hisoblangan daromad dinamikasi': '📈 Динамика дневной выручки',
+        'Tanlangan sanalar bo‘yicha kunlik tushum taqsimoti': 'Распределение выручки по выбранным датам',
+        'Kassaga tushgan': 'Поступило в кассу',
+        'Hisoblangan': 'Начислено',
+        '💳 To‘lov turlari bo‘yicha tushumlar': '💳 Поступления по видам оплаты',
+        'Naqd, karta va onlayn to‘lovlar ulushi': 'Доля наличных, карт и онлайн-оплат',
+        'Kassa kesimi': 'По кассе',
+        '🌐 Bron manbalari bo‘yicha ulush': '🌐 Доля по источникам броней',
+        'Mijozlar qaysi kanal orqali kelgani': 'Каналы привлечения гостей',
+        'Kanallar kesimi': 'По каналам',
+        'Jami tushum': 'Выручка',
+        'Jami bron': 'Всего броней',
+        // Rates tab
+        'Xonalar Ro‘yxati va Tariflar': 'Список номеров и тарифы',
+        '💾 O‘zgarishlarni saqlash': '💾 Сохранить изменения',
+        'Qavat nomi *': 'Этаж *',
+        'Xona raqami *': 'Номер комнаты *',
+        'Xona toifasi *': 'Категория *',
+        'O‘rin *': 'Мест *',
+        'Narxi *': 'Цена *',
+        '+ Yangi xona qo‘shish': '+ Добавить номер',
+        'Qavat': 'Этаж',
+        'Xona №': 'Номер №',
+        'Xona toifasi / Nomi': 'Категория / Название',
+        'O‘rinlar soni': 'Кол-во мест',
+        '1 sutka narxi (UZS)': 'Цена за сутки (UZS)',
+        'Xona holati': 'Статус номера',
+        '🗑 O‘chirish': '🗑 Удалить',
+        // Users tab
+        'Mehmonxona Xodimlari va Kirish Ruxsatlari': 'Сотрудники отеля и права доступа',
+        'Xodim Gmail manzili': 'Gmail сотрудника',
+        'Ismi / Lavozimi': 'Имя / Должность',
+        'Huquq & Parol (kamida 6 belgi)': 'Роль и пароль (мин. 6 симв.)',
+        '+ Xodim qo‘shish': '+ Добавить сотрудника',
+        'Gmail manzili': 'Gmail адрес',
+        'Xodim ismi': 'Имя сотрудника',
+        'Huquq darajasi': 'Роль',
+        'Parol (min. 6 belgi)': 'Пароль (мин. 6)',
+        'Boshqarish': 'Управление',
+        'Faol': 'Активен',
+        'Bloklangan': 'Заблокирован',
+        'Bloklash': 'Блок',
+        'Faollash': 'Актив.',
+        'O‘chirish': 'Удалить',
+        // Booking Modal & Drawer
+        'Yangi Bron / Mehmon Ro‘yxatga Olish': 'Новая бронь / Регистрация гостя',
+        'Qo‘shimcha xizmatlar va aralash to‘lovlar': 'Доп. услуги и смешанные оплаты',
+        'Bron holati': 'Статус брони',
+        'Bron (Oldindan band)': 'Бронь (Предварительно)',
+        'Band (Check-in qilingan)': 'Заселён (Check-in)',
+        'Kirish sanasi va vaqti *': 'Дата и время заезда *',
+        'Chiqish sanasi va vaqti *': 'Дата и время выезда *',
+        'Mehmon F.I.SH *': 'Ф.И.О. гостя *',
+        'Telefon raqami': 'Номер телефона',
+        'Pasport / ID': 'Паспорт / ID',
+        'Mehmonlar soni': 'Кол-во гостей',
+        'Bron manbasi': 'Источник брони',
+        '1 kunlik narx (UZS)': 'Цена за 1 сутки (UZS)',
+        'Qo‘shimcha xizmatlar (UZS)': 'Доп. услуги (UZS)',
+        '🥤 Tezkor qo‘shimcha xizmatlar:': '🥤 Быстрые доп. услуги:',
+        '💳 Qabul qilingan to‘lovlar': '💳 Принятые оплаты',
+        '+ To‘lov qo‘shish': '+ Добавить оплату',
+        'Izoh': 'Примечание',
+        'Bekor qilish': 'Отмена',
+        '✅ Check-in (Kirish)': '✅ Check-in (Заезд)',
+        '🏁 Check-out (Chiqish)': '🏁 Check-out (Выезд)',
+        '❌ Bronni bekor qilish (Atmen)': '❌ Отменить бронь',
+        'Telefon:': 'Телефон:',
+        'Pasport:': 'Паспорт:',
+        'Manba:': 'Источник:',
+        'Sanalar:': 'Даты:',
+        'Mehmonlar:': 'Гости:',
+        '1 kunlik narx:': 'Цена за сутки:',
+        'Qo‘shimcha xizmatlar:': 'Доп. услуги:',
+        'Jami hisob:': 'Итого к оплате:',
+        'To‘lovlar tafsiloti:': 'Детали оплат:',
+        'Jami to‘langan:': 'Всего оплачено:',
+        'Qolgan qarz:': 'Остаток долга:',
+        'Tezkor to‘lov qo‘shish': 'Быстрая оплата',
+        '+ Qo‘shish': '+ Добавить',
+        'Izoh:': 'Примечание:',
+        '✏️ Tahrirlash': '✏️ Редактировать',
+        'Ushbu bron yopilgan (faqat ko‘rish rejimi). O‘zgartirish uchun mehmonxona glavniy adminiga murojaat qiling.': 'Бронь закрыта (только просмотр). Для изменений обратитесь к главному администратору.'
+      },
+      en: {
+        // Login
+        'Har bir mehmonxona uchun alohida yopiq bulutli tizim': 'Private cloud PMS for every hotel',
+        'Gmail manzilingiz': 'Your Gmail address',
+        'Kirish kodi (kamida 6 belgi)': 'Access code (min 6 characters)',
+        'Tizimga kirish →': 'Sign in →',
+        'Texnik yordam yoki tizim sotib olish uchun bog‘lanish:': 'Support & licensing contact:',
+        // Sidebar & Nav
+        'Mehmonxonalar ro‘yxati': 'Hotels list',
+        'Yangi mehmonxona qo‘shish': 'Add new hotel',
+        'Shaxmatka kalendari': 'Room Calendar',
+        'Kunlik hisobot': 'Daily Report',
+        'Bronlar va Mehmonlar': 'Bookings & Guests',
+        'Moliya va Kassa': 'Finance & Cash',
+        'Xonalar va Narxlar': 'Rooms & Rates',
+        'Xodimlar ruxsati': 'Staff Access',
+        'Mijozlar (SaaS Admin)': 'Clients (SaaS Admin)',
+        'Chiqish': 'Log out',
+        'Firebase: Jonli ulangan ✓': 'Firebase: Connected ✓',
+        'Firebase: Ulanmoqda...': 'Firebase: Connecting...',
+        'Firebase: Saqlanmoqda...': 'Firebase: Saving...',
+        // Header & KPIs
+        '🛏️ Yashamoqda:': '🛏️ Staying:',
+        '📥 Bugun keladi:': '📥 Arrivals today:',
+        '📤 Bugun ketadi:': '📤 Departures today:',
+        '⚠️ Qarzdorlar:': '⚠️ Debtors:',
+        'Bron yaratish': 'New Booking',
+        // Matrix controls & legend
+        '🕒 Bugun': '🕒 Today',
+        '30 kun (1 oy)': '30 days (1 mo)',
+        '60 kun (2 oy)': '60 days (2 mo)',
+        '90 kun (3 oy)': '90 days (3 mo)',
+        '180 kun (6 oy)': '180 days (6 mo)',
+        '365 kun (1 yil)': '365 days (1 yr)',
+        '🔎 48px (Kichik)': '🔎 48px (Small)',
+        '🔎 64px (Standart)': '🔎 64px (Standard)',
+        '🔎 96px (Katta)': '🔎 96px (Large)',
+        '🔎 128px (Keng)': '🔎 128px (Wide)',
+        'Holat: Barchasi': 'Status: All',
+        'Band (Check-in)': 'Checked-in',
+        'Bron qilingan': 'Booked',
+        'Chiqdi (Check-out)': 'Checked-out',
+        'Bekor qilingan': 'Canceled',
+        'Band (To‘langan)': 'Checked-in (Paid)',
+        'Qisman to‘langan': 'Partially paid',
+        'Qarzdor': 'Unpaid',
+        'Bron': 'Booked',
+        'Chiqdi': 'Checked-out',
+        '💡 Holat tugmasini bosib qo‘lda ham (Toza / Tozalash / Band) o‘zgartirishingiz mumkin': '💡 Click the room status badge to manually toggle (Clean / Dirty / Occupied)',
+        'Xona / Qavat': 'Room / Floor',
+        'Holati': 'Status',
+        'Toza': 'Clean',
+        'Tozalash': 'Clean up',
+        'Band': 'Occupied',
+        // Daily report
+        '📊 Kunlik Hisobot va Xarajatlar': '📊 Daily Report & Expenses',
+        '1-smena va 2-smena administratorlari har biri o‘z hisobotini qo‘lda kiritadi': 'Shift receptionists log their cash reports manually',
+        '◀ Oldingi': '◀ Prev',
+        'Keyingi ▶': 'Next ▶',
+        '🖨️ Chop etish': '🖨️ Print',
+        'Jami kunlik tushum (Barcha smenalar)': 'Total Daily Revenue (All shifts)',
+        '💵 Jami Naqd pul tushumi': '💵 Total Cash Income',
+        'Barcha smenalar bo‘yicha naqd pul': 'Cash across all shifts',
+        '💸 Jami kunlik xarajatlar': '💸 Total Daily Expenses',
+        'Naqd pul tushumidan yechiladi': 'Deducted from cash register',
+        '💰 Kassada qolgan jami sof naqd': '💰 Net Cash in Register',
+        'Jami naqd − Jami xarajatlar': 'Total cash − Total expenses',
+        '🔄 Smenalar rejimi:': '🔄 Shifts mode:',
+        'Smenalar soni:': 'Shifts count:',
+        '− Smena olish': '− Remove shift',
+        '+ Smena qo‘shish': '+ Add shift',
+        '💾 Saqlash': '💾 Save',
+        'Xarajat yo‘q': 'No expenses',
+        // Bookings tab
+        'Barcha Bronlar va Mehmonlar Ro‘yxati': 'All Bookings & Guests',
+        'Istalgan mehmon ustiga bosib to‘lov qabul qiling yoki tahrirlang': 'Click any guest to accept payment or edit',
+        '+ Yangi mehmon': '+ New guest',
+        'Xona': 'Room',
+        'Mehmon F.I.SH': 'Guest Name',
+        'Telefon / Manba': 'Phone / Source',
+        'Kirish': 'Check-in',
+        'Chiqish': 'Check-out',
+        'Tun': 'Nights',
+        'Jami Summa': 'Total',
+        'To‘langan': 'Paid',
+        'Qarz': 'Due',
+        'To‘lov turi': 'Payment',
+        'Amal': 'Action',
+        'Ochish →': 'Open →',
+        '🛡️ Amallar tarixi': '🛡️ Activity Log',
+        '🗑 Tarixni tozalash': '🗑 Clear log',
+        'Vaqt': 'Time',
+        'Kim bajardi': 'Performed by',
+        'Amal turi': 'Action',
+        'Tafsilot (Xona / Mehmon / Summa)': 'Details (Room / Guest / Amount)',
+        // Finance tab
+        'Moliyaviy Hisobot va Kassa Kesimi': 'Financial Report & Cash Flow',
+        'To‘lov turlari, bron manbalari va kunlik tushum dinamikasi': 'Payment methods, booking sources & daily revenue',
+        'Bugun': 'Today',
+        '7 kun': '7 days',
+        'Joriy oy': 'This month',
+        'O‘tgan oy': 'Last month',
+        'Jami hisoblangan daromad': 'Total Expected Revenue',
+        'Kassaga tushgan (To‘langan)': 'Collected (Paid)',
+        'Umumiy qarzdorlik': 'Total Unpaid Balance',
+        'Sotilgan xona-kunlar': 'Room-Nights Sold',
+        '📈 Kunlik tushum va hisoblangan daromad dinamikasi': '📈 Daily Revenue Dynamics',
+        'Tanlangan sanalar bo‘yicha kunlik tushum taqsimoti': 'Daily breakdown for selected dates',
+        'Kassaga tushgan': 'Collected',
+        'Hisoblangan': 'Expected',
+        '💳 To‘lov turlari bo‘yicha tushumlar': '💳 Revenue by Payment Method',
+        'Naqd, karta va onlayn to‘lovlar ulushi': 'Cash, card & online share',
+        'Kassa kesimi': 'By method',
+        '🌐 Bron manbalari bo‘yicha ulush': '🌐 Share by Booking Source',
+        'Mijozlar qaysi kanal orqali kelgani': 'Guest acquisition channels',
+        'Kanallar kesimi': 'By channel',
+        'Jami tushum': 'Collected',
+        'Jami bron': 'Bookings',
+        // Rates tab
+        'Xonalar Ro‘yxati va Tariflar': 'Rooms & Rates',
+        '💾 O‘zgarishlarni saqlash': '💾 Save changes',
+        'Qavat nomi *': 'Floor *',
+        'Xona raqami *': 'Room # *',
+        'Xona toifasi *': 'Room type *',
+        'O‘rin *': 'Beds *',
+        'Narxi *': 'Rate *',
+        '+ Yangi xona qo‘shish': '+ Add room',
+        'Qavat': 'Floor',
+        'Xona №': 'Room №',
+        'Xona toifasi / Nomi': 'Category / Name',
+        'O‘rinlar soni': 'Beds',
+        '1 sutka narxi (UZS)': 'Nightly rate (UZS)',
+        'Xona holati': 'Status',
+        '🗑 O‘chirish': '🗑 Delete',
+        // Users tab
+        'Mehmonxona Xodimlari va Kirish Ruxsatlari': 'Hotel Staff & Access Permissions',
+        'Xodim Gmail manzili': 'Staff Gmail',
+        'Ismi / Lavozimi': 'Name / Position',
+        'Huquq & Parol (kamida 6 belgi)': 'Role & Password (min 6 chars)',
+        '+ Xodim qo‘shish': '+ Add staff',
+        'Gmail manzili': 'Gmail address',
+        'Xodim ismi': 'Staff name',
+        'Huquq darajasi': 'Role',
+        'Parol (min. 6 belgi)': 'Password (min 6)',
+        'Boshqarish': 'Manage',
+        'Faol': 'Active',
+        'Bloklangan': 'Blocked',
+        'Bloklash': 'Block',
+        'Faollash': 'Activate',
+        'O‘chirish': 'Delete',
+        // Booking Modal & Drawer
+        'Yangi Bron / Mehmon Ro‘yxatga Olish': 'New Booking / Guest Check-in',
+        'Qo‘shimcha xizmatlar va aralash to‘lovlar': 'Extra services & split payments',
+        'Bron holati': 'Booking status',
+        'Bron (Oldindan band)': 'Booked (Reservation)',
+        'Band (Check-in qilingan)': 'Checked-in',
+        'Kirish sanasi va vaqti *': 'Check-in date & time *',
+        'Chiqish sanasi va vaqti *': 'Check-out date & time *',
+        'Mehmon F.I.SH *': 'Guest full name *',
+        'Telefon raqami': 'Phone number',
+        'Pasport / ID': 'Passport / ID',
+        'Mehmonlar soni': 'Guests',
+        'Bron manbasi': 'Booking source',
+        '1 kunlik narx (UZS)': 'Nightly rate (UZS)',
+        'Qo‘shimcha xizmatlar (UZS)': 'Extra services (UZS)',
+        '🥤 Tezkor qo‘shimcha xizmatlar:': '🥤 Quick extra services:',
+        '💳 Qabul qilingan to‘lovlar': '💳 Received payments',
+        '+ To‘lov qo‘shish': '+ Add payment',
+        'Izoh': 'Notes',
+        'Bekor qilish': 'Cancel',
+        '✅ Check-in (Kirish)': '✅ Check-in',
+        '🏁 Check-out (Chiqish)': '🏁 Check-out',
+        '❌ Bronni bekor qilish (Atmen)': '❌ Cancel booking',
+        'Telefon:': 'Phone:',
+        'Pasport:': 'Passport:',
+        'Manba:': 'Source:',
+        'Sanalar:': 'Dates:',
+        'Mehmonlar:': 'Guests:',
+        '1 kunlik narx:': 'Nightly rate:',
+        'Qo‘shimcha xizmatlar:': 'Extra services:',
+        'Jami hisob:': 'Total bill:',
+        'To‘lovlar tafsiloti:': 'Payment breakdown:',
+        'Jami to‘langan:': 'Total paid:',
+        'Qolgan qarz:': 'Balance due:',
+        'Tezkor to‘lov qo‘shish': 'Quick payment',
+        '+ Qo‘shish': '+ Add',
+        'Izoh:': 'Notes:',
+        '✏️ Tahrirlash': '✏️ Edit',
+        'Ushbu bron yopilgan (faqat ko‘rish rejimi). O‘zgartirish uchun mehmonxona glavniy adminiga murojaat qiling.': 'This booking is closed (read-only). Contact the hotel chief admin to make changes.'
+      }
+    };
+
+    const I18N_PATTERNS = {
+      ru: [
+        [/\bbo‘sh\b/g, 'своб.'],
+        [/\bo‘rin\b/g, 'мест'],
+        [/\bta xona\b/g, 'номеров'],
+        [/\bta\b/g, 'шт'],
+        [/\btun\b/g, 'ноч.'],
+        [/\bso‘m\b/g, 'сум'],
+        [/Band xonalar \(Jami:/g, 'Занято номеров (Всего:'],
+        [/Yanvar/g, 'Январь'], [/Fevral/g, 'Февраль'], [/Mart/g, 'Март'], [/Aprel/g, 'Апрель'],
+        [/May/g, 'Май'], [/Iyun/g, 'Июнь'], [/Iyul/g, 'Июль'], [/Avgust/g, 'Август'],
+        [/Sentabr/g, 'Сентябрь'], [/Oktabr/g, 'Октябрь'], [/Noyabr/g, 'Ноябрь'], [/Dekabr/g, 'Декабрь']
+      ],
+      en: [
+        [/\bbo‘sh\b/g, 'free'],
+        [/\bo‘rin\b/g, 'beds'],
+        [/\bta xona\b/g, 'rooms'],
+        [/\bta\b/g, 'pcs'],
+        [/\btun\b/g, 'n.'],
+        [/\bso‘m\b/g, 'UZS'],
+        [/Band xonalar \(Jami:/g, 'Occupied rooms (Total:'],
+        [/Yanvar/g, 'January'], [/Fevral/g, 'February'], [/Mart/g, 'March'], [/Aprel/g, 'April'],
+        [/May/g, 'May'], [/Iyun/g, 'June'], [/Iyul/g, 'July'], [/Avgust/g, 'August'],
+        [/Sentabr/g, 'September'], [/Oktabr/g, 'October'], [/Noyabr/g, 'November'], [/Dekabr/g, 'December']
+      ]
+    };
+
+    function translateUiString(orig) {
+      if (!orig || currentLang === 'uz') return orig;
+      const dict = I18N_MAP[currentLang];
+      if (!dict) return orig;
+      const trimmed = orig.trim();
+      if (dict[trimmed]) {
+        return orig.replace(trimmed, dict[trimmed]);
+      }
+      let out = orig;
+      const pats = I18N_PATTERNS[currentLang] || [];
+      for (const [re, rep] of pats) {
+        out = out.replace(re, rep);
+      }
+      return out;
+    }
+
+    function updateLangButtonsUI() {
+      document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+        const isActive = btn.getAttribute('data-lang-btn') === currentLang;
+        btn.classList.toggle('bg-[#5b54e6]', isActive);
+        btn.classList.toggle('text-white', isActive);
+        btn.classList.toggle('shadow-xs', isActive);
+        if (!isActive) {
+          btn.classList.remove('bg-[#5b54e6]', 'text-white', 'shadow-xs');
+        }
+      });
+    }
+
+    function applyLanguageToSubtree(root = document.body) {
+      if (!root || isApplyingI18n) return;
+      isApplyingI18n = true;
+      try {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+        let node;
+        while ((node = walker.nextNode())) {
+          const parent = node.parentElement;
+          if (!parent || parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') continue;
+          if (parent.hasAttribute('data-lang-btn')) continue;
+          const val = node.nodeValue;
+          if (!val || !val.trim()) continue;
+          if (node._rhOrigText === undefined) node._rhOrigText = val;
+          const target = translateUiString(node._rhOrigText);
+          if (node.nodeValue !== target) node.nodeValue = target;
+        }
+      } finally {
+        isApplyingI18n = false;
+      }
+    }
+
+    function setAppLanguage(lang) {
+      if (!['uz', 'ru', 'en'].includes(lang)) return;
+      currentLang = lang;
+      localStorage.setItem('rh_lang', lang);
+      document.documentElement.lang = lang;
+      updateLangButtonsUI();
+      if (currentUser) refreshAllViews(true);
+      applyLanguageToSubtree(document.body);
+    }
+
+    let i18nObserverTimer = null;
+    const i18nObserver = new MutationObserver(() => {
+      if (isApplyingI18n || currentLang === 'uz') return;
+      clearTimeout(i18nObserverTimer);
+      i18nObserverTimer = setTimeout(() => applyLanguageToSubtree(document.body), 40);
+    });
+    window.addEventListener('DOMContentLoaded', () => {
+      updateLangButtonsUI();
+      if (currentLang !== 'uz') applyLanguageToSubtree(document.body);
+      i18nObserver.observe(document.body, { childList: true, subtree: true });
+    });
 
     if (currentUser) initApp();
   </script>
