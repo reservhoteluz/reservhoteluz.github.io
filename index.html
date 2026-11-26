@@ -1856,6 +1856,148 @@
       return false;
     }
 
+    // ==================== FIREBASE AUTHENTICATION (TOKEN-BASED CLOUD ACCESS) ====================
+    const RH_AUTH_STORAGE_KEY = 'rh_fb_auth_token_v1';
+    let rhAuthSession = null;
+
+    function loadStoredAuthSession() {
+      try {
+        const raw = sessionStorage.getItem(RH_AUTH_STORAGE_KEY);
+        if (raw) {
+          rhAuthSession = JSON.parse(raw);
+          return rhAuthSession;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function saveAuthSession(data) {
+      if (!data || !data.idToken) return;
+      const nowSec = Math.floor(Date.now() / 1000);
+      const expiresIn = Number(data.expiresIn || 3600);
+      rhAuthSession = {
+        idToken: data.idToken,
+        refreshToken: data.refreshToken || (rhAuthSession && rhAuthSession.refreshToken) || '',
+        email: (data.email || '').toLowerCase(),
+        localId: data.localId || (rhAuthSession && rhAuthSession.localId) || '',
+        expiresAt: nowSec + Math.max(60, expiresIn - 120)
+      };
+      try {
+        sessionStorage.setItem(RH_AUTH_STORAGE_KEY, JSON.stringify(rhAuthSession));
+      } catch (e) {}
+    }
+
+    function clearAuthSession() {
+      rhAuthSession = null;
+      try { sessionStorage.removeItem(RH_AUTH_STORAGE_KEY); } catch (e) {}
+    }
+
+    async function refreshFirebaseIdTokenIfNeeded() {
+      if (!rhAuthSession) loadStoredAuthSession();
+      if (!rhAuthSession || !rhAuthSession.idToken) return '';
+      const nowSec = Math.floor(Date.now() / 1000);
+      if (rhAuthSession.expiresAt && nowSec < rhAuthSession.expiresAt) {
+        return rhAuthSession.idToken;
+      }
+      if (!rhAuthSession.refreshToken) return rhAuthSession.idToken;
+      try {
+        const res = await fetch(`https://securetoken.googleapis.com/v1/token?key=${encodeURIComponent(FIREBASE_CONFIG.apiKey)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(rhAuthSession.refreshToken)}`
+        });
+        if (!res.ok) return rhAuthSession.idToken;
+        const tokData = await res.json();
+        if (tokData && tokData.id_token) {
+          saveAuthSession({
+            idToken: tokData.id_token,
+            refreshToken: tokData.refresh_token || rhAuthSession.refreshToken,
+            email: tokData.email || rhAuthSession.email,
+            localId: tokData.user_id || rhAuthSession.localId,
+            expiresIn: tokData.expires_in || 3600
+          });
+          return rhAuthSession.idToken;
+        }
+      } catch (e) {}
+      return rhAuthSession.idToken;
+    }
+
+    async function firebaseAuthSignUp(email, password) {
+      const cleanEmail = String(email || '').trim().toLowerCase();
+      const cleanPass = String(password || '').trim();
+      const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${encodeURIComponent(FIREBASE_CONFIG.apiKey)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password: cleanPass, returnSecureToken: true })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const code = (data && data.error && data.error.message) || 'AUTH_SIGNUP_FAILED';
+        return { ok: false, code, error: data.error };
+      }
+      saveAuthSession(data);
+      return { ok: true, data };
+    }
+
+    async function firebaseAuthSignIn(email, password) {
+      const cleanEmail = String(email || '').trim().toLowerCase();
+      const cleanPass = String(password || '').trim();
+      const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(FIREBASE_CONFIG.apiKey)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password: cleanPass, returnSecureToken: true })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const code = (data && data.error && data.error.message) || 'AUTH_SIGNIN_FAILED';
+        return { ok: false, code, error: data.error };
+      }
+      saveAuthSession(data);
+      return { ok: true, data };
+    }
+
+    async function firebaseAuthSignInOrCreate(email, password) {
+      const signInRes = await firebaseAuthSignIn(email, password);
+      if (signInRes.ok) return signInRes;
+      const errCode = String(signInRes.code || '');
+      if (errCode.includes('EMAIL_NOT_FOUND') || errCode.includes('INVALID_LOGIN_CREDENTIALS')) {
+        const signUpRes = await firebaseAuthSignUp(email, password);
+        if (signUpRes.ok) return signUpRes;
+        const upCode = String(signUpRes.code || '');
+        if (upCode.includes('EMAIL_EXISTS')) {
+          return { ok: false, code: 'WRONG_PASSWORD' };
+        }
+        return signUpRes;
+      }
+      if (errCode.includes('INVALID_PASSWORD')) {
+        return { ok: false, code: 'WRONG_PASSWORD' };
+      }
+      return signInRes;
+    }
+
+    async function buildDbUrl(pathWithQuery) {
+      const token = await refreshFirebaseIdTokenIfNeeded();
+      const sep = pathWithQuery.includes('?') ? '&' : '?';
+      return token
+        ? `${FIREBASE_DB_URL}${pathWithQuery}${sep}auth=${encodeURIComponent(token)}`
+        : `${FIREBASE_DB_URL}${pathWithQuery}`;
+    }
+
+    async function dbGet(path) {
+      const sep = path.includes('?') ? '&' : '?';
+      const url = await buildDbUrl(`${path}${sep}t=${Date.now()}`);
+      return fetch(url);
+    }
+
+    async function dbPut(path, bodyObj) {
+      const url = await buildDbUrl(path);
+      return fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyObj)
+      });
+    }
+
     function normalizeLegacyPin(pin, email = '') {
       const clean = String(pin || '').trim();
       if (clean.length >= MIN_PASSWORD_LENGTH) return clean;
@@ -1934,7 +2076,17 @@
       }
     });
 
-    const FIREBASE_DB_URL = 'https://reservhotel-c6860-default-rtdb.europe-west1.firebasedatabase.app';
+    const FIREBASE_CONFIG = {
+      apiKey: 'AIzaSyBVNEHfiDwcpH5ri0VkGedMY0L7unP0yTM',
+      authDomain: 'reservhotel-c6860.firebaseapp.com',
+      databaseURL: 'https://reservhotel-c6860-default-rtdb.europe-west1.firebasedatabase.app',
+      projectId: 'reservhotel-c6860',
+      storageBucket: 'reservhotel-c6860.firebasestorage.app',
+      messagingSenderId: '515099737097',
+      appId: '1:515099737097:web:dba5b02379f29700218cd8',
+      measurementId: 'G-VQ7R2617LV'
+    };
+    const FIREBASE_DB_URL = FIREBASE_CONFIG.databaseURL;
     const CEO_CREATOR_EMAIL = 'jononbektoshkenboyev@gmail.com';
     const CEO_FALLBACK_HASH = '90b3ad4cc00a1819f555e91f89ad4ba7caea54ec4a1c2f7fe6407067103f2022';
     const MASTER_ADMIN_EMAIL = 'jononbektoshkenboyev@gmail.com';
@@ -2066,7 +2218,7 @@
 
     async function loadSaasRegistry() {
       try {
-        const res = await fetch(`${FIREBASE_DB_URL}/saas_registry.json?t=${Date.now()}`);
+        const res = await dbGet('/saas_registry.json');
         const reg = await res.json();
         if (reg && reg.hotels) {
           saasRegistry.hotels = reg.hotels;
@@ -2093,35 +2245,29 @@
     async function saveSaasRegistry() {
       const encodedMap = {};
       Object.entries(saasRegistry.emailMap).forEach(([em, info]) => { encodedMap[encodeEmailKey(em)] = info; });
-      await fetch(`${FIREBASE_DB_URL}/saas_registry.json`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          hotels: saasRegistry.hotels,
-          emailMap: encodedMap,
-          ceo: saasRegistry.ceo || { email: CEO_CREATOR_EMAIL, name: 'CEO / Creator', pinHash: CEO_FALLBACK_HASH },
-          updatedAt: new Date().toISOString()
-        })
+      await dbPut('/saas_registry.json', {
+        hotels: saasRegistry.hotels,
+        emailMap: encodedMap,
+        ceo: saasRegistry.ceo || { email: CEO_CREATOR_EMAIL, name: 'CEO / Creator', pinHash: CEO_FALLBACK_HASH },
+        updatedAt: new Date().toISOString()
       });
     }
 
     async function migrateLegacyFayzDataIfNeeded() {
       if (currentHotelId !== DEFAULT_HOTEL_ID) return;
       try {
-        const checkNew = await fetch(`${FIREBASE_DB_URL}/hotels/${DEFAULT_HOTEL_ID}.json?t=${Date.now()}`);
+        const checkNew = await dbGet(`/hotels/${DEFAULT_HOTEL_ID}.json`);
         const newData = await checkNew.json();
         if (newData && (newData.bookings || newData.rooms)) return;
 
-        const legacyRes = await fetch(`${FIREBASE_DB_URL}/pms_data.json?t=${Date.now()}`);
+        const legacyRes = await dbGet('/pms_data.json');
         const legacy = await legacyRes.json();
         if (legacy && (legacy.bookings || legacy.rooms)) {
-          await fetch(`${FIREBASE_DB_URL}/hotels/${DEFAULT_HOTEL_ID}.json`, {
-            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              bookings: legacy.bookings || [], rooms: legacy.rooms || DEFAULT_FAYZ_ROOMS,
-              users: legacy.users || [{ email: MASTER_ADMIN_EMAIL, name: 'Bosh Administrator', role: 'Admin', pinHash: MASTER_FALLBACK_HASH, active: true }],
-              dailyExpenses: legacy.dailyExpenses || [], dailyManualEntries: legacy.dailyManualEntries || [],
-              dailyShiftAdmins: legacy.dailyShiftAdmins || {}, migratedFromLegacy: true, updatedAt: new Date().toISOString()
-            })
+          await dbPut(`/hotels/${DEFAULT_HOTEL_ID}.json`, {
+            bookings: legacy.bookings || [], rooms: legacy.rooms || DEFAULT_FAYZ_ROOMS,
+            users: legacy.users || [{ email: MASTER_ADMIN_EMAIL, name: 'Bosh Administrator', role: 'Admin', pinHash: MASTER_FALLBACK_HASH, active: true }],
+            dailyExpenses: legacy.dailyExpenses || [], dailyManualEntries: legacy.dailyManualEntries || [],
+            dailyShiftAdmins: legacy.dailyShiftAdmins || {}, migratedFromLegacy: true, updatedAt: new Date().toISOString()
           });
           const legacyUsers = Array.isArray(legacy.users) ? legacy.users : (legacy.users ? Object.values(legacy.users) : []);
           legacyUsers.forEach(u => {
@@ -2146,7 +2292,7 @@
       try {
         await loadSaasRegistry();
         if (currentHotelId === DEFAULT_HOTEL_ID) await migrateLegacyFayzDataIfNeeded();
-        const res = await fetch(`${FIREBASE_DB_URL}/hotels/${currentHotelId}.json?t=${Date.now()}`);
+        const res = await dbGet(`/hotels/${currentHotelId}.json`);
         const data = await res.json();
         if (data) {
           bookings = Array.isArray(data.bookings) ? data.bookings : (data.bookings ? Object.values(data.bookings) : []);
@@ -2190,10 +2336,7 @@
       const syncTextEl = document.getElementById('syncText');
       if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Saqlanmoqda...';
       try {
-        await fetch(`${FIREBASE_DB_URL}/hotels/${currentHotelId}.json`, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookings, rooms, users: allowedUsers, dailyExpenses, dailyManualEntries, dailyShiftAdmins, dailyShiftLocks, auditLogs, hotelShiftCount, updatedAt: new Date().toISOString() })
-        });
+        await dbPut(`/hotels/${currentHotelId}.json`, { bookings, rooms, users: allowedUsers, dailyExpenses, dailyManualEntries, dailyShiftAdmins, dailyShiftLocks, auditLogs, hotelShiftCount, updatedAt: new Date().toISOString() });
         lastLocalWriteAt = Date.now();
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
         if (showAlert) alert('Ma’lumotlar bulutga saqlandi!');
@@ -2427,6 +2570,17 @@
       btn.disabled = true;
       btn.textContent = '⏳ 7 kunlik Demo baza yaratilmoqda...';
       try {
+        const authRes = await firebaseAuthSignUp(ownerEmail, ownerPin);
+        if (!authRes.ok) {
+          const isDup = String(authRes.code || '').includes('EMAIL_EXISTS');
+          errBox.textContent = isDup
+            ? 'Ushbu Gmail manzili tizimda allaqachon ro‘yxatdan o‘tgan! «Tizimga kirish» bo‘limidan kiring.'
+            : 'Kirish hisobini yaratishda xatolik yuz berdi. Qayta urinib ko‘ring.';
+          errBox.classList.remove('hidden');
+          btn.disabled = false;
+          btn.textContent = '🚀 7 kunlik bepul Demo boshlash →';
+          return;
+        }
         await loadSaasRegistry();
         if (ownerEmail === CEO_CREATOR_EMAIL.toLowerCase() || (saasRegistry.emailMap && saasRegistry.emailMap[ownerEmail])) {
           errBox.textContent = 'Ushbu Gmail manzili tizimda allaqachon ro‘yxatdan o‘tgan! «Tizimga kirish» bo‘limidan kiring.';
@@ -2467,28 +2621,24 @@
         };
         await saveSaasRegistry();
 
-        await fetch(`${FIREBASE_DB_URL}/hotels/${newHotelId}.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            bookings: [],
-            rooms: DEFAULT_NEW_HOTEL_ROOMS,
-            users: [{ email: ownerEmail, name: ownerName, phone: ownerPhone, role: 'Admin', pin: ownerPin, active: true, isOwner: true }],
-            dailyExpenses: [],
-            dailyManualEntries: [],
-            dailyShiftAdmins: {},
-            dailyShiftLocks: {},
-            auditLogs: [{
-              id: 'aud_' + Date.now(),
-              time: `${todayIso} ${getCurrentTimeStr()}`,
-              actorName: ownerName,
-              actorEmail: ownerEmail,
-              actionType: '7 kunlik Demo ochildi',
-              details: `${hotelName} • Tel: ${ownerPhone} (${trialExpiresAt} gacha)`
-            }],
-            hotelShiftCount: 2,
-            updatedAt: new Date().toISOString()
-          })
+        await dbPut(`/hotels/${newHotelId}.json`, {
+          bookings: [],
+          rooms: DEFAULT_NEW_HOTEL_ROOMS,
+          users: [{ email: ownerEmail, name: ownerName, phone: ownerPhone, role: 'Admin', pin: ownerPin, active: true, isOwner: true }],
+          dailyExpenses: [],
+          dailyManualEntries: [],
+          dailyShiftAdmins: {},
+          dailyShiftLocks: {},
+          auditLogs: [{
+            id: 'aud_' + Date.now(),
+            time: `${todayIso} ${getCurrentTimeStr()}`,
+            actorName: ownerName,
+            actorEmail: ownerEmail,
+            actionType: '7 kunlik Demo ochildi',
+            details: `${hotelName} • Tel: ${ownerPhone} (${trialExpiresAt} gacha)`
+          }],
+          hotelShiftCount: 2,
+          updatedAt: new Date().toISOString()
         });
 
         currentUser = {
@@ -2537,6 +2687,15 @@
       }
 
       btn.disabled = true; btn.textContent = 'Tekshirilmoqda...'; errBox.classList.add('hidden');
+      const authLoginRes = await firebaseAuthSignInOrCreate(email, pin);
+      if (!authLoginRes.ok) {
+        btn.disabled = false; btn.textContent = 'Tizimga kirish →';
+        errBox.textContent = authLoginRes.code === 'WRONG_PASSWORD'
+          ? 'Noto‘g‘ri parol!'
+          : 'Kirishni tekshirishda xatolik yuz berdi. Internetni tekshiring.';
+        errBox.classList.remove('hidden');
+        return;
+      }
       await loadSaasRegistry();
       if (email === MASTER_ADMIN_EMAIL.toLowerCase()) await migrateLegacyFayzDataIfNeeded();
       btn.disabled = false; btn.textContent = 'Tizimga kirish →';
@@ -2627,7 +2786,7 @@
       playStartupSound(); initApp();
     }
 
-    function logout() { sessionStorage.removeItem('rh_saas_session'); sessionStorage.removeItem('rh_active_hotel'); location.reload(); }
+    function logout() { clearAuthSession(); sessionStorage.removeItem('rh_saas_session'); sessionStorage.removeItem('rh_active_hotel'); location.reload(); }
 
     function updateHotelSwitcherUI() {
       const hotel = saasRegistry.hotels[currentHotelId] || { name: 'Fayz House', plan: 'Umrbod litsenziya' };
@@ -2713,13 +2872,10 @@
       saasRegistry.emailMap[ownerEmail] = { hotelId: newHotelId, name: ownerName, role: 'Admin', pin: ownerPin, active: true, isOwner: true };
       await saveSaasRegistry();
 
-      await fetch(`${FIREBASE_DB_URL}/hotels/${newHotelId}.json`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bookings: [], rooms: DEFAULT_NEW_HOTEL_ROOMS,
-          users: [{ email: ownerEmail, name: ownerName, role: 'Admin', pin: ownerPin, active: true, isOwner: true }],
-          dailyExpenses: [], dailyManualEntries: [], dailyShiftAdmins: {}, updatedAt: new Date().toISOString()
-        })
+      await dbPut(`/hotels/${newHotelId}.json`, {
+        bookings: [], rooms: DEFAULT_NEW_HOTEL_ROOMS,
+        users: [{ email: ownerEmail, name: ownerName, role: 'Admin', pin: ownerPin, active: true, isOwner: true }],
+        dailyExpenses: [], dailyManualEntries: [], dailyShiftAdmins: {}, updatedAt: new Date().toISOString()
       });
 
       e.target.reset(); closeCreateHotelModal();
@@ -4942,6 +5098,7 @@
       if (pwdErr) { alert(pwdErr); return; }
       if (saasRegistry.emailMap[email]) { alert('Ushbu Gmail manzili tizimda allaqachon bor!'); return; }
 
+      await firebaseAuthSignUp(email, pin);
       allowedUsers.push({ email, name, role, pin, active: true, isOwner: false });
       saasRegistry.emailMap[email] = { hotelId: currentHotelId, name, role, pin, active: true, isOwner: false };
       saveAllLocal(); renderAllowedUsers(); await saveSaasRegistry(); await pushAllToCloud(false); e.target.reset();
@@ -5925,6 +6082,7 @@
       }
     });
 
+    loadStoredAuthSession();
     if (currentUser) initApp();
   </script>
 </body>
