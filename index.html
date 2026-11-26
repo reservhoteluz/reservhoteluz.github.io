@@ -23,14 +23,49 @@
     ::-webkit-scrollbar-thumb { background: #a5b0f5; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #5b54e6; }
 
-    .matrix-container { overflow-x: auto; overflow-y: auto; max-height: calc(100vh - 210px); position: relative; border: 1px solid #d8defa; border-radius: 12px; background: #ffffff; }
+    .matrix-container { overflow-x: auto; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; max-height: calc(100vh - 210px); position: relative; border: 1px solid #d8defa; border-radius: 12px; background: #ffffff; }
     .matrix-table { border-collapse: separate; border-spacing: 0; table-layout: fixed; }
-    .sticky-col-room { position: sticky; left: 0; z-index: 25; background: #ffffff; border-right: 1px solid #cbd5e1; }
-    .sticky-col-clean { position: sticky; left: 155px; z-index: 25; background: #ffffff; border-right: 2px solid #94a3b8; }
+    .sticky-col-room { position: sticky; left: 0; z-index: 25; background: #ffffff; border-right: 1px solid #cbd5e1; width: 155px; min-width: 155px; }
+    .sticky-col-clean { position: sticky; left: 155px; z-index: 25; background: #ffffff; border-right: 2px solid #94a3b8; width: 75px; min-width: 75px; }
     .sticky-header-top { position: sticky; top: 0; z-index: 30; }
-    .sticky-corner { position: sticky; top: 0; left: 0; z-index: 40; }
-    .sticky-corner-clean { position: sticky; top: 0; left: 155px; z-index: 40; }
+    .sticky-corner { position: sticky; top: 0; left: 0; z-index: 40; width: 155px; min-width: 155px; }
+    .sticky-corner-clean { position: sticky; top: 0; left: 155px; z-index: 40; width: 75px; min-width: 75px; }
     .sticky-footer-bottom { position: sticky; bottom: 0; z-index: 28; background: #f2f4ff; border-top: 2px solid #cbd5e1; }
+
+    /* Mobil ekranlar uchun qulay shaxmatka va pastki ilova menyusi */
+    @media (max-width: 767px) {
+      .matrix-container {
+        max-height: calc(100vh - 225px);
+        border-radius: 10px;
+      }
+      .sticky-col-room, .sticky-corner {
+        width: 82px !important;
+        min-width: 82px !important;
+        max-width: 82px !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+      }
+      .sticky-col-clean, .sticky-corner-clean {
+        left: 82px !important;
+        width: 54px !important;
+        min-width: 54px !important;
+        max-width: 54px !important;
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+      }
+      .day-cell { height: 42px; }
+      .booking-bar { height: 32px; top: 4px; font-size: 10.5px; padding: 0 5px; }
+      .tab-content { padding-bottom: 74px !important; }
+      #rhToastContainer { bottom: 72px !important; right: 12px !important; left: 12px !important; max-width: none !important; }
+    }
+    .mobile-bottom-nav {
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    body.dark-mode .mobile-bottom-nav {
+      background: rgba(15, 22, 48, 0.94) !important;
+      border-color: rgba(99, 102, 241, 0.35) !important;
+    }
 
     .day-cell { height: 46px; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; position: relative; user-select: none; cursor: crosshair; }
     .day-cell:hover { background-color: #eef2ff; }
@@ -514,8 +549,56 @@
   </div>
 
   <!-- ==================== 1. YOPIQ KIRISH EKRANI (INSTAGRAM USLUBIDA) ==================== -->
-  <div id="loginScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-[#090d22] via-[#131b3a] to-[#1b2554] backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-[#5b54e6]/25">
+  <div id="loginScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-[#090d22] via-[#131b3a] to-[#1b2554] backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 rounded-3xl shadow-2xl overflow-hidden border border-[#5b54e6]/30 bg-white my-auto">
+      <!-- CHAP TOMON: PREMIUM SAAS TAQDIMOT (FAQAT KOMPYUTERDA) -->
+      <div class="hidden lg:flex lg:col-span-6 bg-gradient-to-br from-[#0b1024] via-[#131b3a] to-[#241f6b] p-9 text-white flex-col justify-between relative overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#5b54e6]/25 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 space-y-5">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-indigo-200">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Cloud Hotel PMS • 24/7 Bulutli Boshqaruv</span>
+          </div>
+          <h2 class="text-3xl font-extrabold leading-tight tracking-tight">
+            Mehmonxonangizni <span class="text-indigo-300">100% nazorat</span> qiling — daftarsiz va xatosiz
+          </h2>
+          <p class="text-xs text-indigo-100/80 leading-relaxed">
+            Shaxmatka kalendari, 2 smenali kassa hisoboti, avtomatik qarzdorlik nazorati va moliyaviy analitika — barchasi bitta tezkor tizimda.
+          </p>
+
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+              <div class="text-lg">📅</div>
+              <div class="text-xs font-extrabold text-white">Jonli Shaxmatka</div>
+              <div class="text-[11px] text-indigo-200/75">Overbooking himoyasi, surib ko‘chirish va cho‘zish</div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+              <div class="text-lg">💰</div>
+              <div class="text-xs font-extrabold text-white">Smena & Kassa</div>
+              <div class="text-[11px] text-indigo-200/75">Naqd, karta, xarajat va sof foyda hisobi</div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+              <div class="text-lg">🛡️</div>
+              <div class="text-xs font-extrabold text-white">Amallar Tarixi</div>
+              <div class="text-[11px] text-indigo-200/75">Xodimlarning har bir harakati nazoratda</div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+              <div class="text-lg">📱</div>
+              <div class="text-xs font-extrabold text-white">Telefon & PC</div>
+              <div class="text-[11px] text-indigo-200/75">Dunyoning istalgan nuqtasidan jonli kuzatuv</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-indigo-200/80">
+          <div>🎁 <b>7 kun bepul</b> to‘liq sinov</div>
+          <div>💎 $99/yil yoki $299 umrbod</div>
+        </div>
+      </div>
+
+      <!-- O'NG TOMON: KIRISH / RO'YXATDAN O'TISH KARTASI -->
+      <div class="lg:col-span-6 bg-white w-full overflow-hidden flex flex-col justify-between">
       <div class="bg-gradient-to-r from-[#090d22] via-[#131b3a] to-[#1b2554] p-7 text-center text-white flex flex-col items-center relative">
         <div class="absolute top-3 right-3 flex items-center gap-1 bg-white/10 p-1 rounded-lg border border-white/15 text-[10px] font-bold">
           <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2 py-0.5 rounded transition">UZ</button>
@@ -648,6 +731,7 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
   </div>
 
@@ -655,7 +739,7 @@
   <div id="appShell" class="hidden flex-1 flex h-screen overflow-hidden">
     
     <!-- LEFT SIDEBAR (ReservHotel Logo rangida: #131b3a + #5b54e6) -->
-    <aside id="sidebar" class="w-64 bg-gradient-to-b from-[#131b3a] via-[#131b3a] to-[#0b1024] text-slate-200 flex flex-col justify-between transition-all duration-200 shrink-0 border-r border-[#5b54e6]/25">
+    <aside id="sidebar" class="hidden md:flex w-64 bg-gradient-to-b from-[#131b3a] via-[#131b3a] to-[#0b1024] text-slate-200 flex-col justify-between transition-all duration-200 shrink-0 border-r border-[#5b54e6]/25 fixed md:static inset-y-0 left-0 z-50">
       <div>
         <!-- Brand Header -->
         <div class="h-14 px-4 flex items-center justify-between border-b border-white/10">
@@ -785,6 +869,11 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <button type="button" onclick="openGlobalSearch()" title="Tezkor qidiruv (Ctrl + K)" class="px-2.5 py-2 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold flex items-center gap-1.5 transition">
+            <span>🔍</span>
+            <span class="hidden md:inline text-slate-500">Qidirish</span>
+            <kbd class="hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-bold bg-[#f4f5ff] border border-[#d8defa] rounded text-slate-500">Ctrl+K</kbd>
+          </button>
           <button type="button" id="themeToggleBtn" onclick="toggleDarkMode()" title="Kunduzgi / Tungi smena rejimi" class="p-2 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-bold transition">
             🌙
           </button>
@@ -806,7 +895,30 @@
       <div id="trialStatusBanner" class="hidden px-5 py-2.5 text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shrink-0 border-b"></div>
 
       <!-- ==================== TAB 1: SHAXMATKA KALENDARI ==================== -->
-      <main id="tab-matrix" class="tab-content flex-1 flex flex-col p-4 overflow-hidden">
+      <main id="tab-matrix" class="tab-content flex-1 flex flex-col p-2.5 sm:p-4 overflow-hidden">
+        <!-- YANGI DEMO MIJOZLAR UCHUN 3 QADAMLI TEZ BOSHLASH (ONBOARDING) -->
+        <div id="onboardingGuideCard" class="hidden mb-2.5 p-3 rounded-xl bg-gradient-to-r from-[#eef0ff] via-white to-emerald-50/70 border border-[#5b54e6]/30 shadow-2xs">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="text-xs font-extrabold text-[#131b3a] flex items-center gap-1.5">
+              <span>🚀</span> <span>Tez boshlash — 3 ta oddiy qadam:</span>
+            </div>
+            <button type="button" onclick="dismissOnboardingCard()" class="text-[11px] font-bold text-slate-400 hover:text-slate-600 px-1.5">✕ Yopish</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+            <button type="button" id="onbStep1" onclick="switchTab('rates')" class="flex items-center justify-between gap-2 p-2 rounded-lg bg-white border border-[#d8defa] hover:border-[#5b54e6] text-left transition">
+              <span class="font-bold text-[#131b3a]">1. Xonalaringizni qo‘shing</span>
+              <span id="onbStep1Badge" class="px-1.5 py-0.5 rounded bg-[#eef0ff] text-[#5b54e6] font-extrabold">Ochish →</span>
+            </button>
+            <button type="button" id="onbStep2" onclick="openBookingModal()" class="flex items-center justify-between gap-2 p-2 rounded-lg bg-white border border-[#d8defa] hover:border-[#5b54e6] text-left transition">
+              <span class="font-bold text-[#131b3a]">2. Birinchi bronni yarating</span>
+              <span id="onbStep2Badge" class="px-1.5 py-0.5 rounded bg-[#eef0ff] text-[#5b54e6] font-extrabold">+ Bron</span>
+            </button>
+            <button type="button" id="onbStep3" onclick="switchTab('users')" class="flex items-center justify-between gap-2 p-2 rounded-lg bg-white border border-[#d8defa] hover:border-[#5b54e6] text-left transition">
+              <span class="font-bold text-[#131b3a]">3. Smena xodimini qo‘shing</span>
+              <span id="onbStep3Badge" class="px-1.5 py-0.5 rounded bg-[#eef0ff] text-[#5b54e6] font-extrabold">Qo‘shish →</span>
+            </button>
+          </div>
+        </div>
         <div class="bg-white/95 p-3 rounded-xl border border-[#d8defa] mb-3 flex flex-wrap items-center gap-3 shadow-2xs">
           <div class="flex items-center gap-2 flex-wrap flex-1">
             <button onclick="shiftStartDate(-7)" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-[#f7f8ff] hover:bg-[#eef0ff] text-xs font-semibold text-[#131b3a]">◀</button>
@@ -822,6 +934,7 @@
             </select>
             <div class="border-l border-[#d8defa] mx-1 h-6"></div>
             <select id="matrixScale" onchange="changeMatrixScale()" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-[#f5f6ff] text-xs font-semibold text-[#131b3a] hover:bg-[#eef0ff] cursor-pointer">
+              <option value="36">📱 36px (Mobil)</option>
               <option value="48">🔎 48px (Kichik)</option>
               <option value="64" selected>🔎 64px (Standart)</option>
               <option value="96">🔎 96px (Katta)</option>
@@ -1491,6 +1604,38 @@
           <button type="submit" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-sm">Tasdiqlash</button>
         </div>
       </form>
+    </div>
+  </div>
+
+
+  <!-- MOBIL ILOVA PASTKI MENYUSI (MOBILE BOTTOM NAV) -->
+  <nav id="mobileBottomNav" class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-[#d8defa] px-2 py-1.5 grid grid-cols-5 gap-1 shadow-lg">
+    <button type="button" onclick="switchTab('matrix')" data-mob-nav="matrix" class="mob-nav-btn flex flex-col items-center justify-center py-1 rounded-xl text-[10px] font-bold text-[#5b54e6] bg-[#eef0ff]">
+      <span class="text-base leading-none">📅</span><span class="mt-0.5">Shaxmatka</span>
+    </button>
+    <button type="button" onclick="switchTab('daily')" data-mob-nav="daily" class="mob-nav-btn flex flex-col items-center justify-center py-1 rounded-xl text-[10px] font-bold text-slate-500">
+      <span class="text-base leading-none">📊</span><span class="mt-0.5">Kassa</span>
+    </button>
+    <button type="button" onclick="switchTab('bookings')" data-mob-nav="bookings" class="mob-nav-btn flex flex-col items-center justify-center py-1 rounded-xl text-[10px] font-bold text-slate-500">
+      <span class="text-base leading-none">📋</span><span class="mt-0.5">Bronlar</span>
+    </button>
+    <button type="button" onclick="switchTab('finance')" data-mob-nav="finance" class="mob-nav-btn flex flex-col items-center justify-center py-1 rounded-xl text-[10px] font-bold text-slate-500">
+      <span class="text-base leading-none">💰</span><span class="mt-0.5">Moliya</span>
+    </button>
+    <button type="button" onclick="switchTab('rates')" data-mob-nav="rates" class="mob-nav-btn flex flex-col items-center justify-center py-1 rounded-xl text-[10px] font-bold text-slate-500">
+      <span class="text-base leading-none">🏷️</span><span class="mt-0.5">Xonalar</span>
+    </button>
+  </nav>
+
+  <!-- GLOBAL TEZKOR QIDIRUV OYNASI (CTRL + K) -->
+  <div id="globalSearchModal" onclick="if(event.target===this) closeGlobalSearch()" class="fixed inset-0 z-[95] hidden bg-[#090d22]/65 backdrop-blur-xs flex items-start justify-center pt-16 sm:pt-24 p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#5b54e6]/35 overflow-hidden">
+      <div class="p-3.5 border-b border-slate-200 flex items-center gap-2.5 bg-[#f8f9ff]">
+        <span class="text-base">🔍</span>
+        <input type="text" id="globalSearchInput" oninput="runGlobalSearch(this.value)" placeholder="Mehmon ismi, telefon, pasport yoki xona raqami..." class="flex-1 bg-transparent text-sm font-semibold text-[#131b3a] focus:outline-none" />
+        <button type="button" onclick="closeGlobalSearch()" class="px-2 py-0.5 rounded bg-slate-200/80 text-slate-600 text-[10px] font-bold">ESC</button>
+      </div>
+      <div id="globalSearchResults" class="max-h-80 overflow-y-auto divide-y divide-slate-100 p-1"></div>
     </div>
   </div>
 
@@ -2482,8 +2627,13 @@
       else document.getElementById('nav-saas').classList.add('hidden');
 
       loadLocalHotelCache(); updateHotelSwitcherUI();
+      if (window.innerWidth < 768) {
+        currentMatrixScale = 36;
+        const scEl = document.getElementById('matrixScale');
+        if (scEl) scEl.value = '36';
+      }
       const todayStr = toIsoDate(new Date());
-      document.getElementById('matrixStartDate').value = addDays(todayStr, -3);
+      document.getElementById('matrixStartDate').value = window.innerWidth < 768 ? addDays(todayStr, -1) : addDays(todayStr, -3);
       document.getElementById('dailyReportDate').value = todayStr;
       syncDailyFormDefaultDates(todayStr, true);
       setFinanceCurrentMonth(); populateRoomSelect(); refreshAllViews(true); syncFromCloud(false);
@@ -2805,6 +2955,27 @@
           autoFromBookingId: bookingObj.id,
           createdBy: `${currentUser ? currentUser.name : 'Admin'} (${actionLabel})`
         });
+      });
+    }
+
+    function updateAutoDailyEntriesForBooking(bookingObj) {
+      if (!bookingObj || !bookingObj.id || !Array.isArray(dailyManualEntries)) return;
+      const cIn = toIsoDate(bookingObj.checkIn) || toIsoDate(new Date());
+      const cOut = toIsoDate(bookingObj.checkOut) || addDays(cIn, 1);
+      const inTime = bookingObj.checkInTime || '14:00';
+      const outTime = bookingObj.checkOutTime || '12:00';
+      const datesText = `${cIn} (${inTime}) → ${cOut} (${outTime})`;
+      dailyManualEntries.forEach(m => {
+        if (m && m.autoFromBookingId === bookingObj.id) {
+          m.room = bookingObj.room;
+          m.guestName = bookingObj.guestName || m.guestName;
+          m.inDate = cIn;
+          m.inTime = inTime;
+          m.outDate = cOut;
+          m.outTime = outTime;
+          m.datesText = datesText;
+          m.rate = Number(bookingObj.rate) || m.rate;
+        }
       });
     }
 
@@ -3151,7 +3322,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       rooms = activeRooms;
       const totalBeds = activeRooms.reduce((s, r) => s + (Number(r.beds) || 0), 0);
       document.getElementById('headerCapacityBadge').textContent = `${activeRooms.length} xona • ${totalBeds} o‘rin`;
-      updateKpis(); renderMatrix();
+      updateKpis(); updateOnboardingCard(); renderMatrix();
       if (!isTypingInDailyTab()) renderDailyReport();
       renderBookingsTable(); renderFinance();
       if (includeConfig) { renderRoomsConfig(); renderAllowedUsers(); if (isMasterAdmin()) renderSaasHotels(); }
@@ -3174,6 +3345,16 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       activeBtn.classList.add('bg-[#5b54e6]', 'text-white'); activeBtn.classList.remove('text-indigo-100/85', 'text-amber-300');
       const titles = { matrix: 'Shaxmatka kalendari', daily: 'Kunlik hisobot', bookings: 'Bronlar va Mehmonlar', finance: 'Moliya va Kassa', rates: 'Xonalar va Narxlar', users: 'Xodimlar ruxsati', saas: 'Master-Admin • Mijozlar' };
       document.getElementById('pageTitle').textContent = titles[tabName];
+      document.querySelectorAll('[data-mob-nav]').forEach(btn => {
+        const isAct = btn.getAttribute('data-mob-nav') === tabName;
+        btn.classList.toggle('text-[#5b54e6]', isAct);
+        btn.classList.toggle('bg-[#eef0ff]', isAct);
+        btn.classList.toggle('text-slate-500', !isAct);
+      });
+      if (window.innerWidth < 768) {
+        const sb = document.getElementById('sidebar');
+        if (sb && !sb.classList.contains('hidden')) sb.classList.add('hidden');
+      }
       if (tabName === 'daily') syncDailyInTimesLive(false);
       refreshAllViews(true);
     }
@@ -3255,15 +3436,17 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       let tbodyHtml = '';
       const viewStartMs = getLocalMs(dates[0].iso, '00:00'), viewEndMs = getLocalMs(addDays(dates[dates.length - 1].iso, 1), '00:00'), msPerDay = 86400000, todayPct = getTodayTimePercent();
 
-      floors.forEach(fl => {
+      const floorAccents = ['#5b54e6', '#10b981', '#0ea5e9', '#f59e0b', '#ec4899'];
+      floors.forEach((fl, flIdx) => {
+        const floorColor = floorAccents[flIdx % floorAccents.length];
         const floorRooms = rooms.filter(r => (r.floor || '1-etaj') === fl);
-        tbodyHtml += `<tr class="bg-[#f2f4ff]"><td class="sticky-col-room bg-[#f2f4ff] font-bold text-xs text-[#131b3a] px-3 py-2 border-b border-slate-300">▼ ${fl} (${floorRooms.length} ta xona)</td><td class="sticky-col-clean bg-[#f2f4ff] border-b border-slate-300"></td>`;
+        tbodyHtml += `<tr class="bg-[#f2f4ff]"><td class="sticky-col-room bg-[#f2f4ff] font-bold text-xs text-[#131b3a] px-3 py-2 border-b border-slate-300 truncate" style="border-left:4px solid ${floorColor};">▼ ${fl} <span class="hidden sm:inline">(${floorRooms.length} ta)</span></td><td class="sticky-col-clean bg-[#f2f4ff] border-b border-slate-300"></td>`;
         dates.forEach(dt => { const freeCount = floorRooms.filter(r => !isRoomOccupiedOnDate(r.id, dt.iso, bookings)).length; tbodyHtml += `<td class="text-center text-[10px] font-bold text-slate-600 border-r border-b border-slate-300 py-1.5" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;">${freeCount} bo‘sh</td>`; });
         tbodyHtml += `</tr>`;
 
         floorRooms.forEach(room => {
           const cleanBadge = getRoomStatusBadgeHtml(room);
-          tbodyHtml += `<tr><td class="sticky-col-room px-3 py-1.5 border-b border-slate-200"><div class="flex items-center justify-between"><span class="font-extrabold text-[#131b3a] text-xs">№ ${room.id}</span><span class="text-[10px] text-slate-400 font-medium">${room.beds} o‘rin</span></div></td><td class="sticky-col-clean text-center border-b border-slate-200">${cleanBadge}</td>`;
+          tbodyHtml += `<tr><td class="sticky-col-room px-3 py-1.5 border-b border-slate-200" style="border-left:3px solid ${floorColor};"><div class="flex items-center justify-between gap-1"><span class="font-extrabold text-[#131b3a] text-xs">№ ${room.id}</span><span class="hidden sm:inline text-[10px] text-slate-400 font-medium">${room.beds} o‘rin</span></div></td><td class="sticky-col-clean text-center border-b border-slate-200">${cleanBadge}</td>`;
           dates.forEach(dt => {
             const cellClasses = ['day-cell']; if (dt.isWeekend) cellClasses.push('weekend'); if (dt.isToday) cellClasses.push('today-col'); if (dt.iso < todayStr) cellClasses.push('past-col');
             let barHtml = '';
@@ -3517,6 +3700,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
         b.nights = newNights;
         b.total = (newNights * (Number(b.rate) || 0)) + (Number(b.extra) || 0);
 
+        updateAutoDailyEntriesForBooking(b);
         recordAuditAction(
           'Chiqish sanasi cho‘zildi',
           `№ ${b.room} • ${b.guestName || 'Mehmon'}: ${oldOut} → ${st.newCheckOut} (${newNights} tun, Jami: ${formatMoney(b.total)})`
@@ -3600,6 +3784,8 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       moveDragState = {
         bookingId,
         b,
+        origCheckIn: toIsoDate(b.checkIn),
+        scale: currentMatrixScale || 64,
         nights,
         sourceBar,
         startX: e.clientX,
@@ -3672,7 +3858,6 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       }
 
       // Pure O(1)/O(N_rows) math lookup — zero DOM reflow or elementFromPoint!
-      const probeX = Math.max(st.stickyLeftBoundary + 4, x - st.offsetX + 16);
       let targetRoomId = null;
       for (let i = 0; i < st.rowBands.length; i++) {
         const rb = st.rowBands[i];
@@ -3684,13 +3869,8 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
 
       let targetDateIso = null;
       if (targetRoomId) {
-        for (let i = 0; i < st.colCols.length; i++) {
-          const cc = st.colCols[i];
-          if (probeX >= cc.left && probeX < cc.right) {
-            targetDateIso = cc.dateIso;
-            break;
-          }
-        }
+        const deltaDays = Math.round((x - st.startX) / st.scale);
+        targetDateIso = addDays(st.origCheckIn, deltaDays);
       }
 
       const key = (targetRoomId && targetDateIso) ? (targetRoomId + '|' + targetDateIso) : '';
@@ -3708,7 +3888,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       if (!targetRoomId || !targetDateIso) return;
 
       const newOut = addDays(targetDateIso, st.nights);
-      const isPast = targetDateIso < st.todayStr;
+      const isPast = (targetDateIso !== st.origCheckIn) && (targetDateIso < st.todayStr);
       const conflict = isPast || Boolean(checkOverbooking(targetRoomId, targetDateIso, newOut, st.bookingId));
       st.isValidDrop = !conflict;
 
@@ -3758,7 +3938,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
 
       if (b.room === targetRoomId && b.checkIn === newCheckIn) return;
 
-      if (targetDateIso < st.todayStr) {
+      if (targetDateIso !== st.origCheckIn && targetDateIso < st.todayStr) {
         showToast('⛔ O‘tgan sanalarga bronni ko‘chirib bo‘lmaydi!', 'error');
         return;
       }
@@ -3789,6 +3969,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       }
 
       lastLocalWriteAt = Date.now();
+      updateAutoDailyEntriesForBooking(b);
       recordAuditAction('Bron ko‘chirildi', `${b.guestName || 'Mehmon'}: № ${oldRoomId} (${oldDates}) → № ${targetRoomId} (${newCheckIn} → ${newCheckOut})`);
       saveAllLocal();
       refreshAllViews(false);
@@ -4022,6 +4203,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
         const idx = bookings.findIndex(x => x.id === editId);
         const prevPaid = idx > -1 ? (Number(bookings[idx].paid) || 0) : 0;
         if (idx > -1) bookings[idx] = payload;
+        updateAutoDailyEntriesForBooking(payload);
         recordAuditAction('Bron tahrirlandi', `№ ${room} • ${payload.guestName} (${checkIn} → ${checkOut}, ${status})`);
         if (paid > prevPaid && status !== 'Bekor qilingan') {
           const diffAmt = paid - prevPaid;
@@ -5393,6 +5575,92 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
     window.addEventListener('DOMContentLoaded', () => {
       if (localStorage.getItem('rh_dark_mode') === '1') {
         applyThemeMode(true);
+      }
+    });
+
+
+    // ==================== ONBOARDING (TEZ BOSHLASH) & GLOBAL SEARCH (CTRL+K) ====================
+    function updateOnboardingCard() {
+      const card = document.getElementById('onboardingGuideCard');
+      if (!card || !currentUser) return;
+      if (localStorage.getItem(storageKey('onb_dismissed')) === '1') {
+        card.classList.add('hidden');
+        return;
+      }
+      const step1Done = rooms.length > 1;
+      const step2Done = bookings.length > 0;
+      const step3Done = allowedUsers.length > 1;
+      if (step1Done && step2Done && step3Done) {
+        card.classList.add('hidden');
+        return;
+      }
+      card.classList.remove('hidden');
+      const setStepUI = (badgeId, done, pendingTxt) => {
+        const el = document.getElementById(badgeId);
+        if (!el) return;
+        el.textContent = done ? '✓ Tayyor' : pendingTxt;
+        el.className = done
+          ? 'px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-extrabold'
+          : 'px-1.5 py-0.5 rounded bg-[#eef0ff] text-[#5b54e6] font-extrabold';
+      };
+      setStepUI('onbStep1Badge', step1Done, 'Ochish →');
+      setStepUI('onbStep2Badge', step2Done, '+ Bron');
+      setStepUI('onbStep3Badge', step3Done, 'Qo‘shish →');
+    }
+
+    function dismissOnboardingCard() {
+      localStorage.setItem(storageKey('onb_dismissed'), '1');
+      const card = document.getElementById('onboardingGuideCard');
+      if (card) card.classList.add('hidden');
+    }
+
+    function openGlobalSearch() {
+      const modal = document.getElementById('globalSearchModal');
+      const inp = document.getElementById('globalSearchInput');
+      if (!modal || !inp) return;
+      modal.classList.remove('hidden');
+      inp.value = '';
+      runGlobalSearch('');
+      setTimeout(() => inp.focus(), 30);
+    }
+
+    function closeGlobalSearch() {
+      const modal = document.getElementById('globalSearchModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function runGlobalSearch(q) {
+      const box = document.getElementById('globalSearchResults');
+      if (!box) return;
+      const term = String(q || '').trim().toLowerCase();
+      const valid = bookings.filter(isValidBookingRecord);
+      const matches = (term
+        ? valid.filter(b => `${b.guestName} ${b.room} ${b.phone} ${b.passport}`.toLowerCase().includes(term))
+        : valid.slice(-8).reverse()
+      ).slice(0, 12);
+
+      if (!matches.length) {
+        box.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">Hech qanday mehmon yoki xona topilmadi</div>`;
+        return;
+      }
+      box.innerHTML = matches.map(b => `
+        <button type="button" onclick="closeGlobalSearch(); openGuestDrawer('${b.id}')" class="w-full px-3.5 py-2.5 text-left hover:bg-[#eef0ff] flex items-center justify-between gap-2 transition rounded-xl">
+          <div class="min-w-0">
+            <div class="text-xs font-extrabold text-[#131b3a] truncate">№ ${b.room} • ${b.guestName}</div>
+            <div class="text-[11px] text-slate-500 truncate">${b.checkIn} → ${b.checkOut} ${b.phone ? '• ' + b.phone : ''}</div>
+          </div>
+          <span class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${b.status === 'Band' ? 'bg-emerald-100 text-emerald-700' : (b.status === 'Bron' ? 'bg-indigo-100 text-[#5b54e6]' : 'bg-slate-200 text-slate-600')}">${b.status}</span>
+        </button>
+      `).join('');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        if (!currentUser) return;
+        e.preventDefault();
+        openGlobalSearch();
+      } else if (e.key === 'Escape') {
+        closeGlobalSearch();
       }
     });
 
