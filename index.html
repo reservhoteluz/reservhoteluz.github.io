@@ -1639,6 +1639,27 @@
     </div>
   </div>
 
+
+  <!-- ZAMONAVIY TASDIQLASH VA KIRITISH OYNASI (CONFIRM / PROMPT) -->
+  <div id="rhDialogModal" class="fixed inset-0 z-[110] hidden bg-[#090d22]/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-[#5b54e6]/30 overflow-hidden transform transition-all">
+      <div id="rhDialogHeader" class="px-5 py-3.5 bg-gradient-to-r from-[#131b3a] to-[#5b54e6] text-white flex items-center justify-between">
+        <h3 id="rhDialogTitle" class="font-bold text-sm flex items-center gap-2"><span>🔔</span><span>Tasdiqlash</span></h3>
+        <button type="button" id="rhDialogCloseBtn" class="text-indigo-200 hover:text-white text-base leading-none">✕</button>
+      </div>
+      <div class="p-5 space-y-4">
+        <p id="rhDialogMessage" class="text-xs sm:text-sm text-[#131b3a] leading-relaxed whitespace-pre-line font-medium"></p>
+        <div id="rhDialogInputWrap" class="hidden">
+          <input type="text" id="rhDialogInput" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm font-bold text-[#131b3a] bg-white focus:outline-none focus:ring-2 focus:ring-[#5b54e6]" />
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" id="rhDialogCancelBtn" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 font-semibold text-xs transition">Bekor qilish</button>
+          <button type="button" id="rhDialogOkBtn" class="px-5 py-2 rounded-xl bg-[#5b54e6] hover:bg-[#4942d4] text-white font-bold text-xs shadow-sm transition">Tasdiqlash</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const MIN_PASSWORD_LENGTH = 6;
 
@@ -1667,11 +1688,177 @@
       if (btn) btn.textContent = shown ? '👁️' : '🙈';
     }
 
+    // ==================== CUSTOM CONFIRM / PROMPT DIALOGS ====================
+    function openRhDialog({ mode = 'confirm', title = 'Tasdiqlash', message = '', defaultValue = '', inputType = 'text', okText = 'Tasdiqlash', cancelText = 'Bekor qilish', danger = false }) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('rhDialogModal');
+        const headerEl = document.getElementById('rhDialogHeader');
+        const titleEl = document.getElementById('rhDialogTitle');
+        const msgEl = document.getElementById('rhDialogMessage');
+        const inpWrap = document.getElementById('rhDialogInputWrap');
+        const inpEl = document.getElementById('rhDialogInput');
+        const okBtn = document.getElementById('rhDialogOkBtn');
+        const cancelBtn = document.getElementById('rhDialogCancelBtn');
+        const closeBtn = document.getElementById('rhDialogCloseBtn');
+        if (!modal) { resolve(mode === 'prompt' ? null : false); return; }
+
+        headerEl.className = danger
+          ? 'px-5 py-3.5 bg-gradient-to-r from-rose-700 to-rose-600 text-white flex items-center justify-between'
+          : 'px-5 py-3.5 bg-gradient-to-r from-[#131b3a] to-[#5b54e6] text-white flex items-center justify-between';
+        titleEl.innerHTML = `<span>${danger ? '⚠️' : (mode === 'prompt' ? '✏️' : '🔔')}</span><span>${title}</span>`;
+        msgEl.textContent = message;
+        okBtn.textContent = okText;
+        okBtn.className = danger
+          ? 'px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition'
+          : 'px-5 py-2 rounded-xl bg-[#5b54e6] hover:bg-[#4942d4] text-white font-bold text-xs shadow-sm transition';
+        cancelBtn.textContent = cancelText;
+
+        if (mode === 'prompt') {
+          inpWrap.classList.remove('hidden');
+          inpEl.type = inputType || 'text';
+          inpEl.value = defaultValue !== undefined && defaultValue !== null ? String(defaultValue) : '';
+        } else {
+          inpWrap.classList.add('hidden');
+        }
+
+        const cleanup = (val) => {
+          modal.classList.add('hidden');
+          okBtn.onclick = null;
+          cancelBtn.onclick = null;
+          closeBtn.onclick = null;
+          modal.onclick = null;
+          document.removeEventListener('keydown', onKey);
+          resolve(val);
+        };
+
+        const onConfirm = () => cleanup(mode === 'prompt' ? inpEl.value : true);
+        const onCancel = () => cleanup(mode === 'prompt' ? null : false);
+        const onKey = (ev) => {
+          if (ev.key === 'Escape') { ev.preventDefault(); onCancel(); }
+          else if (ev.key === 'Enter') { ev.preventDefault(); onConfirm(); }
+        };
+
+        okBtn.onclick = onConfirm;
+        cancelBtn.onclick = onCancel;
+        closeBtn.onclick = onCancel;
+        modal.onclick = (ev) => { if (ev.target === modal) onCancel(); };
+        document.addEventListener('keydown', onKey);
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          if (mode === 'prompt') { inpEl.focus(); inpEl.select(); }
+          else okBtn.focus();
+        }, 30);
+      });
+    }
+
+    function rhConfirm(message, opts = {}) {
+      const msg = String(message || '');
+      const isDanger = opts.danger !== undefined ? opts.danger : /o‘chir|olib tashla|tozalash|blok/i.test(msg);
+      return openRhDialog({
+        mode: 'confirm',
+        title: opts.title || (isDanger ? 'O‘chirishni tasdiqlang' : 'Tasdiqlash'),
+        message: msg,
+        okText: opts.okText || (isDanger ? 'Ha, bajarilsin' : 'Tasdiqlash'),
+        cancelText: opts.cancelText || 'Bekor qilish',
+        danger: isDanger
+      });
+    }
+
+    function rhPrompt(message, defaultValue = '', opts = {}) {
+      return openRhDialog({
+        mode: 'prompt',
+        title: opts.title || 'Qiymat kiriting',
+        message: String(message || ''),
+        defaultValue,
+        inputType: opts.inputType || 'number',
+        okText: opts.okText || 'Saqlash',
+        cancelText: opts.cancelText || 'Bekor qilish',
+        danger: false
+      });
+    }
+
+    // ==================== SHA-256 PIN HASHING (NO PLAINTEXT MASTER/CEO PINS IN CODE) ====================
+    function sha256Fallback(ascii) {
+      function rightRotate(v, a) { return (v >>> a) | (v << (32 - a)); }
+      const maxWord = Math.pow(2, 32), l = ascii.length;
+      let result = '', words = [], asciiBitLength = l * 8;
+      let hash = sha256Fallback.h = sha256Fallback.h || [];
+      let k = sha256Fallback.k = sha256Fallback.k || [];
+      let primeCounter = k.length, isComposite = {};
+      for (let candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+          hash[primeCounter] = (Math.pow(candidate, 0.5) * maxWord) | 0;
+          k[primeCounter++] = (Math.pow(candidate, 1 / 3) * maxWord) | 0;
+        }
+      }
+      ascii += '\x80';
+      while (ascii.length % 64 - 56) ascii += '\x00';
+      for (let i = 0; i < ascii.length; i++) {
+        const j = ascii.charCodeAt(i);
+        words[i >> 2] |= j << ((3 - i) % 4) * 8;
+      }
+      words[words.length] = ((asciiBitLength / maxWord) | 0);
+      words[words.length] = (asciiBitLength);
+      let H = hash.slice(0, 8);
+      for (let j = 0; j < words.length;) {
+        const w = words.slice(j, j += 16), oldH = H.slice(0);
+        for (let i = 0; i < 64; i++) {
+          const w15 = w[i - 15], w2 = w[i - 2];
+          const a = H[0], e = H[4];
+          const temp1 = H[7]
+            + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+            + ((e & H[5]) ^ ((~e) & H[6]))
+            + k[i]
+            + (w[i] = (i < 16) ? w[i] : (
+              w[i - 16]
+              + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+              + w[i - 7]
+              + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+            ) | 0);
+          const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+            + ((a & H[1]) ^ (a & H[2]) ^ (H[1] & H[2]));
+          H = [(temp1 + temp2) | 0].concat(H);
+          H[4] = (H[4] + temp1) | 0;
+          H.length = 8;
+        }
+        for (let i = 0; i < 8; i++) H[i] = (H[i] + oldH[i]) | 0;
+      }
+      for (let i = 0; i < 8; i++) {
+        for (let j = 3; j + 1; j--) {
+          const b = (H[i] >> (j * 8)) & 255;
+          result += ((b < 16) ? '0' : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+
+    async function hashPin(pin) {
+      const msg = 'rh_v6_salt:' + String(pin || '').trim();
+      try {
+        if (window.crypto && window.crypto.subtle && window.TextEncoder) {
+          const buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+          return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+      } catch (e) {}
+      return sha256Fallback(msg);
+    }
+
+    async function verifyPinAgainst(inputPin, storedPlain, storedHash, fallbackHash = '') {
+      const clean = String(inputPin || '').trim();
+      if (!clean) return false;
+      const inputHash = await hashPin(clean);
+      if (storedHash && inputHash === String(storedHash).trim()) return true;
+      if (storedPlain && clean === String(storedPlain).trim()) return true;
+      if (fallbackHash && !storedHash && !storedPlain && inputHash === fallbackHash) return true;
+      if (fallbackHash && inputHash === fallbackHash) return true;
+      return false;
+    }
+
     function normalizeLegacyPin(pin, email = '') {
       const clean = String(pin || '').trim();
-      const em = String(email || '').trim().toLowerCase();
       if (clean.length >= MIN_PASSWORD_LENGTH) return clean;
-      if (em === MASTER_ADMIN_EMAIL.toLowerCase()) return DEFAULT_MASTER_PIN;
       return (clean || '123456').padEnd(MIN_PASSWORD_LENGTH, '0');
     }
 
@@ -1749,9 +1936,9 @@
 
     const FIREBASE_DB_URL = 'https://reservhotel-c6860-default-rtdb.europe-west1.firebasedatabase.app';
     const CEO_CREATOR_EMAIL = 'jononbektoshkenboyev@gmail.com';
-    const DEFAULT_CEO_PIN = '901277';
+    const CEO_FALLBACK_HASH = '90b3ad4cc00a1819f555e91f89ad4ba7caea54ec4a1c2f7fe6407067103f2022';
     const MASTER_ADMIN_EMAIL = 'jononbektoshkenboyev@gmail.com';
-    const DEFAULT_MASTER_PIN = '202626';
+    const MASTER_FALLBACK_HASH = '79f48aa3fdb54f8c0a16e9ec6ad8719af9802fcfd0089cd2ff310aa4cabf6cb3';
     const DEFAULT_HOTEL_ID = 'fayz_house';
 
     const DEFAULT_FAYZ_ROOMS = [
@@ -1779,10 +1966,10 @@
 
     let saasRegistry = {
       hotels: {
-        fayz_house: { id: 'fayz_house', name: 'Fayz House', ownerEmail: MASTER_ADMIN_EMAIL, ownerName: 'Bosh Administrator', ownerPin: DEFAULT_MASTER_PIN, plan: 'Umrbod litsenziya (Asosiy)', active: true, createdAt: '2026-01-01' }
+        fayz_house: { id: 'fayz_house', name: 'Fayz House', ownerEmail: MASTER_ADMIN_EMAIL, ownerName: 'Bosh Administrator', ownerPinHash: MASTER_FALLBACK_HASH, plan: 'Umrbod litsenziya (Asosiy)', active: true, createdAt: '2026-01-01' }
       },
       emailMap: {
-        [MASTER_ADMIN_EMAIL.toLowerCase()]: { hotelId: 'fayz_house', name: 'Bosh Administrator', role: 'Admin', pin: DEFAULT_MASTER_PIN, active: true, isOwner: true }
+        [MASTER_ADMIN_EMAIL.toLowerCase()]: { hotelId: 'fayz_house', name: 'Bosh Administrator', role: 'Admin', pinHash: MASTER_FALLBACK_HASH, active: true, isOwner: true }
       }
     };
 
@@ -1887,18 +2074,18 @@
           if (reg.emailMap) Object.entries(reg.emailMap).forEach(([k, v]) => { decodedMap[decodeEmailKey(k)] = v; });
           saasRegistry.emailMap = decodedMap;
         }
-        if (reg && reg.ceo && reg.ceo.pin) {
+        if (reg && reg.ceo && (reg.ceo.pinHash || reg.ceo.pin)) {
           saasRegistry.ceo = reg.ceo;
-          localStorage.setItem('rh_saas_ceo_pin', String(reg.ceo.pin));
+          if (reg.ceo.pinHash) localStorage.setItem('rh_saas_ceo_hash', String(reg.ceo.pinHash));
         }
         if (!saasRegistry.hotels.fayz_house) {
-          saasRegistry.hotels.fayz_house = { id: 'fayz_house', name: 'Fayz House', ownerEmail: MASTER_ADMIN_EMAIL, ownerName: 'Bosh Administrator', ownerPin: DEFAULT_MASTER_PIN, plan: 'Umrbod litsenziya (Asosiy)', active: true, createdAt: '2026-01-01' };
+          saasRegistry.hotels.fayz_house = { id: 'fayz_house', name: 'Fayz House', ownerEmail: MASTER_ADMIN_EMAIL, ownerName: 'Bosh Administrator', ownerPinHash: MASTER_FALLBACK_HASH, plan: 'Umrbod litsenziya (Asosiy)', active: true, createdAt: '2026-01-01' };
         }
         if (!saasRegistry.emailMap[MASTER_ADMIN_EMAIL.toLowerCase()]) {
-          saasRegistry.emailMap[MASTER_ADMIN_EMAIL.toLowerCase()] = { hotelId: 'fayz_house', name: 'Fayz House Bosh Admini', role: 'Admin', pin: DEFAULT_MASTER_PIN, active: true, isOwner: true };
+          saasRegistry.emailMap[MASTER_ADMIN_EMAIL.toLowerCase()] = { hotelId: 'fayz_house', name: 'Fayz House Bosh Admini', role: 'Admin', pinHash: MASTER_FALLBACK_HASH, active: true, isOwner: true };
         }
-        if (!saasRegistry.ceo || !saasRegistry.ceo.pin) {
-          saasRegistry.ceo = { email: CEO_CREATOR_EMAIL, name: 'CEO / Creator', pin: localStorage.getItem('rh_saas_ceo_pin') || DEFAULT_CEO_PIN };
+        if (!saasRegistry.ceo || (!saasRegistry.ceo.pinHash && !saasRegistry.ceo.pin)) {
+          saasRegistry.ceo = { email: CEO_CREATOR_EMAIL, name: 'CEO / Creator', pinHash: localStorage.getItem('rh_saas_ceo_hash') || CEO_FALLBACK_HASH };
         }
       } catch (e) {}
     }
@@ -1911,7 +2098,7 @@
         body: JSON.stringify({
           hotels: saasRegistry.hotels,
           emailMap: encodedMap,
-          ceo: saasRegistry.ceo || { email: CEO_CREATOR_EMAIL, name: 'CEO / Creator', pin: DEFAULT_CEO_PIN },
+          ceo: saasRegistry.ceo || { email: CEO_CREATOR_EMAIL, name: 'CEO / Creator', pinHash: CEO_FALLBACK_HASH },
           updatedAt: new Date().toISOString()
         })
       });
@@ -1931,7 +2118,7 @@
             method: 'PUT', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               bookings: legacy.bookings || [], rooms: legacy.rooms || DEFAULT_FAYZ_ROOMS,
-              users: legacy.users || [{ email: MASTER_ADMIN_EMAIL, name: 'Bosh Administrator', role: 'Admin', pin: DEFAULT_MASTER_PIN, active: true }],
+              users: legacy.users || [{ email: MASTER_ADMIN_EMAIL, name: 'Bosh Administrator', role: 'Admin', pinHash: MASTER_FALLBACK_HASH, active: true }],
               dailyExpenses: legacy.dailyExpenses || [], dailyManualEntries: legacy.dailyManualEntries || [],
               dailyShiftAdmins: legacy.dailyShiftAdmins || {}, migratedFromLegacy: true, updatedAt: new Date().toISOString()
             })
@@ -2152,7 +2339,7 @@
       if (!isMasterAdmin()) return;
       const h = saasRegistry.hotels && saasRegistry.hotels[hotelId];
       if (!h) return;
-      if (!confirm(`"${h.name}" mehmonxonasini Umrbod litsenziyaga ($299) o‘tkazmoqchimisiz?`)) return;
+      if (!(await rhConfirm(`"${h.name}" mehmonxonasini Umrbod litsenziyaga ($299) o‘tkazmoqchimisiz?`, { title: "Umrbod litsenziya", okText: "💎 O‘tkazish" }))) return;
       h.plan = 'Umrbod litsenziya ($299)';
       h.trialExpiresAt = '';
       h.trialDays = 0;
@@ -2167,7 +2354,7 @@
       if (!isMasterAdmin()) return;
       const h = saasRegistry.hotels && saasRegistry.hotels[hotelId];
       if (!h) return;
-      if (!confirm(`"${h.name}" mehmonxonasini 1 yillik obunaga ($99 / 365 kun) o‘tkazmoqchimisiz?`)) return;
+      if (!(await rhConfirm(`"${h.name}" mehmonxonasini 1 yillik obunaga ($99 / 365 kun) o‘tkazmoqchimisiz?`, { title: "1 yillik obuna", okText: "📅 O‘tkazish" }))) return;
       h.plan = '1 yillik obuna ($99)';
       h.trialDays = 365;
       h.trialExpiresAt = addDays(toIsoDate(new Date()), 365);
@@ -2355,14 +2542,16 @@
       btn.disabled = false; btn.textContent = 'Tizimga kirish →';
 
       if (email === CEO_CREATOR_EMAIL.toLowerCase()) {
-        const ceoStoredPin = (saasRegistry.ceo && saasRegistry.ceo.pin) ? String(saasRegistry.ceo.pin) : (localStorage.getItem('rh_saas_ceo_pin') || DEFAULT_CEO_PIN);
-        const ceoName = (saasRegistry.ceo && saasRegistry.ceo.name) ? String(saasRegistry.ceo.name) : 'CEO / Creator';
-        const hotelOwnerEntry = saasRegistry.emailMap[email] || { pin: DEFAULT_MASTER_PIN, name: 'Fayz House Bosh Admini' };
-        const allowedHotelAdminPins = [normalizeLegacyPin(hotelOwnerEntry.pin, email), DEFAULT_MASTER_PIN];
+        const ceoObj = saasRegistry.ceo || {};
+        const ceoName = ceoObj.name ? String(ceoObj.name) : 'CEO / Creator';
+        const isCeoMatch = await verifyPinAgainst(pin, ceoObj.pin, ceoObj.pinHash || localStorage.getItem('rh_saas_ceo_hash'), CEO_FALLBACK_HASH);
 
-        if (pin === ceoStoredPin) {
-          if (!saasRegistry.ceo || !saasRegistry.ceo.pin) {
-            saasRegistry.ceo = { email: CEO_CREATOR_EMAIL, name: ceoName, pin: DEFAULT_CEO_PIN };
+        if (isCeoMatch) {
+          if (!ceoObj.pinHash || ceoObj.pin) {
+            const newHash = await hashPin(pin);
+            saasRegistry.ceo = { email: CEO_CREATOR_EMAIL, name: ceoName, pinHash: newHash, updatedAt: new Date().toISOString() };
+            localStorage.setItem('rh_saas_ceo_hash', newHash);
+            localStorage.removeItem('rh_saas_ceo_pin');
             await saveSaasRegistry();
           }
           currentUser = {
@@ -2382,22 +2571,9 @@
           return;
         }
 
-        if (allowedHotelAdminPins.includes(pin)) {
-          if (pin === '2026') {
-            saasRegistry.emailMap[email] = {
-              ...(saasRegistry.emailMap[email] || {}),
-              hotelId: DEFAULT_HOTEL_ID,
-              name: hotelOwnerEntry.name || 'Fayz House Bosh Admini',
-              role: 'Admin',
-              pin: DEFAULT_MASTER_PIN,
-              active: true,
-              isOwner: true
-            };
-            if (saasRegistry.hotels && saasRegistry.hotels[DEFAULT_HOTEL_ID]) {
-              saasRegistry.hotels[DEFAULT_HOTEL_ID].ownerPin = DEFAULT_MASTER_PIN;
-            }
-            await saveSaasRegistry();
-          }
+        const hotelOwnerEntry = saasRegistry.emailMap[email] || { pinHash: MASTER_FALLBACK_HASH, name: 'Fayz House Bosh Admini' };
+        const isMasterHotelMatch = await verifyPinAgainst(pin, hotelOwnerEntry.pin, hotelOwnerEntry.pinHash, MASTER_FALLBACK_HASH);
+        if (isMasterHotelMatch) {
           currentUser = {
             email: CEO_CREATOR_EMAIL,
             name: hotelOwnerEntry.name || 'Fayz House Bosh Admini',
@@ -2570,13 +2746,15 @@
         return;
       }
 
+      const newCeoHash = await hashPin(p1);
       saasRegistry.ceo = {
         email: CEO_CREATOR_EMAIL,
         name: (saasRegistry.ceo && saasRegistry.ceo.name) ? saasRegistry.ceo.name : 'CEO / Creator',
-        pin: p1,
+        pinHash: newCeoHash,
         updatedAt: new Date().toISOString()
       };
-      localStorage.setItem('rh_saas_ceo_pin', p1);
+      localStorage.setItem('rh_saas_ceo_hash', newCeoHash);
+      localStorage.removeItem('rh_saas_ceo_pin');
       await saveSaasRegistry();
       document.getElementById('newCeoPinInput').value = '';
       document.getElementById('confirmCeoPinInput').value = '';
@@ -2613,7 +2791,7 @@
           <td class="p-3.5 font-extrabold text-[#131b3a]">${h.name} ${isCurrent ? '<span class="ml-1 px-1.5 py-0.5 rounded bg-[#5b54e6] text-white text-[10px]">Ochiq</span>' : ''}</td>
           <td class="p-3.5 font-semibold text-slate-700">${h.ownerEmail} <div class="text-[10px] text-slate-500">${h.ownerName || ''} ${h.ownerPhone ? '• 📞 ' + h.ownerPhone : ''}</div></td>
           <td class="p-3.5 font-mono font-bold text-[#5b54e6]">
-            <span id="saasPin_${h.id}" data-real="${h.ownerPin}" data-shown="0">••••••</span>
+            <span id="saasPin_${h.id}" data-real="${h.ownerPin || 'Shifrlangan 🔒'}" data-shown="0">••••••</span>
             <button type="button" onclick="toggleSpanPassword('saasPin_${h.id}', this)" title="Ko‘rish / Yashirish" class="ml-1 text-slate-400 hover:text-[#5b54e6] text-xs">👁️</button>
           </td>
           <td class="p-3.5">${planHtml}</td>
@@ -2761,7 +2939,7 @@
       if (countBadge) countBadge.textContent = `${hotelShiftCount} ta`;
     }
 
-    function changeHotelShiftCount(delta) {
+    async function changeHotelShiftCount(delta) {
       if (!isHotelChiefAdmin()) {
         alert('⛔ Ruxsat yo‘q: Smenalar sonini faqat bosh administrator o‘zgartira oladi!');
         return;
@@ -2771,7 +2949,7 @@
         alert('Smenalar soni kamida 1 ta, ko‘pi bilan 4 ta bo‘lishi mumkin.');
         return;
       }
-      if (delta < 0 && !confirm(`${hotelShiftCount}-smenani olib tashlamoqchimisiz? (Oldingi kiritilgan ma’lumotlar bazada saqlanib qoladi)`)) {
+      if (delta < 0 && !(await rhConfirm(`${hotelShiftCount}-smenani olib tashlamoqchimisiz? (Oldingi kiritilgan ma’lumotlar bazada saqlanib qoladi)`))) {
         return;
       }
       hotelShiftCount = nextCount;
@@ -3004,7 +3182,7 @@
       });
     }
 
-    function toggleShiftLock(shiftNum) {
+    async function toggleShiftLock(shiftNum) {
       const dateIso = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
       const key = `${dateIso}_${shiftNum}`;
       const currentlyLocked = Boolean(dailyShiftLocks[key]);
@@ -3013,13 +3191,11 @@
           alert('🔒 Ruxsat yo‘q: Yopilgan smenani faqat bosh administrator qayta ocha oladi!');
           return;
         }
-        if (!confirm(`${dateIso} • ${shiftNum}-smenani qayta ochmoqchimisiz?`)) return;
+        if (!(await rhConfirm(`${dateIso} • ${shiftNum}-smenani qayta ochmoqchimisiz?`, { title: "Smenani ochish", okText: "🔓 Qayta ochish" }))) return;
         delete dailyShiftLocks[key];
         recordAuditAction('Smena qayta ochildi', `${dateIso} • ${shiftNum}-smena qulfdan chiqarildi`);
       } else {
-        if (!confirm(`${dateIso} • ${shiftNum}-smenani yopib topshirmoqchimisiz?
-
-Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
+        if (!(await rhConfirm(`${dateIso} • ${shiftNum}-smenani yopib topshirmoqchimisiz?\n\nYopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`, { title: "Smenani yopish (Z-hisobot)", okText: "🔒 Yopish" }))) return;
         dailyShiftLocks[key] = {
           lockedBy: currentUser ? currentUser.name : 'Admin',
           lockedAt: `${toIsoDate(new Date())} ${getCurrentTimeStr()}`
@@ -3054,13 +3230,13 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       recordAuditAction(`${shiftNum}-smena kassa yozuvi`, `№ ${room} • ${guestName} — ${formatMoney(paid)} (${payType})`);
       saveAllLocal(); e.target.reset(); syncDailyFormDefaultDates(dateIso, true); renderDailyReport(); pushAllToCloud(false);
     }
-    function deleteDailyManualEntry(id) {
+    async function deleteDailyManualEntry(id) {
       const target = dailyManualEntries.find(x => x.id === id);
       if (target && isShiftLocked(target.date, target.shift) && !isHotelChiefAdmin()) {
         alert('🔒 Yopilgan smena yozuvini o‘chirib bo‘lmaydi!');
         return;
       }
-      if (confirm('O‘chirmoqchimisiz?')) { dailyManualEntries = dailyManualEntries.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); }
+      if (await rhConfirm('Ushbu kassa yozuvini o‘chirmoqchimisiz?', { danger: true })) { dailyManualEntries = dailyManualEntries.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); }
     }
     function addDailyExpense(e, shiftNum) {
       e.preventDefault();
@@ -3076,13 +3252,13 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       recordAuditAction(`${shiftNum}-smena xarajati`, `${title} — −${formatMoney(amount)}`);
       saveAllLocal(); e.target.reset(); renderDailyReport(); pushAllToCloud(false);
     }
-    function deleteDailyExpense(id) {
+    async function deleteDailyExpense(id) {
       const target = dailyExpenses.find(x => x.id === id);
       if (target && isShiftLocked(target.date, target.shift) && !isHotelChiefAdmin()) {
         alert('🔒 Yopilgan smena xarajatini o‘chirib bo‘lmaydi!');
         return;
       }
-      if (confirm('O‘chirmoqchimisiz?')) { dailyExpenses = dailyExpenses.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); }
+      if (await rhConfirm('Ushbu xarajatni o‘chirmoqchimisiz?', { danger: true })) { dailyExpenses = dailyExpenses.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); }
     }
 
     function getShiftStats(selectedDate, shiftNum) {
@@ -3321,13 +3497,14 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       win.document.close();
     }
 
-    function printDailyReport() {
+    async function printDailyReport() {
       const data = getDailyReportData(), hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
       const activeShiftObj = data.shifts.find(x => x.shiftNum === activeDailyShift) || data.shifts[0];
-      const printAll = confirm(`Hozir ${activeShiftObj ? activeShiftObj.shiftNum + '-smena' : '1-smena'} ochiq.
-
-• OK — Barcha smenalarni umumiy chop etish
-• Bekor qilish (Cancel) — Faqat ${activeShiftObj ? activeShiftObj.shiftNum + '-smenaning' : '1-smenaning'} o‘zini chop etish`);
+      const printAll = await rhConfirm(`Hozir ${activeShiftObj ? activeShiftObj.shiftNum + '-smena' : '1-smena'} ochiq.\n\nQaysi hisobotni chop etmoqchisiz?`, {
+        title: 'Chop etish turi',
+        okText: '🖨️ Barcha smenalar',
+        cancelText: `Faqat ${activeShiftObj ? activeShiftObj.shiftNum : 1}-smena`
+      });
       const shiftsToPrint = printAll ? data.shifts : (activeShiftObj ? [activeShiftObj] : data.shifts);
       const win = window.open('', '_blank', 'width=950,height=780'); if (!win) return;
       win.document.write(`<html><head><meta charset="UTF-8" /><title>${hotel.name} — Hisobot (${data.selectedDate})</title></head><body style="font-family:Arial,sans-serif;font-size:12px;padding:14px;color:#0f172a;">
@@ -3539,8 +3716,8 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       saveAllLocal(); populateRoomSelect(); refreshAllViews(true); pushAllToCloud(false);
       document.getElementById('newRoomId').value = '';
     }
-    function deleteRoomItem(idx) {
-      const target = rooms[idx]; if (!target || !confirm(`№ ${target.id} xonasini o‘chirmoqchimisiz?`)) return;
+    async function deleteRoomItem(idx) {
+      const target = rooms[idx]; if (!target || !(await rhConfirm(`№ ${target.id} xonasini o‘chirmoqchimisiz?`, { danger: true }))) return;
       rooms.splice(idx, 1); saveAllLocal(); populateRoomSelect(); refreshAllViews(true); pushAllToCloud(false);
     }
     function renderRoomsConfig() {
@@ -4116,7 +4293,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       const c = document.getElementById('extraServicesTags');
       c.innerHTML = currentExtraServices.length ? currentExtraServices.map((x, i) => `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#eef0ff] border border-[#5b54e6]/30 text-[#131b3a] font-semibold text-[11px]">${x.name}: ${formatMoney(x.amount)} <button type="button" onclick="removeExtraService(${i})" class="text-rose-500 font-bold ml-1">✕</button></span>`).join('') : `<span class="text-[11px] text-slate-400 italic">Qo‘shimcha xizmatlar tanlanmagan</span>`;
     }
-    function addExtraService(name, def) { const p = prompt(`"${name}" summasi:`, def); if (p === null) return; const a = Number(p) || 0; if (a > 0) { currentExtraServices.push({ name, amount: a }); document.getElementById('formExtra').value = currentExtraServices.reduce((s, x) => s + Number(x.amount || 0), 0); renderExtraServicesTags(); recalcBookingTotal(); } }
+    async function addExtraService(name, def) { const p = await rhPrompt(`"${name}" xizmati summasini kiriting (UZS):`, def, { title: name, inputType: "number", okText: "+ Qo‘shish" }); if (p === null) return; const a = Number(p) || 0; if (a > 0) { currentExtraServices.push({ name, amount: a }); document.getElementById('formExtra').value = currentExtraServices.reduce((s, x) => s + Number(x.amount || 0), 0); renderExtraServicesTags(); recalcBookingTotal(); } }
     function removeExtraService(i) { currentExtraServices.splice(i, 1); document.getElementById('formExtra').value = currentExtraServices.reduce((s, x) => s + Number(x.amount || 0), 0); renderExtraServicesTags(); recalcBookingTotal(); }
 
     function addModalPaymentRow(method = 'Naqd pul', amount = 0) {
@@ -4372,9 +4549,9 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
     }
     function editCurrentDrawerBooking() { const b = bookings.find(x => x.id === activeDrawerBookingId); if (b && (b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bronni faqat bosh administrator tahrirlay oladi!'); return; } const id = activeDrawerBookingId; closeGuestDrawer(); openBookingModal(id); }
-    function deleteCurrentDrawerBooking() {
+    async function deleteCurrentDrawerBooking() {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b || !isHotelOwnerOrMaster()) return;
-      if (!confirm('Ushbu bronni o‘chirmoqchimisiz?')) return;
+      if (!(await rhConfirm('Ushbu bronni butunlay o‘chirmoqchimisiz?', { danger: true }))) return;
       const roomId = b.room; recordAuditAction('Bron o‘chirildi', `№ ${b.room} • ${b.guestName || 'Mehmon'} (${b.checkIn} → ${b.checkOut})`); bookings = bookings.filter(x => x.id !== activeDrawerBookingId);
       const r = rooms.find(x => x.id === roomId); if (r && !isRoomCheckedInToday(roomId) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
       saveAllLocal(); closeGuestDrawer(); refreshAllViews(false); pushAllToCloud(false);
@@ -4406,12 +4583,12 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
       saveAllLocal();
     }
 
-    function clearAuditLogs() {
+    async function clearAuditLogs() {
       if (!isHotelChiefAdmin()) {
         alert('⛔ Ruxsat yo‘q: Amallar tarixini faqat bosh administrator o‘chira oladi!');
         return;
       }
-      if (!confirm('Barcha qilingan amallar tarixini o‘chirmoqchimisiz?')) return;
+      if (!(await rhConfirm('Barcha qilingan amallar tarixini o‘chirmoqchimisiz?', { danger: true }))) return;
       auditLogs = [];
       saveAllLocal();
       renderAuditLogsTable();
@@ -4778,7 +4955,7 @@ Yopilgandan so‘ng ushbu smena yozuvlari va xarajatlari qulflanadi.`)) return;
     }
 
     async function removeAllowedUser(idx) {
-      if (!isHotelOwnerOrMaster() || !confirm('O‘chirmoqchimisiz?')) return;
+      if (!isHotelOwnerOrMaster() || !(await rhConfirm('Ushbu xodim ruxsatini o‘chirmoqchimisiz?', { danger: true }))) return;
       const em = String(allowedUsers[idx].email || '').toLowerCase(); delete saasRegistry.emailMap[em]; allowedUsers.splice(idx, 1);
       saveAllLocal(); renderAllowedUsers(); await saveSaasRegistry(); await pushAllToCloud(false);
     }
