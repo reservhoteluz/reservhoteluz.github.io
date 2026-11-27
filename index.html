@@ -127,6 +127,7 @@
     .bar-booked { background: linear-gradient(135deg, #5b54e6, #4338ca); }
     .bar-out { background: linear-gradient(135deg, #64748b, #475569); opacity: 0.88; }
     .bar-canceled { background: linear-gradient(135deg, #dc2626, #991b1b); border: 1.5px dashed rgba(255,255,255,0.75); opacity: 0.92; }
+    .bar-ooo { background: repeating-linear-gradient(135deg, #334155 0px, #334155 7px, #1e293b 7px, #1e293b 14px); border: 1.5px solid #f59e0b; color: #fef3c7; }
 
     
     .day-cell.drop-target-valid { background-color: rgba(16, 185, 129, 0.22) !important; outline: 2px dashed #10b981; outline-offset: -2px; }
@@ -942,11 +943,15 @@
             </select>
           </div>
           <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="openMaintenanceModal()" class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold transition">
+              🔧 Ta’mirga yopish
+            </button>
             <select id="filterStatus" onchange="renderMatrix()" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] text-xs font-medium text-[#131b3a] bg-white">
               <option value="ALL">Holat: Barchasi</option>
               <option value="Band">Band (Check-in)</option>
               <option value="Bron">Bron qilingan</option>
               <option value="Chiqdi">Chiqdi (Check-out)</option>
+              <option value="Ta'mirda">🔧 Ta’mirda (Yopiq)</option>
               <option value="Bekor qilingan">Bekor qilingan</option>
             </select>
           </div>
@@ -960,6 +965,7 @@
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#5b54e6] inline-block"></span> Bron</span>
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-500 inline-block"></span> Chiqdi</span>
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-700 border border-dashed border-white inline-block"></span> Bekor qilingan</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-700 border border-amber-400 inline-block"></span> Ta’mirda (Yopiq)</span>
           </div>
           <div class="text-[#5b54e6] font-semibold">💡 Holat tugmasini bosib qo‘lda ham (Toza / Tozalash / Band) o‘zgartirishingiz mumkin</div>
         </div>
@@ -1141,6 +1147,39 @@
           </div>
         </div>
 
+        <!-- 3 ta Professional Mehmonxona Samaradorlik KPI (Occupancy %, ADR, RevPAR) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="fin-kpi-card bg-gradient-to-br from-white to-indigo-50/70 p-4 rounded-2xl border border-[#5b54e6]/30 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-[#5b54e6] uppercase tracking-wide">Bandlik foizi (Occupancy)</span>
+              <span id="finOccBadge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#eef0ff] text-[#5b54e6]">0%</span>
+            </div>
+            <div id="finOccupancyPct" class="text-2xl font-extrabold text-[#131b3a] mt-1.5">0%</div>
+            <div class="w-full h-1.5 bg-indigo-100 rounded-full overflow-hidden mt-2">
+              <div id="finOccupancyBar" class="h-full bg-gradient-to-r from-[#5b54e6] to-emerald-500 rounded-full transition-all duration-700" style="width: 0%"></div>
+            </div>
+            <div id="finOccupancySub" class="text-[11px] text-slate-500 font-medium mt-1.5">Sotilgan: 0 / 0 mavjud tun</div>
+          </div>
+
+          <div class="fin-kpi-card bg-gradient-to-br from-white to-sky-50/70 p-4 rounded-2xl border border-sky-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-sky-700 uppercase tracking-wide">ADR — O‘rtacha xona narxi</span>
+              <span class="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-bold">💎</span>
+            </div>
+            <div id="finAdrVal" class="text-2xl font-extrabold text-[#131b3a] mt-1.5">0 so‘m</div>
+            <div class="text-[11px] text-slate-500 font-medium mt-2">Average Daily Rate • 1 sotilgan tun daromadi</div>
+          </div>
+
+          <div class="fin-kpi-card bg-gradient-to-br from-white to-amber-50/70 p-4 rounded-2xl border border-amber-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-amber-700 uppercase tracking-wide">RevPAR — Xona samaradorligi</span>
+              <span class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">🏆</span>
+            </div>
+            <div id="finRevParVal" class="text-2xl font-extrabold text-[#131b3a] mt-1.5">0 so‘m</div>
+            <div id="finRevParSub" class="text-[11px] text-slate-500 font-medium mt-2">Har bir mavjud xonadan kunlik daromad</div>
+          </div>
+        </div>
+
         <!-- Kunlik Tushum Dinamikasi (Bar Chart) -->
         <div class="fin-chart-card bg-white/95 rounded-2xl border border-[#d8defa] p-5 shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
@@ -1248,6 +1287,82 @@
         <div class="bg-white/95 rounded-xl border border-[#d8defa] overflow-x-auto shadow-sm">
           <table class="w-full text-left border-collapse text-xs min-w-[780px]"><thead><tr class="bg-[#f5f6ff] border-b border-slate-200 text-[#131b3a] uppercase text-[11px]"><th class="p-3.5">Gmail manzili</th><th class="p-3.5">Xodim ismi</th><th class="p-3.5">Huquq darajasi</th><th class="p-3.5">Parol (min. 6 belgi)</th><th class="p-3.5">Holati</th><th class="p-3.5 text-right">Boshqarish</th></tr></thead><tbody id="allowedUsersBody" class="divide-y divide-slate-100"></tbody></table>
         </div>
+
+        <!-- RAHBAR UCHUN TELEGRAM BILDIRISHNOMALAR (24/7 NAZORAT) -->
+        <section id="telegramNotifySection" class="hidden bg-white/95 rounded-2xl border border-sky-200 shadow-sm overflow-hidden">
+          <div class="px-5 py-4 bg-gradient-to-r from-[#0f172a] via-[#131b3a] to-[#0284c7] text-white flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center text-lg">✈️</div>
+              <div>
+                <h4 class="font-extrabold text-sm">Rahbar uchun Telegram-bildirishnomalar</h4>
+                <p class="text-[11px] text-sky-100/90">Yangi bron, to‘lov, xarajat va smena yopilganda (Z-hisobot) darhol Telegramingizga xabar boradi</p>
+              </div>
+            </div>
+            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/15 border border-white/25 cursor-pointer select-none text-xs font-bold">
+              <input type="checkbox" id="tgEnabledToggle" class="w-4 h-4 accent-emerald-400 rounded cursor-pointer" />
+              <span>Bildirishnomalarni yoqish</span>
+            </label>
+          </div>
+          <form onsubmit="saveTelegramSettings(event)" class="p-5 space-y-4 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-[#131b3a] mb-1">1. Telegram Bot Token (@BotFather dan olinadi)</label>
+                <div class="flex items-center gap-1.5">
+                  <input type="password" id="tgBotTokenInput" autocomplete="off" placeholder="1234567890:AAHxxxxxxxxxxxxxxxxxxxxxxxx" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono text-xs bg-white focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  <button type="button" onclick="toggleInputPassword('tgBotTokenInput', this)" title="Ko‘rish / Yashirish" class="px-2.5 py-2 rounded-xl border border-slate-300 bg-slate-50 hover:bg-slate-100 text-xs">👁️</button>
+                </div>
+                <p class="text-[10.5px] text-slate-500 mt-1">Telegramda <b>@BotFather</b> ga kirib <code>/newbot</code> buyrug‘i orqali 30 soniyada shaxsiy bot oching.</p>
+              </div>
+              <div>
+                <label class="block font-bold text-[#131b3a] mb-1">2. Rahbar (yoki Guruh) Chat ID raqami</label>
+                <div class="flex items-center gap-1.5">
+                  <input type="text" id="tgChatIdInput" autocomplete="off" placeholder="Masalan: 987654321 yoki -1001234567890" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-xs bg-white focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  <button type="button" onclick="detectTelegramChatId()" class="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-[11px] shrink-0 transition">🔍 Avto-topish</button>
+                </div>
+                <p class="text-[10.5px] text-slate-500 mt-1">Botingizga kirib <b>Start</b> bosing, so‘ng «🔍 Avto-topish» tugmasini bosing — ID o‘zi topiladi.</p>
+              </div>
+            </div>
+
+            <div class="bg-[#f8f9ff] border border-[#d8defa] rounded-xl p-3.5">
+              <div class="font-bold text-[#131b3a] mb-2.5">🔔 Qaysi holatlarda Telegramga xabar yuborilsin?</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-white border border-slate-200 cursor-pointer hover:border-sky-300">
+                  <input type="checkbox" id="tgEvtNewBooking" class="w-4 h-4 accent-[#5b54e6]" checked />
+                  <span class="font-semibold text-[#131b3a]">🆕 Yangi bron yaratilganda</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-white border border-slate-200 cursor-pointer hover:border-sky-300">
+                  <input type="checkbox" id="tgEvtPayment" class="w-4 h-4 accent-[#5b54e6]" checked />
+                  <span class="font-semibold text-[#131b3a]">💳 To‘lov qabul qilinganda</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-white border border-slate-200 cursor-pointer hover:border-sky-300">
+                  <input type="checkbox" id="tgEvtCheckInOut" class="w-4 h-4 accent-[#5b54e6]" checked />
+                  <span class="font-semibold text-[#131b3a]">🔑 Check-in / Check-out da</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-white border border-slate-200 cursor-pointer hover:border-sky-300">
+                  <input type="checkbox" id="tgEvtCancel" class="w-4 h-4 accent-[#5b54e6]" checked />
+                  <span class="font-semibold text-[#131b3a]">❌ Bekor qilish / O‘chirishda</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-white border border-slate-200 cursor-pointer hover:border-sky-300">
+                  <input type="checkbox" id="tgEvtShiftClose" class="w-4 h-4 accent-[#5b54e6]" checked />
+                  <span class="font-semibold text-[#131b3a]">🔒 Smena yopilganda (Z-hisobot)</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-white border border-slate-200 cursor-pointer hover:border-sky-300">
+                  <input type="checkbox" id="tgEvtExpense" class="w-4 h-4 accent-[#5b54e6]" checked />
+                  <span class="font-semibold text-[#131b3a]">💸 Smenada xarajat yozilganda</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+              <button type="button" onclick="sendTestTelegramNotification()" class="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-300 font-bold text-xs transition">
+                📨 Test xabar yuborish
+              </button>
+              <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#5b54e6] to-[#0284c7] hover:opacity-95 text-white font-bold text-xs shadow-sm transition">
+                💾 Telegram sozlamalarini saqlash
+              </button>
+            </div>
+          </form>
+        </section>
       </main>
 
       <!-- TAB 7: MASTER-ADMIN SAAS PANELI -->
@@ -1471,7 +1586,7 @@
         <div id="overbookingAlert" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-semibold"></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label class="block font-semibold text-slate-700 mb-1">Xona raqami *</label><select id="formRoom" onchange="recalcBookingTotal()" required class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold"></select></div>
-          <div><label class="block font-semibold text-slate-700 mb-1">Bron holati</label><select id="formStatus" onchange="handleFormStatusChange()" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold"><option value="Bron" selected>Bron (Oldindan band)</option><option value="Band">Band (Check-in qilingan)</option><option value="Chiqdi">Chiqdi (Check-out)</option><option value="Bekor qilingan">Bekor qilingan</option></select></div>
+          <div><label class="block font-semibold text-slate-700 mb-1">Bron holati</label><select id="formStatus" onchange="handleFormStatusChange()" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold"><option value="Bron" selected>Bron (Oldindan band)</option><option value="Band">Band (Check-in qilingan)</option><option value="Chiqdi">Chiqdi (Check-out)</option><option value="Ta'mirda">🔧 Ta’mirda / Yopiq (Out of Order)</option><option value="Bekor qilingan">Bekor qilingan</option></select></div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label class="block font-semibold text-slate-700 mb-1">Kirish sanasi va vaqti *</label><div class="flex gap-2"><input type="date" id="formCheckIn" onchange="recalcBookingTotal()" required class="flex-1 min-w-0 px-2.5 py-2 border border-slate-300 rounded-lg font-semibold" /><input type="time" id="formCheckInTime" value="14:00" required class="w-28 shrink-0 px-2.5 py-2 border border-slate-300 rounded-lg font-semibold text-center" /></div></div>
@@ -1541,6 +1656,13 @@
             <div><span class="text-rose-600 font-semibold">Kim bekor qildi:</span> <span id="drawerCanceledBy" class="font-bold">-</span></div>
             <div><span class="text-rose-600 font-semibold">Sababi:</span> <span id="drawerCancelReason" class="font-bold">-</span></div>
             <div class="text-[10px] text-rose-500" id="drawerCanceledAt"></div>
+          </div>
+          <div id="drawerOooInfo" class="hidden bg-amber-50 border-2 border-amber-300 rounded-xl p-3.5 text-amber-900 space-y-2">
+            <div class="font-extrabold text-amber-800 text-xs">🔧 XONA TA’MIRDA / SOTUVDAN YOPILGAN (OUT OF ORDER)</div>
+            <div class="text-[11px] text-amber-800/90">Ushbu sanalarda xonaga bron qo‘yib bo‘lmaydi va u moliyaviy qarzga hisoblanmaydi.</div>
+            <button type="button" onclick="releaseOutOfOrderBooking()" class="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
+              ✅ Ta’mirdan chiqarish (Sotuvga ochish)
+            </button>
           </div>
           <div id="drawerLockedNotice" class="hidden bg-slate-100 border border-slate-300 rounded-xl p-3 text-slate-700 font-semibold text-[11px] flex items-center gap-2">
             <span>🔒</span>
@@ -1998,6 +2120,125 @@
       });
     }
 
+    async function dbPatch(path, bodyObj) {
+      const url = await buildDbUrl(path);
+      return fetch(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyObj)
+      });
+    }
+
+    async function dbDelete(path) {
+      const url = await buildDbUrl(path);
+      return fetch(url, { method: 'DELETE' });
+    }
+
+    // ==================== GRANULAR PATCH SYNC ENGINE (ZERO CONCURRENT OVERWRITES) ====================
+    function safeFbKey(raw) {
+      return String(raw || '').trim().replace(/[.#$\[\]\/]/g, '_') || ('k_' + Date.now());
+    }
+
+    const cloudLegacyKeys = {
+      bookings: {},
+      rooms: {},
+      users: {},
+      dailyExpenses: {},
+      dailyManualEntries: {},
+      auditLogs: {}
+    };
+    let pendingAuditPatchEntries = [];
+
+    function resetLegacyKeysMap() {
+      Object.keys(cloudLegacyKeys).forEach(k => { cloudLegacyKeys[k] = {}; });
+    }
+
+    function parseCloudCollection(rawNode, idGetter, colName) {
+      cloudLegacyKeys[colName] = {};
+      if (!rawNode) return [];
+      const entries = Array.isArray(rawNode)
+        ? rawNode.map((val, idx) => [String(idx), val])
+        : (typeof rawNode === 'object' ? Object.entries(rawNode) : []);
+      const byId = new Map();
+      for (const [fbKey, item] of entries) {
+        if (!item || typeof item !== 'object') continue;
+        const rawId = idGetter(item, fbKey);
+        const canonKey = safeFbKey(rawId);
+        if (fbKey !== canonKey) {
+          cloudLegacyKeys[colName][canonKey] = fbKey;
+        }
+        // Prefer canonical-keyed record over legacy numeric slot if both exist
+        if (!byId.has(canonKey) || fbKey === canonKey) {
+          byId.set(canonKey, item);
+        }
+      }
+      return [...byId.values()];
+    }
+
+    function addCollectionPatchItem(patchObj, colName, rawId, itemObj) {
+      const canonKey = safeFbKey(rawId);
+      patchObj[`${colName}/${canonKey}`] = itemObj;
+      const legacyKey = cloudLegacyKeys[colName] && cloudLegacyKeys[colName][canonKey];
+      if (legacyKey && legacyKey !== canonKey) {
+        patchObj[`${colName}/${legacyKey}`] = null;
+        delete cloudLegacyKeys[colName][canonKey];
+      }
+    }
+
+    function addCollectionDeleteItem(patchObj, colName, rawId) {
+      const canonKey = safeFbKey(rawId);
+      patchObj[`${colName}/${canonKey}`] = null;
+      const legacyKey = cloudLegacyKeys[colName] && cloudLegacyKeys[colName][canonKey];
+      if (legacyKey && legacyKey !== canonKey) {
+        patchObj[`${colName}/${legacyKey}`] = null;
+        delete cloudLegacyKeys[colName][canonKey];
+      }
+    }
+
+    function collectionToKeyedMap(list, idGetter) {
+      const map = {};
+      (list || []).forEach((item, idx) => {
+        if (!item || typeof item !== 'object') return;
+        const k = safeFbKey(idGetter(item, String(idx)));
+        map[k] = item;
+      });
+      return map;
+    }
+
+    async function patchHotelCloud(patchObj, showAlert = false) {
+      const finalPatch = Object.assign({}, patchObj || {});
+      if (pendingAuditPatchEntries.length > 0) {
+        pendingAuditPatchEntries.forEach(entry => {
+          if (entry && entry.id) addCollectionPatchItem(finalPatch, 'auditLogs', entry.id, entry);
+        });
+        pendingAuditPatchEntries = [];
+      }
+      if (!Object.keys(finalPatch).length) return;
+      finalPatch.updatedAt = new Date().toISOString();
+
+      isPushingNow = true;
+      lastLocalWriteAt = Date.now();
+      const syncTextEl = document.getElementById('syncText');
+      if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Saqlanmoqda...';
+      try {
+        const res = await dbPatch(`/hotels/${currentHotelId}.json`, finalPatch);
+        if (!res.ok) throw new Error(`HTTP_${res.status}`);
+        lastLocalWriteAt = Date.now();
+        if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
+        if (showAlert) alert('O‘zgarishlar bulutga saqlandi!');
+      } catch (err) {
+        if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Saqlash xatosi';
+      } finally {
+        isPushingNow = false;
+      }
+    }
+
+    async function patchSaasRegistry(patchObj) {
+      if (!patchObj || !Object.keys(patchObj).length) return;
+      const payload = Object.assign({}, patchObj, { updatedAt: new Date().toISOString() });
+      await dbPatch('/saas_registry.json', payload);
+    }
+
     function normalizeLegacyPin(pin, email = '') {
       const clean = String(pin || '').trim();
       if (clean.length >= MIN_PASSWORD_LENGTH) return clean;
@@ -2128,6 +2369,8 @@
     let currentUser = JSON.parse(sessionStorage.getItem('rh_saas_session')) || null;
     let currentHotelId = sessionStorage.getItem('rh_active_hotel') || DEFAULT_HOTEL_ID;
     let rooms = [], bookings = [], allowedUsers = [], dailyExpenses = [], dailyManualEntries = [], dailyShiftAdmins = {}, dailyShiftLocks = {}, auditLogs = [];
+    const DEFAULT_TELEGRAM_SETTINGS = { enabled: false, botToken: '', chatId: '', onNewBooking: true, onPayment: true, onCheckInOut: true, onCancel: true, onShiftClose: true, onExpense: true };
+    let telegramSettings = { ...DEFAULT_TELEGRAM_SETTINGS };
     let activeDrawerBookingId = null, isSyncingNow = false, isPushingNow = false, lastLocalWriteAt = 0, activeTabName = 'matrix', isDragging = false, dragRoomId = null, dragStartDate = null, dragEndDate = null, payChartInstance = null, sourceChartInstance = null, dailyTrendChartInstance = null, currentMatrixScale = 64, activeDailyShift = 1, hotelShiftCount = 2;
 
     function isCeoCreator() {
@@ -2153,6 +2396,8 @@
       dailyShiftLocks = JSON.parse(localStorage.getItem(storageKey('daily_shift_locks'))) || {};
       auditLogs = JSON.parse(localStorage.getItem(storageKey('audit_logs'))) || [];
       hotelShiftCount = Math.min(4, Math.max(1, Number(localStorage.getItem(storageKey('shift_count'))) || 2));
+      const cachedTg = JSON.parse(localStorage.getItem(storageKey('telegram_settings')) || 'null');
+      telegramSettings = cachedTg && typeof cachedTg === 'object' ? { ...DEFAULT_TELEGRAM_SETTINGS, ...cachedTg } : { ...DEFAULT_TELEGRAM_SETTINGS };
       if (upgradeLegacyUserPins()) saveAllLocal();
     }
 
@@ -2166,6 +2411,7 @@
       localStorage.setItem(storageKey('daily_shift_locks'), JSON.stringify(dailyShiftLocks));
       localStorage.setItem(storageKey('audit_logs'), JSON.stringify(auditLogs));
       localStorage.setItem(storageKey('shift_count'), String(hotelShiftCount));
+      localStorage.setItem(storageKey('telegram_settings'), JSON.stringify(telegramSettings || DEFAULT_TELEGRAM_SETTINGS));
     }
 
     function formatMoney(num) { return Number(num || 0).toLocaleString('ru-RU') + ' so‘m'; }
@@ -2243,14 +2489,17 @@
     }
 
     async function saveSaasRegistry() {
-      const encodedMap = {};
-      Object.entries(saasRegistry.emailMap).forEach(([em, info]) => { encodedMap[encodeEmailKey(em)] = info; });
-      await dbPut('/saas_registry.json', {
-        hotels: saasRegistry.hotels,
-        emailMap: encodedMap,
-        ceo: saasRegistry.ceo || { email: CEO_CREATOR_EMAIL, name: 'CEO / Creator', pinHash: CEO_FALLBACK_HASH },
-        updatedAt: new Date().toISOString()
+      const patch = { updatedAt: new Date().toISOString() };
+      Object.entries(saasRegistry.hotels || {}).forEach(([hId, hObj]) => {
+        patch[`hotels/${safeFbKey(hId)}`] = hObj;
       });
+      Object.entries(saasRegistry.emailMap || {}).forEach(([em, info]) => {
+        patch[`emailMap/${encodeEmailKey(em)}`] = info;
+      });
+      if (saasRegistry.ceo) {
+        patch['ceo'] = saasRegistry.ceo;
+      }
+      await dbPatch('/saas_registry.json', patch);
     }
 
     async function migrateLegacyFayzDataIfNeeded() {
@@ -2298,11 +2547,12 @@
         }
         const data = await res.json();
         if (data && typeof data === 'object' && !data.error) {
-          const cloudBookings = Array.isArray(data.bookings) ? data.bookings : (data.bookings ? Object.values(data.bookings) : []);
-          const cloudRooms = Array.isArray(data.rooms) ? data.rooms : (data.rooms ? Object.values(data.rooms) : null);
-          const cloudUsers = Array.isArray(data.users) ? data.users : (data.users ? Object.values(data.users) : []);
-          const cloudExpenses = Array.isArray(data.dailyExpenses) ? data.dailyExpenses : (data.dailyExpenses ? Object.values(data.dailyExpenses) : []);
-          const cloudManual = Array.isArray(data.dailyManualEntries) ? data.dailyManualEntries : (data.dailyManualEntries ? Object.values(data.dailyManualEntries) : []);
+          const cloudBookings = parseCloudCollection(data.bookings, (b, k) => b.id || ('bk_' + k), 'bookings');
+          const cloudRoomsRaw = parseCloudCollection(data.rooms, (r, k) => r.id || ('rm_' + k), 'rooms');
+          const cloudRooms = cloudRoomsRaw.length ? cloudRoomsRaw.sort((a, b) => (Number(a.sortOrder ?? 9999) - Number(b.sortOrder ?? 9999)) || String(a.id).localeCompare(String(b.id), undefined, { numeric: true })) : null;
+          const cloudUsers = parseCloudCollection(data.users, (u, k) => encodeEmailKey(u.email || k), 'users');
+          const cloudExpenses = parseCloudCollection(data.dailyExpenses, (x, k) => x.id || ('exp_' + k), 'dailyExpenses');
+          const cloudManual = parseCloudCollection(data.dailyManualEntries, (m, k) => m.id || ('man_' + k), 'dailyManualEntries');
 
           // Never wipe local bookings/entries with an empty cloud response if local data exists
           const hasCloudPayload = cloudBookings.length > 0 || cloudManual.length > 0 || cloudExpenses.length > 0 || (cloudRooms && cloudRooms.length > 0);
@@ -2317,8 +2567,12 @@
             dailyManualEntries = cloudManual;
             dailyShiftAdmins = (data.dailyShiftAdmins && typeof data.dailyShiftAdmins === 'object') ? data.dailyShiftAdmins : {};
             dailyShiftLocks = (data.dailyShiftLocks && typeof data.dailyShiftLocks === 'object') ? data.dailyShiftLocks : {};
-            auditLogs = Array.isArray(data.auditLogs) ? data.auditLogs : (data.auditLogs ? Object.values(data.auditLogs) : []);
+            const cloudAudits = parseCloudCollection(data.auditLogs, (a, k) => a.id || ('aud_' + k), 'auditLogs');
+            auditLogs = cloudAudits.sort((a, b) => String(b.time || '').localeCompare(String(a.time || '')) || String(b.id || '').localeCompare(String(a.id || ''))).slice(0, 300);
             if (data.hotelShiftCount) hotelShiftCount = Math.min(4, Math.max(1, Number(data.hotelShiftCount) || 2));
+            if (data.telegramSettings && typeof data.telegramSettings === 'object') {
+              telegramSettings = { ...DEFAULT_TELEGRAM_SETTINGS, ...data.telegramSettings };
+            }
             const upgradedPins = upgradeLegacyUserPins();
             saveAllLocal();
             if (upgradedPins) {
@@ -2356,7 +2610,24 @@
       const syncTextEl = document.getElementById('syncText');
       if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Saqlanmoqda...';
       try {
-        await dbPut(`/hotels/${currentHotelId}.json`, { bookings, rooms, users: allowedUsers, dailyExpenses, dailyManualEntries, dailyShiftAdmins, dailyShiftLocks, auditLogs, hotelShiftCount, updatedAt: new Date().toISOString() });
+        const roomsWithOrder = (rooms || []).map((r, i) => ({ ...r, sortOrder: i }));
+        const payload = {
+          bookings: collectionToKeyedMap(bookings, (b, k) => b.id || ('bk_' + k)),
+          rooms: collectionToKeyedMap(roomsWithOrder, (r, k) => r.id || ('rm_' + k)),
+          users: collectionToKeyedMap(allowedUsers, (u, k) => encodeEmailKey(u.email || k)),
+          dailyExpenses: collectionToKeyedMap(dailyExpenses, (x, k) => x.id || ('exp_' + k)),
+          dailyManualEntries: collectionToKeyedMap(dailyManualEntries, (m, k) => m.id || ('man_' + k)),
+          dailyShiftAdmins: dailyShiftAdmins || {},
+          dailyShiftLocks: dailyShiftLocks || {},
+          auditLogs: collectionToKeyedMap((auditLogs || []).slice(0, 300), (a, k) => a.id || ('aud_' + k)),
+          hotelShiftCount,
+          telegramSettings: telegramSettings || DEFAULT_TELEGRAM_SETTINGS,
+          updatedAt: new Date().toISOString()
+        };
+        const res = await dbPut(`/hotels/${currentHotelId}.json`, payload);
+        if (!res.ok) throw new Error(`HTTP_${res.status}`);
+        resetLegacyKeysMap();
+        pendingAuditPatchEntries = [];
         lastLocalWriteAt = Date.now();
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
         if (showAlert) alert('Ma’lumotlar bulutga saqlandi!');
@@ -3037,9 +3308,11 @@
       return u.length === 1 ? u[0] : "Aralash to'lov";
     }
     function isRoomCheckedInToday(roomId) { const t = toIsoDate(new Date()); return bookings.some(b => b.room === roomId && b.status === 'Band' && b.checkIn <= t && b.checkOut > t); }
-    function getEffectiveRoomStatus(r) { if (r.manualStatus) return r.clean || 'Toza'; if (isRoomCheckedInToday(r.id)) return 'Band'; return r.clean === 'Tozalash kerak' ? 'Tozalash kerak' : 'Toza'; }
+    function isRoomOutOfOrderToday(roomId) { const t = toIsoDate(new Date()); return bookings.some(b => b.room === roomId && b.status === "Ta'mirda" && b.checkIn <= t && b.checkOut > t); }
+    function getEffectiveRoomStatus(r) { if (isRoomOutOfOrderToday(r.id)) return "Ta'mirda"; if (r.manualStatus) return r.clean || 'Toza'; if (isRoomCheckedInToday(r.id)) return 'Band'; return r.clean === 'Tozalash kerak' ? 'Tozalash kerak' : 'Toza'; }
     function getRoomStatusBadgeHtml(r) {
       const st = getEffectiveRoomStatus(r);
+      if (st === "Ta'mirda") return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-slate-700 text-amber-300 border border-amber-400/60 font-bold text-[10px]">🔧 Ta’mir</button>`;
       if (st === 'Band') return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-[10px]">Band</button>`;
       if (st === 'Tozalash kerak') return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold text-[10px]">Tozalash</button>`;
       return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px]">Toza</button>`;
@@ -3134,7 +3407,7 @@
       recordAuditAction('Smenalar soni o‘zgartirildi', `Kunlik hisobot smenalar soni: ${hotelShiftCount} ta`);
       saveAllLocal();
       renderDailyReport();
-      pushAllToCloud(false);
+      patchHotelCloud({ hotelShiftCount });
     }
 
     function getDefaultShiftHours(shiftNum) {
@@ -3178,10 +3451,12 @@
       const startTime = (stInp ? stInp.value : '') || getDefaultShiftHours(shiftNum).start;
       const endTime = (enInp ? enInp.value : '') || getDefaultShiftHours(shiftNum).end;
 
-      dailyShiftAdmins[`${d}_${shiftNum}`] = { adminName, startTime, endTime };
+      const shiftMetaKey = `${d}_${shiftNum}`;
+      const shiftMetaVal = { adminName, startTime, endTime };
+      dailyShiftAdmins[shiftMetaKey] = shiftMetaVal;
       recordAuditAction('Smena ma’lumoti saqlandi', `${d} • ${shiftNum}-smena: ${adminName || 'Admin'} (${startTime} – ${endTime})`);
       saveAllLocal();
-      pushAllToCloud(false);
+      patchHotelCloud({ [`dailyShiftAdmins/${safeFbKey(shiftMetaKey)}`]: shiftMetaVal });
       if (inp) inp.blur();
       renderDailyReport();
       alert(`${shiftNum}-smena administratori va vaqti (${startTime} – ${endTime}) saqlandi!`);
@@ -3315,10 +3590,11 @@
       const cIn = toIsoDate(bookingObj.checkIn) || todayIso;
       const cOut = toIsoDate(bookingObj.checkOut) || addDays(cIn, 1);
       const datesText = `${cIn} (${bookingObj.checkInTime || '14:00'}) → ${cOut} (${bookingObj.checkOutTime || '12:00'})`;
+      const added = [];
       list.forEach((p, idx) => {
         const amt = Number(p.amount) || 0;
         if (amt <= 0) return;
-        dailyManualEntries.push({
+        const entry = {
           id: `auto_${bookingObj.id}_${Date.now()}_${idx}`,
           date: todayIso,
           shift: targetShift,
@@ -3334,8 +3610,11 @@
           payType: p.method || 'Naqd pul',
           autoFromBookingId: bookingObj.id,
           createdBy: `${currentUser ? currentUser.name : 'Admin'} (${actionLabel})`
-        });
+        };
+        dailyManualEntries.push(entry);
+        added.push(entry);
       });
+      return added;
     }
 
     function updateAutoDailyEntriesForBooking(bookingObj) {
@@ -3345,6 +3624,7 @@
       const inTime = bookingObj.checkInTime || '14:00';
       const outTime = bookingObj.checkOutTime || '12:00';
       const datesText = `${cIn} (${inTime}) → ${cOut} (${outTime})`;
+      const updated = [];
       dailyManualEntries.forEach(m => {
         if (m && m.autoFromBookingId === bookingObj.id) {
           m.room = bookingObj.room;
@@ -3355,8 +3635,10 @@
           m.outTime = outTime;
           m.datesText = datesText;
           m.rate = Number(bookingObj.rate) || m.rate;
+          updated.push(m);
         }
       });
+      return updated;
     }
 
     async function toggleShiftLock(shiftNum) {
@@ -3378,11 +3660,22 @@
           lockedAt: `${toIsoDate(new Date())} ${getCurrentTimeStr()}`
         };
         recordAuditAction('Smena yopildi (Z-hisobot)', `${dateIso} • ${shiftNum}-smena yopildi va qulflandi`);
+        const stSummary = getShiftStats(dateIso, shiftNum);
+        sendHotelTelegramNotification('onShiftClose', `🔒 <b>${shiftNum}-SMENA YOPILDI (Z-HISOBOT)</b>
+📅 Sana: <b>${dateIso}</b> (${stSummary.startTime} – ${stSummary.endTime})
+👤 Smena admini: <b>${escapeTgHtml(stSummary.adminName || (currentUser ? currentUser.name : 'Admin'))}</b>
+
+💼 Jami tushum: <b>${formatMoney(stSummary.totalIncome)}</b>
+💳 Karta / Onlayn: <b>${formatMoney(stSummary.nonCash)}</b>
+💵 Naqd tushum: <b>${formatMoney(stSummary.cashIn)}</b>
+💸 Xarajatlar: <b>−${formatMoney(stSummary.totalExp)}</b>
+━━━━━━━━━━━━━━
+💰 <b>KASSADA SOF NAQD: ${formatMoney(stSummary.netCash)}</b>`);
       }
       lastLocalWriteAt = Date.now();
       saveAllLocal();
       renderDailyReport();
-      pushAllToCloud(false);
+      patchHotelCloud({ [`dailyShiftLocks/${safeFbKey(key)}`]: dailyShiftLocks[key] || null });
     }
 
     function addDailyManualEntry(e, shiftNum) {
@@ -3398,14 +3691,21 @@
       const guestName = document.getElementById(`manGuest_${shiftNum}`).value.trim();
       const paid = Number(document.getElementById(`manPaid_${shiftNum}`).value) || 0;
       const payType = document.getElementById(`manPayType_${shiftNum}`).value || 'Naqd pul';
-      dailyManualEntries.push({
+      const newEntry = {
         id: 'man_' + Date.now(), date: dateIso, shift: shiftNum, room, guestName,
         inDate, inTime, outDate, outTime, datesText: `${inDate} (${inTime}) → ${outDate} (${outTime})`,
         rate: Number(document.getElementById(`manRate_${shiftNum}`).value) || 0, paid,
         payType, createdBy: currentUser ? currentUser.name : 'Admin'
-      });
+      };
+      dailyManualEntries.push(newEntry);
       recordAuditAction(`${shiftNum}-smena kassa yozuvi`, `№ ${room} • ${guestName} — ${formatMoney(paid)} (${payType})`);
-      saveAllLocal(); e.target.reset(); syncDailyFormDefaultDates(dateIso, true); renderDailyReport(); pushAllToCloud(false);
+      sendHotelTelegramNotification('onPayment', `💵 <b>Kassa yozuvi (${shiftNum}-smena)</b>
+🚪 Xona: <b>№ ${escapeTgHtml(room)}</b>
+👤 Mehmon: <b>${escapeTgHtml(guestName)}</b>
+💰 Summa: <b>+${formatMoney(paid)}</b> (${escapeTgHtml(payType)})
+📅 Sana: ${dateIso}`);
+      saveAllLocal(); e.target.reset(); syncDailyFormDefaultDates(dateIso, true); renderDailyReport();
+      const entryPatch = {}; addCollectionPatchItem(entryPatch, 'dailyManualEntries', newEntry.id, newEntry); patchHotelCloud(entryPatch);
     }
     async function deleteDailyManualEntry(id) {
       const target = dailyManualEntries.find(x => x.id === id);
@@ -3413,7 +3713,7 @@
         alert('🔒 Yopilgan smena yozuvini o‘chirib bo‘lmaydi!');
         return;
       }
-      if (await rhConfirm('Ushbu kassa yozuvini o‘chirmoqchimisiz?', { danger: true })) { dailyManualEntries = dailyManualEntries.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); }
+      if (await rhConfirm('Ushbu kassa yozuvini o‘chirmoqchimisiz?', { danger: true })) { dailyManualEntries = dailyManualEntries.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); const delPatch = {}; addCollectionDeleteItem(delPatch, 'dailyManualEntries', id); patchHotelCloud(delPatch); }
     }
     function addDailyExpense(e, shiftNum) {
       e.preventDefault();
@@ -3425,9 +3725,15 @@
       const title = document.getElementById(`expTitle_${shiftNum}`).value.trim(), amount = Number(document.getElementById(`expAmount_${shiftNum}`).value) || 0;
       if (!title || amount <= 0) return;
       const meta = getShiftMetaInfo(dateIso, shiftNum);
-      dailyExpenses.push({ id: 'exp_' + Date.now(), date: dateIso, shift: shiftNum, title, amount, time: getCurrentTimeStr(), createdBy: meta.adminName || (currentUser ? currentUser.name : 'Admin') });
+      const newExp = { id: 'exp_' + Date.now(), date: dateIso, shift: shiftNum, title, amount, time: getCurrentTimeStr(), createdBy: meta.adminName || (currentUser ? currentUser.name : 'Admin') };
+      dailyExpenses.push(newExp);
       recordAuditAction(`${shiftNum}-smena xarajati`, `${title} — −${formatMoney(amount)}`);
-      saveAllLocal(); e.target.reset(); renderDailyReport(); pushAllToCloud(false);
+      sendHotelTelegramNotification('onExpense', `💸 <b>Yangi xarajat (${shiftNum}-smena)</b>
+📝 Sababi: <b>${escapeTgHtml(title)}</b>
+🔻 Summa: <b>−${formatMoney(amount)}</b>
+📅 Sana: ${dateIso}`);
+      saveAllLocal(); e.target.reset(); renderDailyReport();
+      const expPatch = {}; addCollectionPatchItem(expPatch, 'dailyExpenses', newExp.id, newExp); patchHotelCloud(expPatch);
     }
     async function deleteDailyExpense(id) {
       const target = dailyExpenses.find(x => x.id === id);
@@ -3435,7 +3741,7 @@
         alert('🔒 Yopilgan smena xarajatini o‘chirib bo‘lmaydi!');
         return;
       }
-      if (await rhConfirm('Ushbu xarajatni o‘chirmoqchimisiz?', { danger: true })) { dailyExpenses = dailyExpenses.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); pushAllToCloud(false); }
+      if (await rhConfirm('Ushbu xarajatni o‘chirmoqchimisiz?', { danger: true })) { dailyExpenses = dailyExpenses.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); const delExpPatch = {}; addCollectionDeleteItem(delExpPatch, 'dailyExpenses', id); patchHotelCloud(delExpPatch); }
     }
 
     function getShiftStats(selectedDate, shiftNum) {
@@ -3848,6 +4154,7 @@
                 const inDebt = unpaidAmt > 0;
                 let barClass = 'bar-paid';
                 if (b.status === 'Bekor qilingan') barClass = 'bar-canceled';
+                else if (b.status === "Ta'mirda") barClass = 'bar-ooo';
                 else if (b.status === 'Chiqdi') barClass = 'bar-out';
                 else if (b.status === 'Bron') barClass = 'bar-booked';
                 else if (inDebt && paid <= 0) barClass = 'bar-debt';
@@ -3855,9 +4162,10 @@
                 const debtBadgeHtml = (b.status === 'Band' && unpaidAmt > 0)
                   ? `<span class="shrink-0 mr-2.5 px-1.5 py-0.5 rounded bg-white/95 text-rose-600 font-extrabold text-[10px] leading-none shadow-xs">-${unpaidAmt.toLocaleString('ru-RU')} so‘m</span>`
                   : '';
-                const safeName = b.guestName || 'Mehmon', displayLabel = b.status === 'Bekor qilingan' ? `✕ ${safeName}` : safeName;
-                const canDragMove = (b.status === 'Bron' || b.status === 'Band');
-                const canResize = (b.status === 'Band' || b.status === 'Bron');
+                const safeName = b.guestName || (b.status === "Ta'mirda" ? 'Ta’mirda' : 'Mehmon');
+                const displayLabel = b.status === 'Bekor qilingan' ? `✕ ${safeName}` : (b.status === "Ta'mirda" ? `🔧 ${safeName}` : safeName);
+                const canDragMove = (b.status === 'Bron' || b.status === 'Band' || b.status === "Ta'mirda");
+                const canResize = (b.status === 'Band' || b.status === 'Bron' || b.status === "Ta'mirda");
                 const downHandler = canDragMove
                   ? `onpointerdown="startBookingMovePointer(event, '${b.id}')"`
                   : `onmousedown="event.stopPropagation()"`;
@@ -3889,13 +4197,16 @@
       const floor = document.getElementById('newRoomFloor').value.trim() || '1-qavat', id = document.getElementById('newRoomId').value.trim();
       const name = document.getElementById('newRoomType').value.trim() || 'Standard', beds = Number(document.getElementById('newRoomBeds').value) || 2, price = Number(document.getElementById('newRoomPrice').value) || 250000;
       if (!id || rooms.some(r => String(r.id).toLowerCase() === id.toLowerCase())) { alert(`№ ${id} xonasi mavjud yoki noto‘g‘ri!`); return; }
-      rooms.push({ id, floor, name, beds, price, clean: 'Toza' });
-      saveAllLocal(); populateRoomSelect(); refreshAllViews(true); pushAllToCloud(false);
+      const newRoomObj = { id, floor, name, beds, price, clean: 'Toza', sortOrder: rooms.length };
+      rooms.push(newRoomObj);
+      saveAllLocal(); populateRoomSelect(); refreshAllViews(true);
+      const rmPatch = {}; addCollectionPatchItem(rmPatch, 'rooms', newRoomObj.id, newRoomObj); patchHotelCloud(rmPatch);
       document.getElementById('newRoomId').value = '';
     }
     async function deleteRoomItem(idx) {
       const target = rooms[idx]; if (!target || !(await rhConfirm(`№ ${target.id} xonasini o‘chirmoqchimisiz?`, { danger: true }))) return;
-      rooms.splice(idx, 1); saveAllLocal(); populateRoomSelect(); refreshAllViews(true); pushAllToCloud(false);
+      rooms.splice(idx, 1); saveAllLocal(); populateRoomSelect(); refreshAllViews(true);
+      const delRmPatch = {}; addCollectionDeleteItem(delRmPatch, 'rooms', target.id); patchHotelCloud(delRmPatch);
     }
     function renderRoomsConfig() {
       const hotel = saasRegistry.hotels[currentHotelId] || { name: 'Mehmonxona' };
@@ -3911,8 +4222,9 @@
       </tr>`).join('');
     }
     function saveRoomRates() {
-      rooms.forEach((r, idx) => { r.floor = document.getElementById(`rc_floor_${idx}`).value.trim() || r.floor; r.name = document.getElementById(`rc_name_${idx}`).value.trim() || r.name; r.beds = Number(document.getElementById(`rc_beds_${idx}`).value) || r.beds; r.price = Number(document.getElementById(`rc_price_${idx}`).value) || r.price; });
-      saveAllLocal(); populateRoomSelect(); refreshAllViews(false); pushAllToCloud(false); alert('Barcha xonalar va narxlar saqlandi!');
+      const ratesPatch = {};
+      rooms.forEach((r, idx) => { r.floor = document.getElementById(`rc_floor_${idx}`).value.trim() || r.floor; r.name = document.getElementById(`rc_name_${idx}`).value.trim() || r.name; r.beds = Number(document.getElementById(`rc_beds_${idx}`).value) || r.beds; r.price = Number(document.getElementById(`rc_price_${idx}`).value) || r.price; r.sortOrder = idx; addCollectionPatchItem(ratesPatch, 'rooms', r.id, r); });
+      saveAllLocal(); populateRoomSelect(); refreshAllViews(false); patchHotelCloud(ratesPatch); alert('Barcha xonalar va narxlar saqlandi!');
     }
 
     function openCancelModal() {
@@ -3926,9 +4238,15 @@
       e.preventDefault();
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
       b.status = 'Bekor qilingan'; b.canceledBy = document.getElementById('cancelByInput').value.trim(); b.cancelReason = document.getElementById('cancelReasonInput').value.trim(); b.canceledAt = `${toIsoDate(new Date())} ${getCurrentTimeStr()}`; recordAuditAction('Bron bekor qilindi', `№ ${b.room} • ${b.guestName || 'Mehmon'} — Sabab: ${b.cancelReason}`);
+      sendHotelTelegramNotification('onCancel', `❌ <b>Bron bekor qilindi</b>
+🚪 Xona: <b>№ ${escapeTgHtml(b.room)}</b>
+👤 Mehmon: <b>${escapeTgHtml(b.guestName || 'Mehmon')}</b> (${b.checkIn} → ${b.checkOut})
+📝 Sabab: <b>${escapeTgHtml(b.cancelReason)}</b>
+👤 Bekor qildi: ${escapeTgHtml(b.canceledBy)}`);
       const r = rooms.find(x => x.id === b.room);
       if (r && !isRoomCheckedInToday(b.room) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
-      saveAllLocal(); closeCancelModal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
+      saveAllLocal(); closeCancelModal(); openGuestDrawer(b.id); refreshAllViews(false);
+      const cancelPatch = {}; addCollectionPatchItem(cancelPatch, 'bookings', b.id, b); if (r) addCollectionPatchItem(cancelPatch, 'rooms', r.id, r); patchHotelCloud(cancelPatch);
     }
 
     function shiftDailyDate(days) { const next = addDays(document.getElementById('dailyReportDate').value || toIsoDate(new Date()), days); document.getElementById('dailyReportDate').value = next; syncDailyFormDefaultDates(next, true); renderDailyReport(); }
@@ -3958,7 +4276,8 @@
       const r = rooms.find(x => x.id === roomId); if (!r) return;
       const cur = getEffectiveRoomStatus(r);
       r.clean = cur === 'Toza' ? 'Tozalash kerak' : (cur === 'Tozalash kerak' ? 'Band' : 'Toza');
-      r.manualStatus = true; saveAllLocal(); renderMatrix(); renderRoomsConfig(); pushAllToCloud(false);
+      r.manualStatus = true; saveAllLocal(); renderMatrix(); renderRoomsConfig();
+      const clPatch = {}; addCollectionPatchItem(clPatch, 'rooms', r.id, r); patchHotelCloud(clPatch);
     }
 
     function clearDragPreview() {
@@ -3979,7 +4298,7 @@
       e.preventDefault();
       e.stopPropagation();
       const b = bookings.find(x => x.id === bookingId);
-      if (!b || (b.status !== 'Band' && b.status !== 'Bron')) return;
+      if (!b || (b.status !== 'Band' && b.status !== 'Bron' && b.status !== "Ta'mirda")) return;
 
       const barEl = e.currentTarget.closest('.booking-bar');
       if (!barEl) return;
@@ -4079,14 +4398,14 @@
         b.nights = newNights;
         b.total = (newNights * (Number(b.rate) || 0)) + (Number(b.extra) || 0);
 
-        updateAutoDailyEntriesForBooking(b);
+        const updCash = updateAutoDailyEntriesForBooking(b) || [];
         recordAuditAction(
           'Chiqish sanasi cho‘zildi',
           `№ ${b.room} • ${b.guestName || 'Mehmon'}: ${oldOut} → ${st.newCheckOut} (${newNights} tun, Jami: ${formatMoney(b.total)})`
         );
         saveAllLocal();
         refreshAllViews(false);
-        pushAllToCloud(false);
+        const rszPatch = {}; addCollectionPatchItem(rszPatch, 'bookings', b.id, b); updCash.forEach(m => addCollectionPatchItem(rszPatch, 'dailyManualEntries', m.id, m)); patchHotelCloud(rszPatch);
       } else {
         st.barEl.style.width = `${st.origWidth}px`;
       }
@@ -4116,7 +4435,7 @@
       e.stopPropagation();
 
       const b = bookings.find(x => x.id === bookingId);
-      if (!b || (b.status !== 'Bron' && b.status !== 'Band')) return;
+      if (!b || (b.status !== 'Bron' && b.status !== 'Band' && b.status !== "Ta'mirda")) return;
 
       const sourceBar = e.currentTarget;
       const rect = sourceBar.getBoundingClientRect();
@@ -4348,11 +4667,11 @@
       }
 
       lastLocalWriteAt = Date.now();
-      updateAutoDailyEntriesForBooking(b);
+      const updMoveCash = updateAutoDailyEntriesForBooking(b) || [];
       recordAuditAction('Bron ko‘chirildi', `${b.guestName || 'Mehmon'}: № ${oldRoomId} (${oldDates}) → № ${targetRoomId} (${newCheckIn} → ${newCheckOut})`);
       saveAllLocal();
       refreshAllViews(false);
-      pushAllToCloud(false);
+      const mvPatch = {}; addCollectionPatchItem(mvPatch, 'bookings', b.id, b); if (oldRoomObj) addCollectionPatchItem(mvPatch, 'rooms', oldRoomObj.id, oldRoomObj); if (newRoomObj) addCollectionPatchItem(mvPatch, 'rooms', newRoomObj.id, newRoomObj); updMoveCash.forEach(m => addCollectionPatchItem(mvPatch, 'dailyManualEntries', m.id, m)); patchHotelCloud(mvPatch);
       showToast(`✅ ${b.guestName || 'Mehmon'} № ${targetRoomId} xonasiga ko‘chirildi`, 'success', 2400);
     });
 
@@ -4520,11 +4839,26 @@
     }
     function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); }
 
+    function openMaintenanceModal(presetRoom = null, presetIn = null, presetOut = null) {
+      openBookingModal(null, presetRoom, presetIn, presetOut);
+      document.getElementById('modalTitle').textContent = '🔧 Xonani Ta’mirga Yopish (Out of Order)';
+      document.getElementById('formStatus').value = "Ta'mirda";
+      document.getElementById('formGuestName').value = 'Ta’mirda (Yopiq)';
+      document.getElementById('formRate').value = 0;
+      document.getElementById('formExtra').value = 0;
+      handleFormStatusChange();
+    }
+
     function handleFormStatusChange() {
       const st = document.getElementById('formStatus').value;
       const nowDate = toIsoDate(new Date());
       const nowTime = getCurrentTimeStr();
-      if (st === 'Chiqdi') {
+      if (st === "Ta'mirda") {
+        const gEl = document.getElementById('formGuestName');
+        if (gEl && !gEl.value.trim()) gEl.value = 'Ta’mirda (Yopiq)';
+        document.getElementById('formRate').value = 0;
+        document.getElementById('formExtra').value = 0;
+      } else if (st === 'Chiqdi') {
         const cInEl = document.getElementById('formCheckIn');
         const cInTimeEl = document.getElementById('formCheckInTime');
         if (cInEl && cInEl.value > nowDate) cInEl.value = nowDate;
@@ -4541,12 +4875,15 @@
 
     function recalcBookingTotal() {
       const roomId = document.getElementById('formRoom').value, editId = document.getElementById('editBookingId').value;
-      if (!editId) { const r = rooms.find(x => x.id === roomId); if (r) document.getElementById('formRate').value = r.price; }
-      const cIn = document.getElementById('formCheckIn').value, cOut = document.getElementById('formCheckOut').value;
-      const nights = (cIn && cOut) ? diffNights(cIn, cOut) : 1, rate = Number(document.getElementById('formRate').value) || 0, extra = Number(document.getElementById('formExtra').value) || 0;
-      const paid = readModalPayments().reduce((s, x) => s + x.amount, 0), total = (nights * rate) + extra;
       const curStatus = document.getElementById('formStatus').value;
-      const calcDebtVal = (curStatus === 'Bron' || curStatus === 'Bekor qilingan') ? 0 : Math.max(0, total - paid);
+      if (!editId && curStatus !== "Ta'mirda") { const r = rooms.find(x => x.id === roomId); if (r) document.getElementById('formRate').value = r.price; }
+      const cIn = document.getElementById('formCheckIn').value, cOut = document.getElementById('formCheckOut').value;
+      const nights = (cIn && cOut) ? diffNights(cIn, cOut) : 1;
+      const rate = curStatus === "Ta'mirda" ? 0 : (Number(document.getElementById('formRate').value) || 0);
+      const extra = curStatus === "Ta'mirda" ? 0 : (Number(document.getElementById('formExtra').value) || 0);
+      const paid = curStatus === "Ta'mirda" ? 0 : readModalPayments().reduce((s, x) => s + x.amount, 0);
+      const total = (nights * rate) + extra;
+      const calcDebtVal = (curStatus === 'Bron' || curStatus === 'Bekor qilingan' || curStatus === "Ta'mirda") ? 0 : Math.max(0, total - paid);
       document.getElementById('calcNights').textContent = nights; document.getElementById('calcTotal').textContent = formatMoney(total);
       document.getElementById('calcPaidSum').textContent = formatMoney(paid); document.getElementById('calcDebt').textContent = formatMoney(calcDebtVal);
     }
@@ -4567,46 +4904,65 @@
         const conflict = checkOverbooking(room, checkIn, checkOut, editId);
         if (conflict) { alertBox.textContent = `⛔ Sana band! № ${room} xonasi ${conflict.checkIn} dan band!`; alertBox.classList.remove('hidden'); return; }
       }
-      const nights = diffNights(checkIn, checkOut), rate = Number(document.getElementById('formRate').value) || 0, extra = Number(document.getElementById('formExtra').value) || 0;
-      const payments = readModalPayments(), paid = payments.reduce((s, x) => s + x.amount, 0), total = (nights * rate) + extra;
+      const isOoo = status === "Ta'mirda";
+      const nights = diffNights(checkIn, checkOut);
+      const rate = isOoo ? 0 : (Number(document.getElementById('formRate').value) || 0);
+      const extra = isOoo ? 0 : (Number(document.getElementById('formExtra').value) || 0);
+      const payments = isOoo ? [] : readModalPayments();
+      const paid = payments.reduce((s, x) => s + x.amount, 0), total = (nights * rate) + extra;
       const existing = editId ? bookings.find(x => x.id === editId) : null;
       const payload = {
         id: editId || 'bk_' + Date.now(), room, checkIn, checkInTime, checkOut, checkOutTime, nights,
-        guestName: document.getElementById('formGuestName').value.trim(), phone: document.getElementById('formPhone').value.trim(),
-        passport: document.getElementById('formPassport').value.trim(), guestsCount: Number(document.getElementById('formGuestsCount').value) || 1,
-        source: document.getElementById('formSource').value, rate, extra, extraServices: [...currentExtraServices], total, paid, payments, payType: getBookingSummaryPayType(payments),
+        guestName: document.getElementById('formGuestName').value.trim() || (isOoo ? 'Ta’mirda (Yopiq)' : 'Mehmon'), phone: document.getElementById('formPhone').value.trim(),
+        passport: document.getElementById('formPassport').value.trim(), guestsCount: isOoo ? 0 : (Number(document.getElementById('formGuestsCount').value) || 1),
+        source: isOoo ? 'Ta’mir / Texnik xizmat' : document.getElementById('formSource').value, rate, extra, extraServices: isOoo ? [] : [...currentExtraServices], total, paid, payments, payType: isOoo ? "Ta'mirda" : getBookingSummaryPayType(payments),
         status, notes: document.getElementById('formNotes').value.trim(), createdBy: currentUser.email,
         canceledBy: existing ? (existing.canceledBy || '') : '', cancelReason: existing ? (existing.cancelReason || '') : '', canceledAt: existing ? (existing.canceledAt || '') : ''
       };
+      const bkPatch = {};
       if (editId) {
         const idx = bookings.findIndex(x => x.id === editId);
         const prevPaid = idx > -1 ? (Number(bookings[idx].paid) || 0) : 0;
         if (idx > -1) bookings[idx] = payload;
-        updateAutoDailyEntriesForBooking(payload);
+        (updateAutoDailyEntriesForBooking(payload) || []).forEach(m => addCollectionPatchItem(bkPatch, 'dailyManualEntries', m.id, m));
         recordAuditAction('Bron tahrirlandi', `№ ${room} • ${payload.guestName} (${checkIn} → ${checkOut}, ${status})`);
         if (paid > prevPaid && status !== 'Bekor qilingan') {
           const diffAmt = paid - prevPaid;
           const lastMethod = payments.length ? payments[payments.length - 1].method : 'Naqd pul';
-          syncBookingPaymentsToDailyCash(payload, [{ method: lastMethod, amount: diffAmt }], 'Kalendar tahrir');
+          (syncBookingPaymentsToDailyCash(payload, [{ method: lastMethod, amount: diffAmt }], 'Kalendar tahrir') || []).forEach(m => addCollectionPatchItem(bkPatch, 'dailyManualEntries', m.id, m));
+          sendHotelTelegramNotification('onPayment', `💳 <b>To‘lov qabul qilindi</b>
+🚪 Xona: <b>№ ${escapeTgHtml(room)}</b>
+👤 Mehmon: <b>${escapeTgHtml(payload.guestName)}</b>
+💰 Summa: <b>+${formatMoney(diffAmt)}</b> (${escapeTgHtml(lastMethod)})
+📊 Jami to‘langan: ${formatMoney(paid)} / ${formatMoney(total)}`);
         }
       } else {
         bookings.push(payload);
         recordAuditAction('Yangi bron yaratildi', `№ ${room} • ${payload.guestName} (${checkIn} → ${checkOut}, ${formatMoney(total)})`);
         if (paid > 0 && status !== 'Bekor qilingan') {
-          syncBookingPaymentsToDailyCash(payload, payments, 'Yangi bron');
+          (syncBookingPaymentsToDailyCash(payload, payments, 'Yangi bron') || []).forEach(m => addCollectionPatchItem(bkPatch, 'dailyManualEntries', m.id, m));
+        }
+        if (status !== "Ta'mirda") {
+          sendHotelTelegramNotification('onNewBooking', `🆕 <b>Yangi bron yaratildi</b>
+🚪 Xona: <b>№ ${escapeTgHtml(room)}</b> (${escapeTgHtml(status)})
+👤 Mehmon: <b>${escapeTgHtml(payload.guestName)}</b>${payload.phone ? ' • ' + escapeTgHtml(payload.phone) : ''}
+📅 Sana: <b>${checkIn} → ${checkOut}</b> (${nights} tun)
+🌐 Manba: ${escapeTgHtml(payload.source)}
+💵 Jami: <b>${formatMoney(total)}</b> | To‘landi: <b>${formatMoney(paid)}</b>`);
         }
       }
+      addCollectionPatchItem(bkPatch, 'bookings', payload.id, payload);
       const rObj = rooms.find(x => x.id === room);
-      if (rObj) { rObj.manualStatus = false; if (status === 'Chiqdi') rObj.clean = 'Tozalash kerak'; else if (isRoomCheckedInToday(room)) rObj.clean = 'Band'; else if (rObj.clean === 'Band') rObj.clean = 'Toza'; }
-      saveAllLocal(); closeBookingModal(); refreshAllViews(false); pushAllToCloud(false);
+      if (rObj) { rObj.manualStatus = false; if (status === 'Chiqdi') rObj.clean = 'Tozalash kerak'; else if (isRoomCheckedInToday(room)) rObj.clean = 'Band'; else if (rObj.clean === 'Band') rObj.clean = 'Toza'; addCollectionPatchItem(bkPatch, 'rooms', rObj.id, rObj); }
+      saveAllLocal(); closeBookingModal(); refreshAllViews(false); patchHotelCloud(bkPatch);
     }
 
     function openGuestDrawer(bookingId) {
       const b = bookings.find(x => x.id === bookingId); if (!b) return; activeDrawerBookingId = bookingId;
       const nightsCount = Number(b.nights) || diffNights(b.checkIn, b.checkOut), totalVal = Number(b.total) || ((nightsCount * (Number(b.rate) || 0)) + (Number(b.extra) || 0));
       const pList = getBookingPayments(b), paidVal = pList.length ? pList.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0), debt = Math.max(0, totalVal - paidVal);
-      const badgeEl = document.getElementById('drawerStatusBadge'); badgeEl.textContent = b.status;
-      badgeEl.className = b.status === 'Bekor qilingan' ? 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-600 text-white' : (b.status === 'Chiqdi' ? 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-500 text-white' : 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white');
+      const badgeEl = document.getElementById('drawerStatusBadge'); badgeEl.textContent = b.status === "Ta'mirda" ? '🔧 Ta’mirda' : b.status;
+      badgeEl.className = b.status === 'Bekor qilingan' ? 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-600 text-white' : (b.status === "Ta'mirda" ? 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500 text-[#131b3a]' : (b.status === 'Chiqdi' ? 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-500 text-white' : 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white'));
       document.getElementById('drawerGuestName').textContent = b.guestName || 'Mehmon';
       document.getElementById('drawerRoomInfo').textContent = `Xona № ${b.room} • ${nightsCount} tun`;
       document.getElementById('drawerPhone').textContent = b.phone || '-'; document.getElementById('drawerPassport').textContent = b.passport || '-';
@@ -4627,6 +4983,10 @@
       if (b.status === 'Bron') cancelBtn.classList.remove('hidden');
       else cancelBtn.classList.add('hidden');
 
+      const isOooBooking = b.status === "Ta'mirda";
+      const oooInfoEl = document.getElementById('drawerOooInfo');
+      if (oooInfoEl) oooInfoEl.classList.toggle('hidden', !isOooBooking);
+
       const isClosedBooking = (b.status === 'Chiqdi' || b.status === 'Bekor qilingan');
       const isChief = isHotelChiefAdmin();
       const isLockedForUser = isClosedBooking && !isChief;
@@ -4639,21 +4999,21 @@
       const footerActionsEl = document.getElementById('drawerFooterActions');
 
       if (lockedNoticeEl) lockedNoticeEl.classList.toggle('hidden', !isLockedForUser);
-      if (statusActionsEl) statusActionsEl.classList.toggle('hidden', isLockedForUser);
+      if (statusActionsEl) statusActionsEl.classList.toggle('hidden', isLockedForUser || isOooBooking);
 
       const checkinBtnEl = document.getElementById('drawerCheckinBtn');
       const checkoutBtnEl = document.getElementById('drawerCheckoutBtn');
-      if (checkinBtnEl) checkinBtnEl.classList.toggle('hidden', b.status === 'Band');
-      if (checkoutBtnEl) checkoutBtnEl.classList.toggle('hidden', b.status === 'Bron' || b.status === 'Chiqdi');
+      if (checkinBtnEl) checkinBtnEl.classList.toggle('hidden', b.status === 'Band' || isOooBooking);
+      if (checkoutBtnEl) checkoutBtnEl.classList.toggle('hidden', b.status === 'Bron' || b.status === 'Chiqdi' || isOooBooking);
 
-      // Chiqdi bo'lgan bronlarda faqat qarz qolgan bo'lsa xodim to'lov qo'sha oladi; qarz 0 bo'lsa yoki bekor qilingan bo'lsa yopiladi
-      const hideQuickPay = isLockedForUser && !(b.status === 'Chiqdi' && debt > 0);
+      // Chiqdi bo'lgan bronlarda faqat qarz qolgan bo'lsa xodim to'lov qo'sha oladi; qarz 0 bo'lsa yoki bekor qilingan / ta'mirda bo'lsa yopiladi
+      const hideQuickPay = isOooBooking || (isLockedForUser && !(b.status === 'Chiqdi' && debt > 0));
       if (quickPayBoxEl) quickPayBoxEl.classList.toggle('hidden', hideQuickPay);
 
       document.getElementById('drawerPaymentsBreakdown').innerHTML = pList.length
         ? pList.map((p, idx) => `<div class="flex items-center justify-between text-[11px] py-0.5"><span class="font-semibold">${p.method}</span><div class="flex items-center gap-2"><span class="font-bold text-emerald-700">${formatMoney(p.amount)}</span>${isLockedForUser ? '' : `<button onclick="removeSinglePayment(${idx})" class="text-rose-500 font-bold">✕</button>`}</div></div>`).join('')
         : `<div class="text-[11px] text-slate-400">Hali to‘lov kiritilmagan</div>`;
-      const displayDebt = (b.status === 'Bron' || b.status === 'Bekor qilingan') ? 0 : debt;
+      const displayDebt = (b.status === 'Bron' || b.status === 'Bekor qilingan' || isOooBooking) ? 0 : debt;
       document.getElementById('drawerPaid').textContent = formatMoney(paidVal); document.getElementById('drawerDebt').textContent = formatMoney(displayDebt);
       document.getElementById('drawerNotes').textContent = b.notes || 'Izoh yo‘q'; document.getElementById('quickPayAmount').value = displayDebt > 0 ? displayDebt : '';
 
@@ -4688,6 +5048,11 @@
         b.checkInTime = nowTime;
         if (r) { r.clean = 'Band'; r.manualStatus = false; }
         recordAuditAction('Check-in qilindi', `№ ${b.room} • ${b.guestName || 'Mehmon'} → Band (${b.checkIn} ${b.checkInTime})`);
+        sendHotelTelegramNotification('onCheckInOut', `✅ <b>Check-in (Mehmon joylashdi)</b>
+🚪 Xona: <b>№ ${escapeTgHtml(b.room)}</b>
+👤 Mehmon: <b>${escapeTgHtml(b.guestName || 'Mehmon')}</b>
+📅 Muddat: ${b.checkIn} (${b.checkInTime}) → ${b.checkOut}
+💵 Jami: ${formatMoney(b.total)} | To‘landi: ${formatMoney(b.paid)}`);
       } else if (newStatus === 'Chiqdi') {
         const cIn = toIsoDate(b.checkIn);
         // Har doim aynan hozirgi REAL sana va REAL vaqtda Check-out qilinadi
@@ -4702,11 +5067,17 @@
         b.nights = diffNights(b.checkIn, b.checkOut);
         if (r) { r.clean = 'Tozalash kerak'; r.manualStatus = false; }
         recordAuditAction('Check-out qilindi', `№ ${b.room} • ${b.guestName || 'Mehmon'} → Chiqdi (${b.checkOut} ${b.checkOutTime})`);
+        sendHotelTelegramNotification('onCheckInOut', `🏁 <b>Check-out (Mehmon chiqib ketdi)</b>
+🚪 Xona: <b>№ ${escapeTgHtml(b.room)}</b> (Tozalash kerak)
+👤 Mehmon: <b>${escapeTgHtml(b.guestName || 'Mehmon')}</b>
+🕒 Chiqish: ${b.checkOut} ${b.checkOutTime}
+💵 Jami: ${formatMoney(b.total)} | To‘landi: ${formatMoney(b.paid)}`);
       } else {
         recordAuditAction('Holat o‘zgartirildi', `№ ${b.room} • ${b.guestName || 'Mehmon'} → ${newStatus}`);
       }
       lastLocalWriteAt = Date.now();
-      saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
+      saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false);
+      const stPatch = {}; addCollectionPatchItem(stPatch, 'bookings', b.id, b); if (r) addCollectionPatchItem(stPatch, 'rooms', r.id, r); patchHotelCloud(stPatch);
     }
     function applyQuickPayment() {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
@@ -4715,23 +5086,55 @@
       const p = getBookingPayments(b); p.push({ method, amount: amt });
       b.payments = p; b.paid = p.reduce((s, x) => s + Number(x.amount || 0), 0); b.payType = getBookingSummaryPayType(p);
       recordAuditAction('To‘lov qo‘shildi', `№ ${b.room} • ${b.guestName || 'Mehmon'} — +${formatMoney(amt)} (${method})`);
-      syncBookingPaymentsToDailyCash(b, [{ method, amount: amt }], 'Tezkor to‘lov');
-      saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
+      sendHotelTelegramNotification('onPayment', `💳 <b>Tezkor to‘lov qabul qilindi</b>
+🚪 Xona: <b>№ ${escapeTgHtml(b.room)}</b>
+👤 Mehmon: <b>${escapeTgHtml(b.guestName || 'Mehmon')}</b>
+💰 Summa: <b>+${formatMoney(amt)}</b> (${escapeTgHtml(method)})
+📊 Jami to‘langan: ${formatMoney(b.paid)} / ${formatMoney(b.total)}`);
+      const addedPayCash = syncBookingPaymentsToDailyCash(b, [{ method, amount: amt }], 'Tezkor to‘lov') || [];
+      saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false);
+      const qpPatch = {}; addCollectionPatchItem(qpPatch, 'bookings', b.id, b); addedPayCash.forEach(m => addCollectionPatchItem(qpPatch, 'dailyManualEntries', m.id, m)); patchHotelCloud(qpPatch);
     }
     function removeSinglePayment(idx) {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
       if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bron to‘lovini faqat bosh administrator o‘chira oladi!'); return; }
       const p = getBookingPayments(b); p.splice(idx, 1);
       b.payments = p; b.paid = p.reduce((s, x) => s + Number(x.amount || 0), 0); b.payType = getBookingSummaryPayType(p);
-      saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false); pushAllToCloud(false);
+      saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false);
+      const rpPatch = {}; addCollectionPatchItem(rpPatch, 'bookings', b.id, b); patchHotelCloud(rpPatch);
     }
     function editCurrentDrawerBooking() { const b = bookings.find(x => x.id === activeDrawerBookingId); if (b && (b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bronni faqat bosh administrator tahrirlay oladi!'); return; } const id = activeDrawerBookingId; closeGuestDrawer(); openBookingModal(id); }
     async function deleteCurrentDrawerBooking() {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b || !isHotelOwnerOrMaster()) return;
       if (!(await rhConfirm('Ushbu bronni butunlay o‘chirmoqchimisiz?', { danger: true }))) return;
-      const roomId = b.room; recordAuditAction('Bron o‘chirildi', `№ ${b.room} • ${b.guestName || 'Mehmon'} (${b.checkIn} → ${b.checkOut})`); bookings = bookings.filter(x => x.id !== activeDrawerBookingId);
+      const delBkId = b.id; const roomId = b.room; recordAuditAction('Bron o‘chirildi', `№ ${b.room} • ${b.guestName || 'Mehmon'} (${b.checkIn} → ${b.checkOut})`);
+      sendHotelTelegramNotification('onCancel', `🗑 <b>Bron bazadan o‘chirildi</b>
+🚪 Xona: <b>№ ${escapeTgHtml(b.room)}</b>
+👤 Mehmon: <b>${escapeTgHtml(b.guestName || 'Mehmon')}</b>
+📅 Sana: ${b.checkIn} → ${b.checkOut}`); bookings = bookings.filter(x => x.id !== delBkId);
       const r = rooms.find(x => x.id === roomId); if (r && !isRoomCheckedInToday(roomId) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
-      saveAllLocal(); closeGuestDrawer(); refreshAllViews(false); pushAllToCloud(false);
+      saveAllLocal(); closeGuestDrawer(); refreshAllViews(false);
+      const dbkPatch = {}; addCollectionDeleteItem(dbkPatch, 'bookings', delBkId); if (r) addCollectionPatchItem(dbkPatch, 'rooms', r.id, r); patchHotelCloud(dbkPatch);
+    }
+
+    async function releaseOutOfOrderBooking() {
+      const b = bookings.find(x => x.id === activeDrawerBookingId);
+      if (!b || b.status !== "Ta'mirda") return;
+      if (!(await rhConfirm(`№ ${b.room} xonasini ta’mirdan chiqarib, sotuvga ochmoqchimisiz?`, { title: 'Ta’mirdan chiqarish', okText: '✅ Sotuvga ochish' }))) return;
+      const delBkId = b.id;
+      const roomId = b.room;
+      recordAuditAction('Ta’mirdan chiqarildi', `№ ${b.room} • ${b.guestName || 'Ta’mirda'} (${b.checkIn} → ${b.checkOut}) sotuvga ochildi`);
+      bookings = bookings.filter(x => x.id !== delBkId);
+      const r = rooms.find(x => x.id === roomId);
+      if (r) { r.clean = 'Toza'; r.manualStatus = false; }
+      saveAllLocal();
+      closeGuestDrawer();
+      refreshAllViews(false);
+      const relPatch = {};
+      addCollectionDeleteItem(relPatch, 'bookings', delBkId);
+      if (r) addCollectionPatchItem(relPatch, 'rooms', r.id, r);
+      patchHotelCloud(relPatch);
+      showToast(`✅ № ${roomId} xonasi ta’mirdan chiqarildi va sotuvga ochildi!`, 'success');
     }
 
     function isHotelChiefAdmin() {
@@ -4757,7 +5160,9 @@
       };
       auditLogs.unshift(entry);
       if (auditLogs.length > 300) auditLogs = auditLogs.slice(0, 300);
+      pendingAuditPatchEntries.push(entry);
       saveAllLocal();
+      return entry;
     }
 
     async function clearAuditLogs() {
@@ -4767,9 +5172,11 @@
       }
       if (!(await rhConfirm('Barcha qilingan amallar tarixini o‘chirmoqchimisiz?', { danger: true }))) return;
       auditLogs = [];
+      pendingAuditPatchEntries = [];
+      cloudLegacyKeys.auditLogs = {};
       saveAllLocal();
       renderAuditLogsTable();
-      pushAllToCloud(false);
+      patchHotelCloud({ auditLogs: null });
     }
 
     function renderAuditLogsTable() {
@@ -4835,7 +5242,7 @@
         const inDebt = isBookingInDebt(b);
         const sc = b.status === 'Bekor qilingan'
           ? 'bg-rose-100 text-rose-700'
-          : (b.status === 'Band' ? 'bg-emerald-100 text-emerald-700' : (b.status === 'Bron' ? 'bg-sky-100 text-sky-700' : 'bg-slate-200 text-slate-700'));
+          : (b.status === "Ta'mirda" ? 'bg-amber-100 text-amber-800 border border-amber-300' : (b.status === 'Band' ? 'bg-emerald-100 text-emerald-700' : (b.status === 'Bron' ? 'bg-sky-100 text-sky-700' : 'bg-slate-200 text-slate-700')));
         return `<tr onclick="openGuestDrawer('${b.id}')" class="hover:bg-[#f5f6ff] cursor-pointer">
           <td class="p-3.5 font-extrabold">№ ${b.room}</td>
           <td class="p-3.5 font-bold">${b.guestName}</td>
@@ -4907,20 +5314,31 @@
       }).join('');
     }
 
+    function countOverlapNights(bIn, bOut, rangeFrom, rangeTo) {
+      if (!bIn || !bOut || !rangeFrom || !rangeTo) return 0;
+      const rangeEndExcl = addDays(rangeTo, 1);
+      const start = bIn > rangeFrom ? bIn : rangeFrom;
+      const end = bOut < rangeEndExcl ? bOut : rangeEndExcl;
+      if (end <= start) return 0;
+      return Math.max(0, Math.round((new Date(end + 'T00:00:00') - new Date(start + 'T00:00:00')) / 86400000));
+    }
+
     function renderFinance() {
       const from = document.getElementById('finFrom').value, to = document.getElementById('finTo').value;
-      const list = bookings.filter(b => isValidBookingRecord(b) && b.status !== 'Bekor qilingan' && (!from || toIsoDate(b.checkIn) >= from) && (!to || toIsoDate(b.checkIn) <= to));
-      let expected = 0, paid = 0, debt = 0, debtCount = 0, nights = 0;
+      const list = bookings.filter(b => isValidBookingRecord(b) && b.status !== 'Bekor qilingan' && b.status !== "Ta'mirda" && (!from || toIsoDate(b.checkIn) >= from) && (!to || toIsoDate(b.checkIn) <= to));
+      let expected = 0, paid = 0, debt = 0, debtCount = 0, nights = 0, roomOnlyRevenue = 0;
       const byPay = {}, bySrc = {}, byDayPaid = {}, byDayExp = {};
 
       list.forEach(b => {
         const cIn = toIsoDate(b.checkIn);
         const n = Math.max(1, Number(b.nights) || diffNights(cIn, toIsoDate(b.checkOut)));
-        const t = Number(b.total) || ((n * (Number(b.rate) || 0)) + (Number(b.extra) || 0));
+        const rRev = n * (Number(b.rate) || 0);
+        const t = Number(b.total) || (rRev + (Number(b.extra) || 0));
         const pList = getBookingPayments(b);
         const p = pList.length ? pList.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0);
 
         expected += t;
+        roomOnlyRevenue += (rRev > 0 ? rRev : t);
         paid += p;
         nights += n;
         if (isBookingInDebt(b)) {
@@ -4953,6 +5371,49 @@
       document.getElementById('finCollectionBar').style.width = `${collectPct}%`;
       document.getElementById('finDebtCountText').textContent = `Qarzdor bronlar: ${debtCount} ta`;
       document.getElementById('finBookingsCountText').textContent = `Jami faol bronlar: ${list.length} ta`;
+
+      // Professional Hotel KPIs: Occupancy %, ADR, RevPAR
+      const totalRoomsCount = Math.max(1, (rooms || []).length);
+      const periodDays = (from && to && to >= from)
+        ? Math.max(1, Math.round((new Date(to + 'T00:00:00') - new Date(from + 'T00:00:00')) / 86400000) + 1)
+        : 30;
+      let oooNightsInPeriod = 0;
+      let soldNightsInPeriod = 0;
+      let periodRoomRevenue = 0;
+      if (from && to && to >= from) {
+        bookings.forEach(b => {
+          if (!isValidBookingRecord(b) || b.status === 'Bekor qilingan') return;
+          const ov = countOverlapNights(toIsoDate(b.checkIn), toIsoDate(b.checkOut), from, to);
+          if (ov <= 0) return;
+          if (b.status === "Ta'mirda") {
+            oooNightsInPeriod += ov;
+          } else {
+            soldNightsInPeriod += ov;
+            const bRate = Number(b.rate) || 0;
+            const bNights = Math.max(1, Number(b.nights) || diffNights(toIsoDate(b.checkIn), toIsoDate(b.checkOut)));
+            periodRoomRevenue += bRate > 0 ? (ov * bRate) : Math.round(((Number(b.total) || 0) / bNights) * ov);
+          }
+        });
+      } else {
+        soldNightsInPeriod = nights;
+        periodRoomRevenue = roomOnlyRevenue;
+      }
+      const totalCapacityNights = totalRoomsCount * periodDays;
+      const availableSellableNights = Math.max(1, totalCapacityNights - oooNightsInPeriod);
+      const occupancyPct = Math.min(100, Math.round((soldNightsInPeriod / availableSellableNights) * 1000) / 10);
+      const adrVal = soldNightsInPeriod > 0 ? Math.round(periodRoomRevenue / soldNightsInPeriod) : 0;
+      const revParVal = Math.round(periodRoomRevenue / availableSellableNights);
+
+      const occEl = document.getElementById('finOccupancyPct');
+      const occBadgeEl = document.getElementById('finOccBadge');
+      const occBarEl = document.getElementById('finOccupancyBar');
+      const occSubEl = document.getElementById('finOccupancySub');
+      if (occEl) occEl.textContent = `${occupancyPct}%`;
+      if (occBadgeEl) occBadgeEl.textContent = occupancyPct >= 70 ? 'Yuqori' : (occupancyPct >= 40 ? 'O‘rtacha' : 'Past');
+      if (occBarEl) occBarEl.style.width = `${Math.min(100, occupancyPct)}%`;
+      if (occSubEl) occSubEl.textContent = `Sotilgan: ${soldNightsInPeriod} / ${availableSellableNights} tun${oooNightsInPeriod > 0 ? ' (🔧 Ta’mirda: ' + oooNightsInPeriod + ' tun)' : ''}`;
+      animateCounter(document.getElementById('finAdrVal'), adrVal, ' so‘m');
+      animateCounter(document.getElementById('finRevParVal'), revParVal, ' so‘m');
 
       document.getElementById('payChartCenterVal').textContent = formatCompactMoney(paid);
       document.getElementById('sourceChartCenterVal').textContent = formatCompactMoney(expected);
@@ -5075,7 +5536,143 @@
       }
     }
 
+    function escapeTgHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderTelegramSettingsUI() {
+      const sec = document.getElementById('telegramNotifySection');
+      if (!sec) return;
+      if (!isHotelChiefAdmin()) {
+        sec.classList.add('hidden');
+        return;
+      }
+      sec.classList.remove('hidden');
+      const cfg = telegramSettings || DEFAULT_TELEGRAM_SETTINGS;
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = val || ''; };
+      const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = Boolean(val); };
+      setChk('tgEnabledToggle', cfg.enabled);
+      setVal('tgBotTokenInput', cfg.botToken);
+      setVal('tgChatIdInput', cfg.chatId);
+      setChk('tgEvtNewBooking', cfg.onNewBooking !== false);
+      setChk('tgEvtPayment', cfg.onPayment !== false);
+      setChk('tgEvtCheckInOut', cfg.onCheckInOut !== false);
+      setChk('tgEvtCancel', cfg.onCancel !== false);
+      setChk('tgEvtShiftClose', cfg.onShiftClose !== false);
+      setChk('tgEvtExpense', cfg.onExpense !== false);
+    }
+
+    function readTelegramSettingsFromForm() {
+      return {
+        enabled: Boolean(document.getElementById('tgEnabledToggle') && document.getElementById('tgEnabledToggle').checked),
+        botToken: String((document.getElementById('tgBotTokenInput') && document.getElementById('tgBotTokenInput').value) || '').trim(),
+        chatId: String((document.getElementById('tgChatIdInput') && document.getElementById('tgChatIdInput').value) || '').trim(),
+        onNewBooking: Boolean(document.getElementById('tgEvtNewBooking') && document.getElementById('tgEvtNewBooking').checked),
+        onPayment: Boolean(document.getElementById('tgEvtPayment') && document.getElementById('tgEvtPayment').checked),
+        onCheckInOut: Boolean(document.getElementById('tgEvtCheckInOut') && document.getElementById('tgEvtCheckInOut').checked),
+        onCancel: Boolean(document.getElementById('tgEvtCancel') && document.getElementById('tgEvtCancel').checked),
+        onShiftClose: Boolean(document.getElementById('tgEvtShiftClose') && document.getElementById('tgEvtShiftClose').checked),
+        onExpense: Boolean(document.getElementById('tgEvtExpense') && document.getElementById('tgEvtExpense').checked)
+      };
+    }
+
+    async function saveTelegramSettings(e) {
+      e.preventDefault();
+      if (!isHotelChiefAdmin()) {
+        showToast('⛔ Ruxsat yo‘q: Telegram sozlamalarini faqat bosh administrator o‘zgartira oladi!', 'error');
+        return;
+      }
+      const nextCfg = readTelegramSettingsFromForm();
+      if (nextCfg.enabled && (!nextCfg.botToken || !nextCfg.chatId)) {
+        showToast('⚠️ Bildirishnomalarni yoqish uchun Bot Token va Chat ID ni kiriting!', 'error');
+        return;
+      }
+      telegramSettings = nextCfg;
+      recordAuditAction('Telegram sozlamalari saqlandi', `Holat: ${nextCfg.enabled ? 'Yoqilgan' : 'O‘chirilgan'} • Chat ID: ${nextCfg.chatId || '-'}`);
+      saveAllLocal();
+      await patchHotelCloud({ telegramSettings });
+      showToast('✅ Telegram-bildirishnoma sozlamalari saqlandi!', 'success');
+    }
+
+    async function detectTelegramChatId() {
+      const token = String((document.getElementById('tgBotTokenInput') && document.getElementById('tgBotTokenInput').value) || '').trim();
+      if (!token) {
+        showToast('⚠️ Avval 1-maydonga Telegram Bot Tokenni kiriting!', 'error');
+        return;
+      }
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/getUpdates?limit=15`);
+        const data = await res.json();
+        if (!data || !data.ok) {
+          showToast('⛔ Bot Token noto‘g‘ri yoki Telegramga ulanib bo‘lmadi!', 'error');
+          return;
+        }
+        const updates = Array.isArray(data.result) ? data.result : [];
+        let foundChat = null;
+        for (let i = updates.length - 1; i >= 0; i--) {
+          const u = updates[i];
+          const chat = (u.message && u.message.chat) || (u.my_chat_member && u.my_chat_member.chat) || (u.channel_post && u.channel_post.chat);
+          if (chat && chat.id) { foundChat = chat; break; }
+        }
+        if (!foundChat) {
+          showToast('ℹ️ Chat ID topilmadi! Telegramda botingizga kirib /start bosing va yana urinib ko‘ring.', 'info', 4800);
+          return;
+        }
+        const chatInp = document.getElementById('tgChatIdInput');
+        if (chatInp) chatInp.value = String(foundChat.id);
+        const title = foundChat.title || [foundChat.first_name, foundChat.last_name].filter(Boolean).join(' ') || foundChat.username || 'Telegram';
+        showToast(`✅ Chat ID topildi: ${foundChat.id} (${title})`, 'success', 4200);
+      } catch (err) {
+        showToast('⛔ Telegram API ga ulanishda xatolik yuz berdi.', 'error');
+      }
+    }
+
+    async function sendHotelTelegramNotification(eventKey, bodyHtml, forceCfg = null) {
+      const cfg = forceCfg || telegramSettings;
+      if (!cfg || !cfg.botToken || !cfg.chatId) return { ok: false, reason: 'missing_config' };
+      if (!forceCfg && (!cfg.enabled || (eventKey && cfg[eventKey] === false))) return { ok: false, reason: 'disabled' };
+      const hotel = (saasRegistry.hotels && saasRegistry.hotels[currentHotelId]) || { name: 'ReservHotel' };
+      const actor = currentUser ? `${currentUser.name || 'Admin'} (${currentUser.role || ''})` : 'Tizim';
+      const fullText = `🏨 <b>${escapeTgHtml(hotel.name)}</b>
+${bodyHtml}
+
+👤 <i>${escapeTgHtml(actor)} • ${toIsoDate(new Date())} ${getCurrentTimeStr()}</i>`;
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${encodeURIComponent(cfg.botToken)}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: cfg.chatId,
+            text: fullText,
+            parse_mode: 'HTML',
+            disable_web_page_preview: true
+          })
+        });
+        const data = await res.json();
+        return { ok: Boolean(data && data.ok), description: (data && data.description) || '' };
+      } catch (err) {
+        return { ok: false, description: 'Network error' };
+      }
+    }
+
+    async function sendTestTelegramNotification() {
+      const cfg = readTelegramSettingsFromForm();
+      if (!cfg.botToken || !cfg.chatId) {
+        showToast('⚠️ Test yuborish uchun Bot Token va Chat ID ni kiriting!', 'error');
+        return;
+      }
+      showToast('⏳ Test xabar yuborilmoqda...', 'info', 2000);
+      const result = await sendHotelTelegramNotification(null, `✅ <b>Telegram-bildirishnomalar muvaffaqiyatli ulandi!</b>
+Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, cfg);
+      if (result.ok) {
+        showToast('✅ Test xabar Telegramga muvaffaqiyatli yetib bordi!', 'success');
+      } else {
+        showToast(`⛔ Xabar yuborilmadi: ${result.description || 'Token yoki Chat ID ni tekshiring'}`, 'error', 5000);
+      }
+    }
+
     function renderAllowedUsers() {
+      renderTelegramSettingsUI();
       const hotel = saasRegistry.hotels[currentHotelId], ownerEm = hotel ? String(hotel.ownerEmail || '').toLowerCase() : '';
       document.getElementById('allowedUsersBody').innerHTML = allowedUsers.map((u, idx) => {
         const isOwner = String(u.email || '').toLowerCase() === ownerEm || String(u.email || '').toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
@@ -5109,7 +5706,12 @@
       const em = String(target.email || '').toLowerCase();
       if (saasRegistry.emailMap[em]) { saasRegistry.emailMap[em].name = newName; saasRegistry.emailMap[em].pin = newPin; }
       if (saasRegistry.hotels[currentHotelId] && String(saasRegistry.hotels[currentHotelId].ownerEmail || '').toLowerCase() === em) { saasRegistry.hotels[currentHotelId].ownerName = newName; saasRegistry.hotels[currentHotelId].ownerPin = newPin; }
-      saveAllLocal(); await saveSaasRegistry(); await pushAllToCloud(false); alert('Xodim ma’lumotlari saqlandi!');
+      saveAllLocal();
+      const saasP = { [`emailMap/${encodeEmailKey(em)}`]: saasRegistry.emailMap[em] };
+      if (saasRegistry.hotels[currentHotelId] && String(saasRegistry.hotels[currentHotelId].ownerEmail || '').toLowerCase() === em) { saasP[`hotels/${safeFbKey(currentHotelId)}`] = saasRegistry.hotels[currentHotelId]; }
+      await patchSaasRegistry(saasP);
+      const uPatch = {}; addCollectionPatchItem(uPatch, 'users', encodeEmailKey(em), target); await patchHotelCloud(uPatch);
+      alert('Xodim ma’lumotlari saqlandi!');
     }
 
     async function addAllowedUser(e) {
@@ -5120,22 +5722,30 @@
       if (saasRegistry.emailMap[email]) { alert('Ushbu Gmail manzili tizimda allaqachon bor!'); return; }
 
       await firebaseAuthSignUp(email, pin, false);
-      allowedUsers.push({ email, name, role, pin, active: true, isOwner: false });
+      const newUserObj = { email, name, role, pin, active: true, isOwner: false };
+      allowedUsers.push(newUserObj);
       saasRegistry.emailMap[email] = { hotelId: currentHotelId, name, role, pin, active: true, isOwner: false };
-      saveAllLocal(); renderAllowedUsers(); await saveSaasRegistry(); await pushAllToCloud(false); e.target.reset();
+      saveAllLocal(); renderAllowedUsers();
+      await patchSaasRegistry({ [`emailMap/${encodeEmailKey(email)}`]: saasRegistry.emailMap[email] });
+      const auPatch = {}; addCollectionPatchItem(auPatch, 'users', encodeEmailKey(email), newUserObj); await patchHotelCloud(auPatch);
+      e.target.reset();
     }
 
     async function toggleUserActive(idx) {
       if (!isHotelOwnerOrMaster()) return;
       const target = allowedUsers[idx]; target.active = !target.active;
       const em = String(target.email || '').toLowerCase(); if (saasRegistry.emailMap[em]) saasRegistry.emailMap[em].active = target.active;
-      saveAllLocal(); renderAllowedUsers(); await saveSaasRegistry(); await pushAllToCloud(false);
+      saveAllLocal(); renderAllowedUsers();
+      if (saasRegistry.emailMap[em]) await patchSaasRegistry({ [`emailMap/${encodeEmailKey(em)}`]: saasRegistry.emailMap[em] });
+      const tuPatch = {}; addCollectionPatchItem(tuPatch, 'users', encodeEmailKey(em), target); await patchHotelCloud(tuPatch);
     }
 
     async function removeAllowedUser(idx) {
       if (!isHotelOwnerOrMaster() || !(await rhConfirm('Ushbu xodim ruxsatini o‘chirmoqchimisiz?', { danger: true }))) return;
       const em = String(allowedUsers[idx].email || '').toLowerCase(); delete saasRegistry.emailMap[em]; allowedUsers.splice(idx, 1);
-      saveAllLocal(); renderAllowedUsers(); await saveSaasRegistry(); await pushAllToCloud(false);
+      saveAllLocal(); renderAllowedUsers();
+      await patchSaasRegistry({ [`emailMap/${encodeEmailKey(em)}`]: null });
+      const ruPatch = {}; addCollectionDeleteItem(ruPatch, 'users', encodeEmailKey(em)); await patchHotelCloud(ruPatch);
     }
 
 
@@ -5484,6 +6094,25 @@
         'Bron qilingan': 'Забронировано',
         'Chiqdi (Check-out)': 'Выехал (Check-out)',
         'Bekor qilingan': 'Отменено',
+        '🔧 Ta’mirga yopish': '🔧 Закрыть на ремонт',
+        '🔧 Ta’mirda (Yopiq)': '🔧 На ремонте (Закрыто)',
+        '🔧 Ta’mirda / Yopiq (Out of Order)': '🔧 На ремонте (Out of Order)',
+        'Ta’mirda (Yopiq)': 'На ремонте (Закрыто)',
+        'Bandlik foizi (Occupancy)': 'Загрузка номеров (Occupancy)',
+        'ADR — O‘rtacha xona narxi': 'ADR — Средняя цена номера',
+        'RevPAR — Xona samaradorligi': 'RevPAR — Доход на номер',
+        '✅ Ta’mirdan chiqarish (Sotuvga ochish)': '✅ Снять с ремонта (Открыть продажи)',
+        'Rahbar uchun Telegram-bildirishnomalar': 'Telegram-уведомления для руководителя',
+        'Bildirishnomalarni yoqish': 'Включить уведомления',
+        '🔍 Avto-topish': '🔍 Найти ID',
+        '📨 Test xabar yuborish': '📨 Отправить тест',
+        '💾 Telegram sozlamalarini saqlash': '💾 Сохранить настройки Telegram',
+        '🆕 Yangi bron yaratilganda': '🆕 При новой брони',
+        '💳 To‘lov qabul qilinganda': '💳 При приёме оплаты',
+        '🔑 Check-in / Check-out da': '🔑 При Check-in / Check-out',
+        '❌ Bekor qilish / O‘chirishda': '❌ При отмене / удалении',
+        '🔒 Smena yopilganda (Z-hisobot)': '🔒 При закрытии смены (Z-отчёт)',
+        '💸 Smenada xarajat yozilganda': '💸 При расходе в смене',
         'Band (To‘langan)': 'Заселён (Оплачено)',
         'Qisman to‘langan': 'Частично оплачено',
         'Qarzdor': 'Должник',
@@ -5713,6 +6342,25 @@
         'Bron qilingan': 'Booked',
         'Chiqdi (Check-out)': 'Checked-out',
         'Bekor qilingan': 'Canceled',
+        '🔧 Ta’mirga yopish': '🔧 Set Out of Order',
+        '🔧 Ta’mirda (Yopiq)': '🔧 Out of Order',
+        '🔧 Ta’mirda / Yopiq (Out of Order)': '🔧 Out of Order (Maintenance)',
+        'Ta’mirda (Yopiq)': 'Out of Order',
+        'Bandlik foizi (Occupancy)': 'Occupancy Rate',
+        'ADR — O‘rtacha xona narxi': 'ADR — Average Daily Rate',
+        'RevPAR — Xona samaradorligi': 'RevPAR — Rev. Per Avail. Room',
+        '✅ Ta’mirdan chiqarish (Sotuvga ochish)': '✅ Release from Maintenance',
+        'Rahbar uchun Telegram-bildirishnomalar': 'Owner Telegram Notifications',
+        'Bildirishnomalarni yoqish': 'Enable notifications',
+        '🔍 Avto-topish': '🔍 Auto-detect',
+        '📨 Test xabar yuborish': '📨 Send test message',
+        '💾 Telegram sozlamalarini saqlash': '💾 Save Telegram settings',
+        '🆕 Yangi bron yaratilganda': '🆕 On new booking',
+        '💳 To‘lov qabul qilinganda': '💳 On payment received',
+        '🔑 Check-in / Check-out da': '🔑 On Check-in / Check-out',
+        '❌ Bekor qilish / O‘chirishda': '❌ On cancel / delete',
+        '🔒 Smena yopilganda (Z-hisobot)': '🔒 On shift close (Z-report)',
+        '💸 Smenada xarajat yozilganda': '💸 On shift expense',
         'Band (To‘langan)': 'Checked-in (Paid)',
         'Qisman to‘langan': 'Partially paid',
         'Qarzdor': 'Unpaid',
