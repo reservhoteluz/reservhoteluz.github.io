@@ -693,6 +693,61 @@
       box-shadow: 0 6px 18px -6px rgba(91, 84, 230, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.16);
     }
 
+    
+    /* ==================== FULLHD CRISP RENDERING & STAFF CONTROL VISUALS ==================== */
+    #appleLoginPromoPanel,
+    #appleLoginPromoPanel * {
+      -webkit-font-smoothing: subpixel-antialiased;
+      text-rendering: geometricPrecision;
+    }
+    .beam-shell {
+      border-radius: 22px;
+      padding: 1.5px;
+      background: linear-gradient(135deg, rgba(129, 140, 248, 0.55), rgba(16, 185, 129, 0.35), rgba(91, 84, 230, 0.55));
+    }
+    .beam-shell::before {
+      display: none;
+    }
+    @keyframes scanSweep {
+      0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+      35% { opacity: 0.55; }
+      70% { opacity: 0.55; }
+      100% { transform: translateX(260%) skewX(-18deg); opacity: 0; }
+    }
+    .fhd-light-sweep {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 2;
+      border-radius: 20.5px;
+    }
+    .fhd-light-sweep::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 38%;
+      background: linear-gradient(90deg, transparent, rgba(165, 180, 252, 0.08), rgba(52, 211, 153, 0.06), transparent);
+      animation: scanSweep 7.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+      will-change: transform, opacity;
+    }
+    @keyframes staffRowReveal {
+      0% { opacity: 0; transform: translateX(-10px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    .staff-row-anim {
+      opacity: 0;
+      animation: staffRowReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes shieldPulseRing {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.45); }
+      50% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0); }
+    }
+    .shield-pulse {
+      animation: shieldPulseRing 2.2s ease-in-out infinite;
+    }
+
     /* ==================== BUTUN DASTUR ICHIDAGI APPLE VISUAL EFFEKTLARI ==================== */
     header {
       backdrop-filter: blur(18px) saturate(165%) !important;
@@ -1010,11 +1065,11 @@
 
         <!-- 3. 3D-TILT INTERACTIVE SHOWCASE STAGE (WITH CONIC BORDER BEAM) -->
         <div class="relative z-10 space-y-2.5" onmouseenter="pauseShowcaseCycle(true)" onmouseleave="pauseShowcaseCycle(false)">
-          <div id="stageTabsRow" class="grid grid-cols-4 gap-1.5"></div>
+          <div id="stageTabsRow" class="grid grid-cols-2 sm:grid-cols-5 gap-1.5"></div>
 
           <div class="tilt-wrapper">
             <div id="tiltCard" class="beam-shell">
-              <div class="beam-inner p-4 min-h-[250px] flex flex-col justify-between gap-3">
+              <div class="beam-inner p-4 min-h-[268px] flex flex-col justify-between gap-3"><div class="fhd-light-sweep"></div>
                 <div id="stageDynamicBody" class="flex-1 flex flex-col justify-between gap-2.5"></div>
                 <div class="pt-1">
                   <div class="w-full h-1 rounded-full bg-white/10 overflow-hidden">
@@ -7659,24 +7714,26 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       applyLanguageToSubtree(document.body);
     }
 
-    // ==================== CINEMATIC INTERACTIVE LOGIN SHOWCASE (UZ / RU / EN) ====================
+    // ==================== CINEMATIC INTERACTIVE LOGIN SHOWCASE (FULLHD + XODIMLAR NAZORATI) ====================
     let showcaseActiveTab = 0;
     let showcaseIsPaused = false;
     let showcaseCycleTimeout = null;
+    const SHOWCASE_TAB_COUNT = 5;
 
     const SHOWCASE_COPY = {
       uz: {
-        topBadge: 'Cloud PMS • 24/7 Real-time',
+        topBadge: 'Cloud PMS • FullHD • 24/7 Jonli Nazorat',
         headline: 'Mehmonxonangiz foydasini himoya qiling — <span class="bg-gradient-to-r from-indigo-300 via-violet-200 to-emerald-300 bg-clip-text text-transparent">har bir so‘m va xona kaftingizda</span>',
-        subheadline: 'Daftarsiz, xatosiz va yashirin xarajatsiz boshqaruv. Yangi bron, smena kassasi va xodimlar faoliyatini dunyoning istalgan nuqtasidan jonli kuzating.',
+        subheadline: 'Daftarsiz, xatosiz va yashirin xarajatsiz boshqaruv. Yangi bron, smena kassasi va xodimlar nazoratini dunyoning istalgan nuqtasidan jonli kuzating.',
         trustPills: [
           { icon: '🎁', text: '7 kun to‘liq bepul', cls: 'bg-emerald-500/12 border-emerald-400/30 text-emerald-200' },
-          { icon: '⚡', text: '2 daqiqada ishga tushadi', cls: 'bg-indigo-500/15 border-indigo-400/30 text-indigo-100' },
+          { icon: '🛡️', text: '100% Xodimlar nazorati', cls: 'bg-sky-500/12 border-sky-400/30 text-sky-200' },
           { icon: '💎', text: 'Yillik $99 • Umrbod $299', cls: 'bg-amber-500/12 border-amber-400/30 text-amber-200' }
         ],
         tabs: [
           { short: '✈️ Telegram 24/7' },
           { short: '📅 Bronlar kalendari' },
+          { short: '🛡️ Xodimlar nazorati' },
           { short: '📈 Moliya' },
           { short: '💎 1 haftada ROI' }
         ],
@@ -7698,6 +7755,15 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
           mxDebt: '−250 000 so‘m',
           mxBooked: 'Bron • 3 tun',
           mxCaption: 'Xonalarni bir harakatda ko‘chiring va cho‘zing. Ustma-ust bron qilishdan avtomatik himoya hamda kech chiqish signali.',
+
+          stTitle: 'Xodimlar nazorati va Audit jurnali',
+          stBadge: '🔒 Qulf himoyasi faol',
+          stLogs: [
+            { icon: '💳', actor: 'Admin Jasur', action: 'To‘lov +500 000 so‘m', meta: '№205 • 19:42', cls: 'text-emerald-300', delay: '0.04s' },
+            { icon: '🔒', actor: '2-Smena (Dilshod)', action: 'Smena Z-hisoboti yopildi', meta: 'Qulflangan • 20:00', cls: 'text-sky-300', delay: '0.12s' },
+            { icon: '⛔', actor: 'Reception (Madina)', action: 'Yopilgan bronni o‘chirish rad etildi', meta: 'Faqat Rahbar ruxsati', cls: 'text-amber-300', delay: '0.20s' }
+          ],
+          stCaption: 'Har bir to‘lov, smena yopilishi va tahrir muhrlanadi. Yopilgan bron va smenalarni faqat bosh administrator ochadi.',
 
           finOcc: 'Bandlik (Occupancy)',
           finAdr: 'O‘rtacha narx (ADR)',
@@ -7722,17 +7788,18 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
         }
       },
       ru: {
-        topBadge: 'Cloud PMS • Контроль 24/7',
+        topBadge: 'Cloud PMS • FullHD • Контроль 24/7',
         headline: 'Защитите прибыль вашего отеля — <span class="bg-gradient-to-r from-indigo-300 via-violet-200 to-emerald-300 bg-clip-text text-transparent">каждый номер и сум под контролем 24/7</span>',
-        subheadline: 'Управление без тетрадей, ошибок и скрытых трат. Отслеживайте брони, кассу смен и действия персонала из любой точки мира.',
+        subheadline: 'Управление без тетрадей, ошибок и скрытых трат. Отслеживайте брони, кассу смен и контроль персонала из любой точки мира.',
         trustPills: [
           { icon: '🎁', text: '7 дней бесплатно', cls: 'bg-emerald-500/12 border-emerald-400/30 text-emerald-200' },
-          { icon: '⚡', text: 'Запуск за 2 минуты', cls: 'bg-indigo-500/15 border-indigo-400/30 text-indigo-100' },
+          { icon: '🛡️', text: '100% Контроль персонала', cls: 'bg-sky-500/12 border-sky-400/30 text-sky-200' },
           { icon: '💎', text: 'Год $99 • Навсегда $299', cls: 'bg-amber-500/12 border-amber-400/30 text-amber-200' }
         ],
         tabs: [
           { short: '✈️ Telegram 24/7' },
           { short: '📅 Календарь броней' },
+          { short: '🛡️ Контроль смен' },
           { short: '📈 Аналитика' },
           { short: '💎 Окупаемость' }
         ],
@@ -7754,6 +7821,15 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
           mxDebt: '−250 000 сум',
           mxBooked: 'Бронь • 3 ноч.',
           mxCaption: 'Переносите и продлевайте брони одним движением мыши. Автоматическая защита от накладок и контроль позднего выезда.',
+
+          stTitle: 'Контроль персонала и Журнал аудита',
+          stBadge: '🔒 Защита смен активна',
+          stLogs: [
+            { icon: '💳', actor: 'Админ Жасур', action: 'Оплата +500 000 сум', meta: '№205 • 19:42', cls: 'text-emerald-300', delay: '0.04s' },
+            { icon: '🔒', actor: '2-я смена (Дилшод)', action: 'Закрыт Z-отчёт смены', meta: 'Заблокировано • 20:00', cls: 'text-sky-300', delay: '0.12s' },
+            { icon: '⛔', actor: 'Ресепшн (Мадина)', action: 'Удаление закрытой брони отклонено', meta: 'Только по праву CEO', cls: 'text-amber-300', delay: '0.20s' }
+          ],
+          stCaption: 'Каждая операция, закрытие смены и правка фиксируются. Открыть закрытые смены и брони может только главный администратор.',
 
           finOcc: 'Загрузка (Occupancy)',
           finAdr: 'Средний тариф (ADR)',
@@ -7778,17 +7854,18 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
         }
       },
       en: {
-        topBadge: 'Cloud PMS • 24/7 Real-Time',
+        topBadge: 'Cloud PMS • FullHD • 24/7 Live Control',
         headline: 'Protect your hotel’s profit — <span class="bg-gradient-to-r from-indigo-300 via-violet-200 to-emerald-300 bg-clip-text text-transparent">every room and dollar under 24/7 control</span>',
-        subheadline: 'Zero paper notebooks, zero cash leaks, zero overbookings. Monitor live reservations, shift cash registers, and staff activity from anywhere.',
+        subheadline: 'Zero paper notebooks, zero cash leaks, zero overbookings. Monitor live reservations, shift cash registers, and staff controls from anywhere.',
         trustPills: [
           { icon: '🎁', text: '7-Day Free Trial', cls: 'bg-emerald-500/12 border-emerald-400/30 text-emerald-200' },
-          { icon: '⚡', text: 'Live in 2 Minutes', cls: 'bg-indigo-500/15 border-indigo-400/30 text-indigo-100' },
+          { icon: '🛡️', text: '100% Staff Control', cls: 'bg-sky-500/12 border-sky-400/30 text-sky-200' },
           { icon: '💎', text: 'Annual $99 • Lifetime $299', cls: 'bg-amber-500/12 border-amber-400/30 text-amber-200' }
         ],
         tabs: [
           { short: '✈️ Telegram 24/7' },
           { short: '📅 Bookings Calendar' },
+          { short: '🛡️ Staff Control' },
           { short: '📈 RevPAR' },
           { short: '💎 Instant ROI' }
         ],
@@ -7810,6 +7887,15 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
           mxDebt: '−250,000 UZS',
           mxBooked: 'Booked • 3n',
           mxCaption: 'Drag-and-drop room moves and stay extensions in one fluid motion. Built-in overbooking protection and late check-out alerts.',
+
+          stTitle: 'Staff Control & Audit Trail',
+          stBadge: '🔒 Shift Lock Active',
+          stLogs: [
+            { icon: '💳', actor: 'Admin Jasur', action: 'Payment +500,000 UZS', meta: 'Rm №205 • 19:42', cls: 'text-emerald-300', delay: '0.04s' },
+            { icon: '🔒', actor: 'Shift 2 (Dilshod)', action: 'Shift Z-Report locked', meta: 'Sealed • 20:00', cls: 'text-sky-300', delay: '0.12s' },
+            { icon: '⛔', actor: 'Reception (Madina)', action: 'Closed booking delete blocked', meta: 'Owner permission only', cls: 'text-amber-300', delay: '0.20s' }
+          ],
+          stCaption: 'Every payment, shift close, and edit is logged with timestamps. Only the property owner can reopen locked shifts or closed bookings.',
 
           finOcc: 'Occupancy Rate',
           finAdr: 'Avg. Rate (ADR)',
@@ -7854,7 +7940,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       const row = document.getElementById('stageTabsRow');
       if (!row) return;
       row.innerHTML = t.tabs.map((tab, i) => `
-        <button type="button" onclick="selectShowcaseTab(${i})" class="stage-tab-btn ${i === showcaseActiveTab ? 'active' : 'bg-white/[0.04] border-white/10 text-indigo-200/80 hover:bg-white/[0.09] hover:text-white'} px-2 py-2 rounded-xl border text-[10.5px] font-bold truncate text-center">
+        <button type="button" onclick="selectShowcaseTab(${i})" class="stage-tab-btn ${i === showcaseActiveTab ? 'active' : 'bg-white/[0.04] border-white/10 text-indigo-200/80 hover:bg-white/[0.09] hover:text-white'} px-2 py-2 rounded-xl border text-[10px] font-bold truncate text-center">
           ${tab.short}
         </button>
       `).join('');
@@ -7961,6 +8047,35 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       } else if (showcaseActiveTab === 2) {
         body.innerHTML = `
           <div class="panel-enter space-y-2.5">
+            <div class="flex items-center justify-between gap-2 text-[11px]">
+              <span class="font-bold text-white flex items-center gap-1.5">
+                <span class="shield-pulse inline-flex items-center justify-center w-5 h-5 rounded-full bg-sky-500/20 text-sky-300 text-xs">🛡️</span>
+                <span>${s.stTitle}</span>
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-extrabold text-[9.5px] shrink-0">${s.stBadge}</span>
+            </div>
+
+            <div class="rounded-2xl bg-[#090e26]/90 border border-indigo-400/20 p-2.5 space-y-1.5">
+              ${s.stLogs.map(row => `
+                <div style="animation-delay:${row.delay}" class="staff-row-anim flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-[10px]">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="text-xs shrink-0">${row.icon}</span>
+                    <div class="truncate">
+                      <span class="font-extrabold text-white">${row.actor}</span>
+                      <span class="text-indigo-200/60 mx-1">•</span>
+                      <span class="${row.cls} font-bold">${row.action}</span>
+                    </div>
+                  </div>
+                  <span class="text-[9px] text-indigo-200/75 font-mono shrink-0">${row.meta}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <p class="text-[11px] text-indigo-100/80 leading-relaxed">${s.stCaption}</p>
+          </div>`;
+      } else if (showcaseActiveTab === 3) {
+        body.innerHTML = `
+          <div class="panel-enter space-y-2.5">
             <div class="grid grid-cols-3 gap-2">
               <div class="rounded-xl bg-white/[0.06] border border-emerald-400/25 p-2">
                 <div class="text-[9px] font-semibold text-indigo-200/75 truncate">${s.finOcc}</div>
@@ -8052,7 +8167,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       showcaseCycleTimeout = setTimeout(() => {
         const loginEl = document.getElementById('loginScreen');
         if (loginEl && !loginEl.classList.contains('hidden')) {
-          showcaseActiveTab = (showcaseActiveTab + 1) % 4;
+          showcaseActiveTab = (showcaseActiveTab + 1) % SHOWCASE_TAB_COUNT;
           renderShowcaseTabsRow();
           renderShowcaseStageBody();
         }
@@ -8062,10 +8177,6 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
 
     function selectShowcaseTab(idx) {
       showcaseActiveTab = idx;
-      const activeL = ['uz', 'ru', 'en'].includes(currentLang) ? currentLang : 'uz';
-      document.querySelectorAll('[data-lang-btn]').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-lang-btn') === activeL);
-      });
       renderShowcaseTabsRow();
       renderShowcaseStageBody();
       scheduleNextShowcaseTab();
@@ -8121,6 +8232,10 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
         `).join('');
       }
 
+      const activeL = ['uz', 'ru', 'en'].includes(currentLang) ? currentLang : 'uz';
+      document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang-btn') === activeL);
+      });
       renderShowcaseTabsRow();
       renderShowcaseStageBody();
       scheduleNextShowcaseTab();
