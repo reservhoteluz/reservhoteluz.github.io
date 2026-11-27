@@ -548,119 +548,151 @@
     .rh-splash-title { opacity: 0; animation: rhTextUp 0.65s ease-out 0.45s forwards; }
     .rh-splash-bar { animation: rhBarLoad 1.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 
-    /* ==================== SHOWCASE DESIGN FROM SCREENSHOTS (3D-TILT + BORDER-BEAM + 4 TABS) ==================== */
-    .apple-promo-panel {
-      background:
-        radial-gradient(620px circle at var(--pmx, 20%) var(--pmy, 16%), rgba(99, 102, 241, 0.36), transparent 56%),
-        radial-gradient(500px circle at 88% 88%, rgba(16, 185, 129, 0.14), transparent 54%),
-        linear-gradient(155deg, #070b1d 0%, #0e1538 52%, #182256 100%);
-      perspective: 1150px;
+    /* ==================== CINEMATIC INTERACTIVE LOGIN SHOWCASE (EXACT PORT) ==================== */
+    .stage-bg {
+      background: linear-gradient(155deg, #060918 0%, #0d1330 52%, #131b3a 100%);
+      position: relative;
+      isolation: isolate;
     }
-    .rh-promo-grid-bg {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(to right, rgba(255,255,255,0.032) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.032) 1px, transparent 1px);
-      background-size: 26px 26px;
-      mask-image: radial-gradient(ellipse at center, black 48%, transparent 90%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 48%, transparent 90%);
-      pointer-events: none;
+    .dot-grid {
+      background-image: radial-gradient(rgba(165, 180, 252, 0.16) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mask-image: radial-gradient(ellipse 85% 80% at 50% 45%, #000 35%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 85% 80% at 50% 45%, #000 35%, transparent 100%);
     }
-    .apple-lang-seg {
-      background: rgba(15, 23, 56, 0.75);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(148, 163, 184, 0.24);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    @keyframes auroraFloatA {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.55; }
+      50% { transform: translate3d(32px, -22px, 0) scale(1.14); opacity: 0.8; }
     }
-    .rh-showcase-tabs {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 7px;
+    @keyframes auroraFloatB {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.4; }
+      50% { transform: translate3d(-28px, 24px, 0) scale(1.1); opacity: 0.68; }
     }
-    .rh-sc-tab {
-      padding: 8px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(226, 232, 240, 0.85);
-      background: rgba(15, 22, 52, 0.72);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      transition: all 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    .aurora-orb-a {
+      animation: auroraFloatA 11s ease-in-out infinite;
+      will-change: transform, opacity;
     }
-    .rh-sc-tab:hover {
-      color: #ffffff;
-      border-color: rgba(129, 140, 248, 0.55);
-      background: rgba(30, 41, 86, 0.85);
+    .aurora-orb-b {
+      animation: auroraFloatB 13s ease-in-out infinite;
+      will-change: transform, opacity;
     }
-    .rh-sc-tab.is-active {
-      color: #ffffff;
-      background: rgba(34, 39, 86, 0.96);
-      border: 1.5px solid #6366f1;
-      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.25), 0 8px 20px -6px rgba(99, 102, 241, 0.65);
+    .mouse-spotlight {
+      background: radial-gradient(420px circle at var(--spot-x, 50%) var(--spot-y, 35%), rgba(129, 140, 248, 0.16), transparent 68%);
+      transition: opacity 0.35s ease;
     }
-    @property --rh-beam-angle {
-      syntax: '<angle>';
-      initial-value: 0deg;
-      inherits: false;
+    .tilt-wrapper {
+      perspective: 1200px;
     }
-    @keyframes rhBeamSpin {
-      to { --rh-beam-angle: 360deg; }
-    }
-    .rh-tilt-stage {
+    .beam-shell {
       position: relative;
       border-radius: 22px;
       padding: 1.5px;
-      background: conic-gradient(from var(--rh-beam-angle), rgba(99, 102, 241, 0.22) 0%, rgba(52, 211, 153, 0.95) 20%, rgba(129, 140, 248, 0.9) 38%, rgba(99, 102, 241, 0.16) 62%, rgba(52, 211, 153, 0.75) 82%, rgba(99, 102, 241, 0.22) 100%);
-      animation: rhBeamSpin 7.5s linear infinite;
-      transform-style: preserve-3d;
-      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
-      box-shadow: 0 24px 50px -16px rgba(3, 6, 20, 0.85), 0 0 34px -10px rgba(99, 102, 241, 0.42);
-    }
-    .rh-tilt-inner {
-      border-radius: 20.5px;
-      background: linear-gradient(165deg, rgba(11, 16, 42, 0.98), rgba(7, 11, 29, 0.99));
-      padding: 15px 16px 12px 16px;
-      min-height: 268px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
       overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+      box-shadow:
+        0 28px 65px -16px rgba(2, 4, 15, 0.88),
+        0 0 40px -12px rgba(91, 84, 230, 0.35);
+      will-change: transform;
     }
-    .rh-tilt-inner::before {
+    .beam-shell::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: radial-gradient(300px circle at var(--cmx, 50%) var(--cmy, 20%), rgba(129, 140, 248, 0.12), transparent 72%);
-      pointer-events: none;
+      inset: -120%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 220deg,
+        rgba(91, 84, 230, 0.45) 265deg,
+        #818cf8 305deg,
+        #10b981 335deg,
+        #f59e0b 350deg,
+        transparent 360deg
+      );
+      animation: spinBeam 5.5s linear infinite;
+      z-index: 0;
     }
-    @keyframes rhStagePop {
-      0% { opacity: 0; transform: translateY(6px) scale(0.988); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
+    @keyframes spinBeam {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-    .rh-stage-anim {
-      animation: rhStagePop 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-    .rh-sc-progress-track {
+    .beam-inner {
       position: relative;
-      width: 100%;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.14);
-      overflow: hidden;
-      margin-top: 10px;
+      z-index: 1;
+      border-radius: 20.5px;
+      background: linear-gradient(160deg, rgba(13, 19, 48, 0.96) 0%, rgba(7, 11, 28, 0.98) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
-    .rh-sc-progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #6366f1, #10b981);
-      transition: width 0.35s ease;
+    @keyframes tabProgressRun {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+    .tab-progress-bar {
+      animation: tabProgressRun 6s linear forwards;
+    }
+    .tab-progress-bar.paused {
+      animation-play-state: paused;
+    }
+    @keyframes panelFadeUp {
+      0% { opacity: 0; transform: translate3d(0, 10px, 0) scale(0.985); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    .panel-enter {
+      animation: panelFadeUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes glideBooking {
+      0% { transform: translate3d(-18px, 0, 0); opacity: 0.25; }
+      100% { transform: translate3d(0, 0, 0); opacity: 1; }
+    }
+    .glide-bar {
+      animation: glideBooking 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes latePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.65); }
+      50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    }
+    .late-pulse {
+      animation: latePulse 1.8s ease-in-out infinite;
+    }
+    @keyframes beaconDrift {
+      0%, 100% { left: 43%; }
+      50% { left: 48%; }
+    }
+    .live-beacon {
+      animation: beaconDrift 6s ease-in-out infinite;
+    }
+    @keyframes drawSpline {
+      0% { stroke-dashoffset: 520; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .spline-stroke {
+      stroke-dasharray: 520;
+      stroke-dashoffset: 520;
+      animation: drawSpline 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes fadeArea {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .spline-area {
+      opacity: 0;
+      animation: fadeArea 0.9s ease 0.35s forwards;
+    }
+    .lang-seg-wrap {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .stage-tab-btn {
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .stage-tab-btn.active {
+      background: rgba(91, 84, 230, 0.24);
+      border-color: rgba(129, 140, 248, 0.55);
+      color: #ffffff;
+      box-shadow: 0 6px 18px -6px rgba(91, 84, 230, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.16);
     }
 
     /* ==================== BUTUN DASTUR ICHIDAGI APPLE VISUAL EFFEKTLARI ==================== */
@@ -943,51 +975,62 @@
   <!-- ==================== 1. YOPIQ KIRISH EKRANI (INSTAGRAM USLUBIDA) ==================== -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-[#090d22] via-[#131b3a] to-[#1b2554] backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-[1080px] grid grid-cols-1 lg:grid-cols-12 rounded-3xl shadow-2xl overflow-hidden border border-[#5b54e6]/30 bg-white my-auto">
-      <!-- CHAP TOMON: SCREENSHOT SHOWCASE (3D-TILT + BORDER-BEAM + 4 JONLI TAB) -->
-      <div id="appleLoginPromoPanel" onmousemove="handlePromoPanelTilt(event)" onmouseleave="resetPromoPanelTilt()" class="hidden lg:flex lg:col-span-6 apple-promo-panel p-6 xl:p-7 text-white flex-col justify-between relative overflow-hidden">
-        <div class="rh-promo-grid-bg"></div>
-        <div class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#5b54e6]/25 blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none"></div>
+      <!-- CHAP TOMON: CINEMATIC INTERACTIVE VALUE STAGE -->
+      <section id="appleLoginPromoPanel" onpointermove="handleShowcasePointerMove(event)" onpointerleave="handleShowcasePointerLeave()" class="hidden lg:flex lg:col-span-6 stage-bg p-6 xl:p-7 text-white flex-col justify-between gap-4 overflow-hidden select-none">
+        <!-- Ambient Visual Layers -->
+        <div class="dot-grid absolute inset-0 pointer-events-none z-0"></div>
+        <div class="aurora-orb-a absolute -top-28 -left-24 w-80 h-80 rounded-full bg-[#5b54e6]/30 blur-[85px] pointer-events-none z-0"></div>
+        <div class="aurora-orb-b absolute -bottom-28 -right-24 w-80 h-80 rounded-full bg-emerald-500/20 blur-[90px] pointer-events-none z-0"></div>
+        <div id="mouseSpotlight" class="mouse-spotlight absolute inset-0 pointer-events-none z-0"></div>
 
-        <div class="relative z-10 space-y-3.5">
-          <!-- Yuqori qator: Cloud PMS badge va 3 tilda til tanlash -->
-          <div class="flex items-center justify-between gap-2">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#121a42]/90 border border-indigo-400/25 text-[11px] font-semibold text-indigo-100 backdrop-blur-md">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span id="promoBadgeText">Cloud PMS • 24/7 Jonli Nazorat</span>
-            </div>
-            <div class="apple-lang-seg inline-flex items-center gap-0.5 p-1 rounded-xl text-[11px] font-bold">
-              <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2.5 py-1 rounded-lg transition">O‘zbek</button>
-              <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-2.5 py-1 rounded-lg transition">Русский</button>
-              <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-2.5 py-1 rounded-lg transition">English</button>
-            </div>
+        <!-- 1. TOP BAR: Status Pill & 3-Language Apple Segmented Switcher -->
+        <div class="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/15 backdrop-blur-md text-[11px] font-semibold text-indigo-100">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+            </span>
+            <span id="txtTopBadge">Cloud PMS • 24/7 Real-time</span>
           </div>
 
-          <!-- Sarlavha va tavsif -->
-          <div class="space-y-1.5 pt-0.5">
-            <h2 id="promoHeadline" class="text-[22px] xl:text-[24px] font-extrabold leading-[1.2] tracking-tight text-white">
-              Mehmonxonangiz foydasini himoya qiling — <span class="text-indigo-300">har bir so‘m va xona kaftingizda</span>
-            </h2>
-            <p id="promoSubtext" class="text-[11.5px] text-indigo-100/75 leading-relaxed">
-              Daftarsiz, xatosiz va yashirin xarajatsiz boshqaruv. Yangi bron, smena kassasi va xodimlar faoliyatini dunyoning istalgan nuqtasidan jonli kuzating.
-            </p>
-          </div>
-
-          <!-- 4 ta Jonli Tab -->
-          <div id="rhShowcaseTabs" class="rh-showcase-tabs"></div>
-
-          <!-- 3D-Tilt va Border-Beam Markaziy Oyna -->
-          <div id="rhTiltStage" class="rh-tilt-stage">
-            <div id="rhTiltInner" class="rh-tilt-inner"></div>
+          <div class="lang-seg-wrap inline-flex items-center gap-0.5 p-1 rounded-xl text-[11px] font-bold">
+            <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2.5 py-1 rounded-lg transition">O‘zbek</button>
+            <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-2.5 py-1 rounded-lg transition">Русский</button>
+            <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-2.5 py-1 rounded-lg transition">English</button>
           </div>
         </div>
 
-        <!-- Pastki qator -->
-        <div class="relative z-10 pt-3.5 mt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-indigo-100/85">
-          <div id="promoFooterLeft">✨ <b>7 kunlik bepul</b> to‘liq sinov</div>
-          <div id="promoFooterRight" class="font-semibold text-indigo-200">Yillik $99 • Umrbod $299</div>
+        <!-- 2. PERSUASIVE ROI HEADLINE -->
+        <div class="relative z-10 space-y-1.5">
+          <h2 id="txtHeadline" class="text-[22px] xl:text-[26px] font-extrabold leading-[1.16] tracking-tight text-white">
+            Mehmonxonangiz foydasini himoya qiling — <span class="bg-gradient-to-r from-indigo-300 via-violet-200 to-emerald-300 bg-clip-text text-transparent">har bir so‘m va xona kaftingizda</span>
+          </h2>
+          <p id="txtSubheadline" class="text-[12px] text-indigo-100/75 leading-relaxed">
+            Daftarsiz, xatosiz va yashirin xarajatsiz boshqaruv. Yangi bron, smena kassasi va xodimlar faoliyatini dunyoning istalgan nuqtasidan jonli kuzating.
+          </p>
         </div>
-      </div>
+
+        <!-- 3. 3D-TILT INTERACTIVE SHOWCASE STAGE (WITH CONIC BORDER BEAM) -->
+        <div class="relative z-10 space-y-2.5" onmouseenter="pauseShowcaseCycle(true)" onmouseleave="pauseShowcaseCycle(false)">
+          <div id="stageTabsRow" class="grid grid-cols-4 gap-1.5"></div>
+
+          <div class="tilt-wrapper">
+            <div id="tiltCard" class="beam-shell">
+              <div class="beam-inner p-4 min-h-[250px] flex flex-col justify-between gap-3">
+                <div id="stageDynamicBody" class="flex-1 flex flex-col justify-between gap-2.5"></div>
+                <div class="pt-1">
+                  <div class="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                    <div id="cycleProgress" class="tab-progress-bar h-full rounded-full bg-gradient-to-r from-[#5b54e6] via-[#818cf8] to-emerald-400"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. BOTTOM TRUST & CONVERSION STRIP -->
+        <div id="trustStrip" class="relative z-10 pt-2.5 border-t border-white/10 grid grid-cols-3 gap-2 text-[10.5px] font-bold"></div>
+      </section>
 
       <!-- O'NG TOMON: KIRISH / RO'YXATDAN O'TISH KARTASI -->
       <div class="lg:col-span-6 bg-white w-full overflow-hidden flex flex-col justify-between">
@@ -7618,500 +7661,467 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       applyLanguageToSubtree(document.body);
     }
 
-    // ==================== SCREENSHOT SHOWCASE: 3D-TILT + BORDER-BEAM + 4 TABS (UZ / RU / EN) ====================
-    let activeShowcaseTabIdx = 1; // 0: Telegram 24/7, 1: Bronlar kalendari, 2: Moliya, 3: 1 haftada ROI
-    let showcaseAutoTimer = null;
+    // ==================== CINEMATIC INTERACTIVE LOGIN SHOWCASE (UZ / RU / EN) ====================
+    let showcaseActiveTab = 0;
+    let showcaseIsPaused = false;
+    let showcaseCycleTimeout = null;
 
-    const SCREENSHOT_SHOWCASE_DATA = {
+    const SHOWCASE_COPY = {
       uz: {
-        badge: 'Cloud PMS • 24/7 Jonli Nazorat',
-        headline: 'Mehmonxonangiz foydasini himoya qiling — <span class="text-indigo-300">har bir so‘m va xona kaftingizda</span>',
-        subtext: 'Daftarsiz, xatosiz va yashirin xarajatsiz boshqaruv. Yangi bron, smena kassasi va xodimlar faoliyatini dunyoning istalgan nuqtasidan jonli kuzating.',
-        footerLeft: '✨ <b>7 kunlik bepul</b> to‘liq sinov',
-        footerRight: 'Yillik $99 • Umrbod $299',
+        topBadge: 'Cloud PMS • 24/7 Real-time',
+        headline: 'Mehmonxonangiz foydasini himoya qiling — <span class="bg-gradient-to-r from-indigo-300 via-violet-200 to-emerald-300 bg-clip-text text-transparent">har bir so‘m va xona kaftingizda</span>',
+        subheadline: 'Daftarsiz, xatosiz va yashirin xarajatsiz boshqaruv. Yangi bron, smena kassasi va xodimlar faoliyatini dunyoning istalgan nuqtasidan jonli kuzating.',
+        trustPills: [
+          { icon: '🎁', text: '7 kun to‘liq bepul', cls: 'bg-emerald-500/12 border-emerald-400/30 text-emerald-200' },
+          { icon: '⚡', text: '2 daqiqada ishga tushadi', cls: 'bg-indigo-500/15 border-indigo-400/30 text-indigo-100' },
+          { icon: '💎', text: 'Yillik $99 • Umrbod $299', cls: 'bg-amber-500/12 border-amber-400/30 text-amber-200' }
+        ],
         tabs: [
-          {
-            label: '✈️ Telegram 24/7',
-            cardTitle: '24/7 Telegram Z-Hisobot va Audit',
-            cardBadge: 'Jonli xabarnoma',
-            cardBadgeClass: 'bg-sky-500/15 text-sky-300 border-sky-400/30',
-            caption: 'Har bir yangi bron, to‘lov, xarajat va yopilgan smena hisoboti rahbarning Telegramiga lahzada yuboriladi.',
-            progressPct: 25,
-            vis: `
-              <div class="rounded-xl bg-[#0e1536] border border-indigo-400/20 p-3 space-y-2 text-[11px]">
-                <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
-                  <span class="font-bold text-sky-300">🤖 @ReservHotel_bot • 1-Smena Z-Hisobot</span>
-                  <span class="text-[10px] font-bold text-emerald-300">Yuborildi ✓</span>
-                </div>
-                <div class="flex items-center justify-between text-indigo-100/85"><span>💵 Naqd tushum:</span><b class="text-emerald-300">3 850 000 so‘m</b></div>
-                <div class="flex items-center justify-between text-indigo-100/85"><span>💸 Xarajatlar:</span><b class="text-rose-300">−400 000 so‘m</b></div>
-                <div class="flex items-center justify-between pt-1 border-t border-white/10 text-white font-extrabold"><span>💰 Kassada sof naqd:</span><span class="text-emerald-300">3 450 000 so‘m</span></div>
-              </div>`
-          },
-          {
-            label: '📅 Bronlar kalendari',
-            cardTitle: 'Jonli bronlar jadvali',
-            cardBadge: '0% Overbooking ✓',
-            cardBadgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35',
-            caption: 'Xonalarni bir harakatda ko‘chiring va cho‘zing. Ustma-ust bron qilishdan avtomatik himoya hamda kech chiqish signali.',
-            progressPct: 50,
-            vis: `
-              <div class="relative rounded-xl bg-[#0a0f28] border border-white/10 p-3 space-y-2.5 overflow-hidden">
-                <div class="pointer-events-none absolute top-0 bottom-0 left-[51%] w-[1.5px] bg-indigo-400/80 z-10">
-                  <span class="block w-2.5 h-2.5 rounded-full bg-[#0a0f28] border-2 border-white -ml-[4.2px] mt-1"></span>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-indigo-200/85">№ 102</span>
-                  <div class="col-span-6 h-6 rounded-md bg-emerald-500 px-2.5 flex items-center justify-between text-white shadow-xs">
-                    <span class="truncate">A. Karimov</span>
-                    <span class="text-[9.5px] bg-black/20 px-1.5 py-0.5 rounded">To‘langan</span>
-                  </div>
-                  <div class="col-span-4 h-6 rounded-md bg-[#5b54e6] px-2 flex items-center justify-center text-white text-[10px] truncate">
-                    Bron • 3 tun
-                  </div>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-rose-300">№ 105</span>
-                  <div class="col-span-10 h-6 rounded-md bg-gradient-to-r from-red-600 to-rose-700 px-2.5 flex items-center justify-between text-white border border-rose-300/40">
-                    <span class="truncate">S. Alimov</span>
-                    <span class="text-[9.5px] bg-white text-rose-700 px-1.5 py-0.5 rounded font-extrabold shrink-0">⏰ Kech chiqish +2s</span>
-                  </div>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-indigo-200/85">№ 204</span>
-                  <div class="col-span-2"></div>
-                  <div class="col-span-8 h-6 rounded-md bg-amber-500 px-2.5 flex items-center justify-between text-[#131b3a]">
-                    <span class="truncate">M. Azizova</span>
-                    <span class="text-[9.5px] bg-white/90 text-rose-700 px-1.5 py-0.5 rounded font-extrabold shrink-0">−250 000 so‘m</span>
-                  </div>
-                </div>
-              </div>`
-          },
-          {
-            label: '📈 Moliya',
-            cardTitle: 'Oylik sof tushum dinamikasi',
-            cardBadge: '✓ Qarzdorlar: 0',
-            cardBadgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35',
-            caption: 'Qaysi xona va kanal eng ko‘p foyda keltirayotganini aniq raqamlarda ko‘ring. Qarzdorliklarni nolga tushiring.',
-            progressPct: 75,
-            vis: `
-              <div class="space-y-2.5">
-                <div class="grid grid-cols-3 gap-2">
-                  <div class="rounded-xl bg-[#0e1536] border border-emerald-400/35 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">Bandlik (Occupancy)</div>
-                    <div class="text-sm font-extrabold text-emerald-400 mt-0.5">87%</div>
-                  </div>
-                  <div class="rounded-xl bg-[#0e1536] border border-indigo-400/30 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">O‘rtacha narx (ADR)</div>
-                    <div class="text-sm font-extrabold text-white mt-0.5">340 000</div>
-                  </div>
-                  <div class="rounded-xl bg-[#0e1536] border border-amber-400/35 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">Samaradorlik (RevPAR)</div>
-                    <div class="text-sm font-extrabold text-amber-300 mt-0.5">296 000</div>
-                  </div>
-                </div>
-                <div class="rounded-xl bg-[#0a0f28] border border-white/10 px-3 py-2">
-                  <svg class="w-full h-12 overflow-visible" viewBox="0 0 300 54">
-                    <defs>
-                      <linearGradient id="rhAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#6366f1" stop-opacity="0.42"/>
-                        <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0"/>
-                      </linearGradient>
-                      <linearGradient id="rhLineGrad" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stop-color="#6366f1"/>
-                        <stop offset="65%" stop-color="#818cf8"/>
-                        <stop offset="100%" stop-color="#10b981"/>
-                      </linearGradient>
-                    </defs>
-                    <path d="M4,46 C52,42 84,22 132,24 C178,26 218,16 292,6 L292,50 L4,50 Z" fill="url(#rhAreaGrad)"/>
-                    <path d="M4,46 C52,42 84,22 132,24 C178,26 218,16 292,6" fill="none" stroke="url(#rhLineGrad)" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="292" cy="6" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
-                  </svg>
-                </div>
-              </div>`
-          },
-          {
-            label: '💎 1 haftada ROI',
-            cardTitle: 'Xarajatsiz va tez qoplanuvchi tizim',
-            cardBadge: '7 kun bepul',
-            cardBadgeClass: 'bg-indigo-500/20 text-indigo-200 border-indigo-400/35',
-            caption: 'Daftardagi xatolar va kamomadlarning oldini olib, $99 yillik tarifni birinchi haftalardayoq foydaga aylantiring.',
-            progressPct: 100,
-            vis: `
-              <div class="grid grid-cols-2 gap-2.5 text-[11px]">
-                <div class="rounded-xl bg-[#0e1536] border border-white/10 p-2.5 space-y-1">
-                  <div class="text-[10px] text-indigo-200/75 font-semibold">📅 1 Yillik Obuna</div>
-                  <div class="text-base font-extrabold text-white">$99 <span class="text-[10px] font-medium text-indigo-200/70">/ yil</span></div>
-                  <div class="text-[10px] text-emerald-300 font-semibold">Barcha modullar ochiq</div>
-                </div>
-                <div class="rounded-xl bg-[#0e1536] border border-emerald-400/35 p-2.5 space-y-1">
-                  <div class="text-[10px] text-emerald-300 font-semibold">💎 Umrbod Litsenziya</div>
-                  <div class="text-base font-extrabold text-white">$299 <span class="text-[10px] font-medium text-indigo-200/70">/ bir marta</span></div>
-                  <div class="text-[10px] text-amber-300 font-semibold">Keyingi yillar 0 so‘m</div>
-                </div>
-              </div>`
-          }
-        ]
+          { short: '✈️ Telegram 24/7' },
+          { short: '📅 Bronlar kalendari' },
+          { short: '📈 Moliya' },
+          { short: '💎 1 haftada ROI' }
+        ],
+        stage: {
+          tgTitle: '🔒 1-SMENA YOPILDI (Z-HISOBOT)',
+          tgTime: 'Hozirgina • 20:01',
+          tgTotalLbl: 'Jami tushum',
+          tgCashLbl: 'Naqd pul',
+          tgExpLbl: 'Xarajatlar',
+          tgNetLbl: 'Kassada sof qoldiq:',
+          tgAuditBadge: '🛡️ Amallar tarixi',
+          tgAuditLine: 'Admin Jasur • Xona №205 • To‘lov +500 000 so‘m',
+          tgCaption: 'Daftarsiz, yashirin xarajatsiz va xodimlar ustidan 100% shaffof nazorat — barcha hisobotlar 2 soniyada Telegramingizda.',
+
+          mxTitle: 'Jonli bronlar jadvali',
+          mxBadge: '0% Overbooking ✓',
+          mxPaid: 'To‘langan',
+          mxLate: '⏰ Kech chiqish +2s',
+          mxDebt: '−250 000 so‘m',
+          mxBooked: 'Bron • 3 tun',
+          mxCaption: 'Xonalarni bir harakatda ko‘chiring va cho‘zing. Ustma-ust bron qilishdan avtomatik himoya hamda kech chiqish signali.',
+
+          finOcc: 'Bandlik (Occupancy)',
+          finAdr: 'O‘rtacha narx (ADR)',
+          finRev: 'Samaradorlik (RevPAR)',
+          finDebtZero: '✓ Qarzdorlar: 0',
+          finChartTitle: 'Oylik sof tushum dinamikasi',
+          finCaption: 'Qaysi xona va kanal eng ko‘p foyda keltirayotganini aniq raqamlarda ko‘ring. Qarzdorliklarni nolga tushiring.',
+
+          roiOldTitle: 'Daftar / Excel',
+          roiOldList: [
+            'Ustma-ust bron (overbooking) va mijoz yo‘qotish',
+            'Kassadagi kamomad va nazoratsiz xarajatlar',
+            'Unutilgan qarzlar va vaqt yo‘qotish'
+          ],
+          roiNewTitle: 'ReservHotel PMS',
+          roiNewList: [
+            'Oyiga atigi $8.25 (yillik $99) yoki Umrbod $299',
+            '1 kechalik xona narxidan ham arzon tizim',
+            'Bitta unutilgan qarzni ushlash bilan o‘zini oqlaydi'
+          ],
+          roiCaption: 'Dastur xarajat emas — mehmonxonangiz foydasini o‘g‘irlik va xatolardan himoya qiluvchi eng foydali investitsiya.'
+        }
       },
       ru: {
-        badge: 'Cloud PMS • Контроль 24/7',
-        headline: 'Защитите прибыль отеля — <span class="text-indigo-300">каждый сум и номер под рукой</span>',
-        subtext: 'Управление без тетрадей, ошибок и скрытых потерь. Следите за бронями, сменной кассой и действиями персонала из любой точки мира.',
-        footerLeft: '✨ <b>7 дней бесплатно</b> полный доступ',
-        footerRight: 'Годовой $99 • Бессрочный $299',
+        topBadge: 'Cloud PMS • Контроль 24/7',
+        headline: 'Защитите прибыль вашего отеля — <span class="bg-gradient-to-r from-indigo-300 via-violet-200 to-emerald-300 bg-clip-text text-transparent">каждый номер и сум под контролем 24/7</span>',
+        subheadline: 'Управление без тетрадей, ошибок и скрытых трат. Отслеживайте брони, кассу смен и действия персонала из любой точки мира.',
+        trustPills: [
+          { icon: '🎁', text: '7 дней бесплатно', cls: 'bg-emerald-500/12 border-emerald-400/30 text-emerald-200' },
+          { icon: '⚡', text: 'Запуск за 2 минуты', cls: 'bg-indigo-500/15 border-indigo-400/30 text-indigo-100' },
+          { icon: '💎', text: 'Год $99 • Навсегда $299', cls: 'bg-amber-500/12 border-amber-400/30 text-amber-200' }
+        ],
         tabs: [
-          {
-            label: '✈️ Telegram 24/7',
-            cardTitle: 'Z-Отчёт и Аудит в Telegram 24/7',
-            cardBadge: 'Мгновенно',
-            cardBadgeClass: 'bg-sky-500/15 text-sky-300 border-sky-400/30',
-            caption: 'Каждая новая бронь, оплата, расход и закрытие смены мгновенно приходят руководителю в Telegram.',
-            progressPct: 25,
-            vis: `
-              <div class="rounded-xl bg-[#0e1536] border border-indigo-400/20 p-3 space-y-2 text-[11px]">
-                <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
-                  <span class="font-bold text-sky-300">🤖 @ReservHotel_bot • Z-Отчёт 1-й смены</span>
-                  <span class="text-[10px] font-bold text-emerald-300">Отправлено ✓</span>
-                </div>
-                <div class="flex items-center justify-between text-indigo-100/85"><span>💵 Наличные:</span><b class="text-emerald-300">3 850 000 сум</b></div>
-                <div class="flex items-center justify-between text-indigo-100/85"><span>💸 Расходы:</span><b class="text-rose-300">−400 000 сум</b></div>
-                <div class="flex items-center justify-between pt-1 border-t border-white/10 text-white font-extrabold"><span>💰 Чистый остаток в кассе:</span><span class="text-emerald-300">3 450 000 сум</span></div>
-              </div>`
-          },
-          {
-            label: '📅 Календарь броней',
-            cardTitle: 'Живой календарь броней',
-            cardBadge: '0% Овербукинга ✓',
-            cardBadgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35',
-            caption: 'Переносите и продлевайте брони одним движением. Автозащита от двойных броней и сигнал позднего выезда.',
-            progressPct: 50,
-            vis: `
-              <div class="relative rounded-xl bg-[#0a0f28] border border-white/10 p-3 space-y-2.5 overflow-hidden">
-                <div class="pointer-events-none absolute top-0 bottom-0 left-[51%] w-[1.5px] bg-indigo-400/80 z-10">
-                  <span class="block w-2.5 h-2.5 rounded-full bg-[#0a0f28] border-2 border-white -ml-[4.2px] mt-1"></span>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-indigo-200/85">№ 102</span>
-                  <div class="col-span-6 h-6 rounded-md bg-emerald-500 px-2.5 flex items-center justify-between text-white">
-                    <span class="truncate">А. Каримов</span>
-                    <span class="text-[9.5px] bg-black/20 px-1.5 py-0.5 rounded">Оплачено</span>
-                  </div>
-                  <div class="col-span-4 h-6 rounded-md bg-[#5b54e6] px-2 flex items-center justify-center text-white text-[10px] truncate">
-                    Бронь • 3 ноч.
-                  </div>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-rose-300">№ 105</span>
-                  <div class="col-span-10 h-6 rounded-md bg-gradient-to-r from-red-600 to-rose-700 px-2.5 flex items-center justify-between text-white border border-rose-300/40">
-                    <span class="truncate">С. Алимов</span>
-                    <span class="text-[9.5px] bg-white text-rose-700 px-1.5 py-0.5 rounded font-extrabold shrink-0">⏰ Поздний выезд +2ч</span>
-                  </div>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-indigo-200/85">№ 204</span>
-                  <div class="col-span-2"></div>
-                  <div class="col-span-8 h-6 rounded-md bg-amber-500 px-2.5 flex items-center justify-between text-[#131b3a]">
-                    <span class="truncate">М. Азизова</span>
-                    <span class="text-[9.5px] bg-white/90 text-rose-700 px-1.5 py-0.5 rounded font-extrabold shrink-0">−250 000 сум</span>
-                  </div>
-                </div>
-              </div>`
-          },
-          {
-            label: '📈 Финансы',
-            cardTitle: 'Динамика чистой выручки',
-            cardBadge: '✓ Должники: 0',
-            cardBadgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35',
-            caption: 'Смотрите в точных цифрах, какие номера и каналы приносят прибыль. Сведите задолженности гостей к нулю.',
-            progressPct: 75,
-            vis: `
-              <div class="space-y-2.5">
-                <div class="grid grid-cols-3 gap-2">
-                  <div class="rounded-xl bg-[#0e1536] border border-emerald-400/35 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">Загрузка (Occupancy)</div>
-                    <div class="text-sm font-extrabold text-emerald-400 mt-0.5">87%</div>
-                  </div>
-                  <div class="rounded-xl bg-[#0e1536] border border-indigo-400/30 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">Средний тариф (ADR)</div>
-                    <div class="text-sm font-extrabold text-white mt-0.5">340 000</div>
-                  </div>
-                  <div class="rounded-xl bg-[#0e1536] border border-amber-400/35 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">Доходность (RevPAR)</div>
-                    <div class="text-sm font-extrabold text-amber-300 mt-0.5">296 000</div>
-                  </div>
-                </div>
-                <div class="rounded-xl bg-[#0a0f28] border border-white/10 px-3 py-2">
-                  <svg class="w-full h-12 overflow-visible" viewBox="0 0 300 54">
-                    <defs>
-                      <linearGradient id="rhAreaGradRu" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#6366f1" stop-opacity="0.42"/>
-                        <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0"/>
-                      </linearGradient>
-                      <linearGradient id="rhLineGradRu" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stop-color="#6366f1"/>
-                        <stop offset="65%" stop-color="#818cf8"/>
-                        <stop offset="100%" stop-color="#10b981"/>
-                      </linearGradient>
-                    </defs>
-                    <path d="M4,46 C52,42 84,22 132,24 C178,26 218,16 292,6 L292,50 L4,50 Z" fill="url(#rhAreaGradRu)"/>
-                    <path d="M4,46 C52,42 84,22 132,24 C178,26 218,16 292,6" fill="none" stroke="url(#rhLineGradRu)" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="292" cy="6" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
-                  </svg>
-                </div>
-              </div>`
-          },
-          {
-            label: '💎 ROI за неделю',
-            cardTitle: 'Быстрая окупаемость без лишних затрат',
-            cardBadge: '7 дней бесплатно',
-            cardBadgeClass: 'bg-indigo-500/20 text-indigo-200 border-indigo-400/35',
-            caption: 'Предотвращайте ошибки в журнале и кассовые расхождения, окупая тариф $99 уже в первые недели работы.',
-            progressPct: 100,
-            vis: `
-              <div class="grid grid-cols-2 gap-2.5 text-[11px]">
-                <div class="rounded-xl bg-[#0e1536] border border-white/10 p-2.5 space-y-1">
-                  <div class="text-[10px] text-indigo-200/75 font-semibold">📅 1 Год подписки</div>
-                  <div class="text-base font-extrabold text-white">$99 <span class="text-[10px] font-medium text-indigo-200/70">/ год</span></div>
-                  <div class="text-[10px] text-emerald-300 font-semibold">Все модули активны</div>
-                </div>
-                <div class="rounded-xl bg-[#0e1536] border border-emerald-400/35 p-2.5 space-y-1">
-                  <div class="text-[10px] text-emerald-300 font-semibold">💎 Бессрочная лицензия</div>
-                  <div class="text-base font-extrabold text-white">$299 <span class="text-[10px] font-medium text-indigo-200/70">/ единоразово</span></div>
-                  <div class="text-[10px] text-amber-300 font-semibold">Далее 0 сум в год</div>
-                </div>
-              </div>`
-          }
-        ]
+          { short: '✈️ Telegram 24/7' },
+          { short: '📅 Календарь броней' },
+          { short: '📈 Аналитика' },
+          { short: '💎 Окупаемость' }
+        ],
+        stage: {
+          tgTitle: '🔒 1-Я СМЕНА ЗАКРЫТА (Z-ОТЧЁТ)',
+          tgTime: 'Только что • 20:01',
+          tgTotalLbl: 'Выручка',
+          tgCashLbl: 'Наличные',
+          tgExpLbl: 'Расходы',
+          tgNetLbl: 'Чистый остаток в кассе:',
+          tgAuditBadge: '🛡️ История действий',
+          tgAuditLine: 'Админ Жасур • Номер №205 • Оплата +500 000 сум',
+          tgCaption: '100% прозрачный контроль персонала без скрытых расходов — каждый платёж и Z-отчёт приходит в ваш Telegram за 2 секунды.',
+
+          mxTitle: 'Живой календарь номеров',
+          mxBadge: '0% Овербукинга ✓',
+          mxPaid: 'Оплачено',
+          mxLate: '⏰ Поздний выезд +2ч',
+          mxDebt: '−250 000 сум',
+          mxBooked: 'Бронь • 3 ноч.',
+          mxCaption: 'Переносите и продлевайте брони одним движением мыши. Автоматическая защита от накладок и контроль позднего выезда.',
+
+          finOcc: 'Загрузка (Occupancy)',
+          finAdr: 'Средний тариф (ADR)',
+          finRev: 'Доходность (RevPAR)',
+          finDebtZero: '✓ Должников: 0',
+          finChartTitle: 'Динамика чистой выручки за месяц',
+          finCaption: 'Видьте реальную прибыльность каждого номера и канала продаж в точных цифрах. Сведите задолженности к нулю.',
+
+          roiOldTitle: 'Тетрадь / Excel',
+          roiOldList: [
+            'Двойные брони (овербукинг) и потеря гостей',
+            'Недостачи в кассе и неучтённые расходы',
+            'Забытые долги и хаос при передаче смен'
+          ],
+          roiNewTitle: 'ReservHotel PMS',
+          roiNewList: [
+            'Всего $8.25/мес ($99/год) или $299 навсегда',
+            'Дешевле стоимости одной ночи проживания',
+            'Окупается за 1 неделю, поймав всего один забытый долг'
+          ],
+          roiCaption: 'Это не расход, а надёжная защита вашей прибыли от человеческого фактора и финансовых потерь.'
+        }
       },
       en: {
-        badge: 'Cloud PMS • 24/7 Live Control',
-        headline: 'Protect your hotel profit — <span class="text-indigo-300">every currency and room at your fingertips</span>',
-        subtext: 'Paperless, error-free management with zero hidden leaks. Track new bookings, shift cash registers, and staff actions live from anywhere.',
-        footerLeft: '✨ <b>7-day free</b> full trial',
-        footerRight: 'Annual $99 • Lifetime $299',
+        topBadge: 'Cloud PMS • 24/7 Real-Time',
+        headline: 'Protect your hotel’s profit — <span class="bg-gradient-to-r from-indigo-300 via-violet-200 to-emerald-300 bg-clip-text text-transparent">every room and dollar under 24/7 control</span>',
+        subheadline: 'Zero paper notebooks, zero cash leaks, zero overbookings. Monitor live reservations, shift cash registers, and staff activity from anywhere.',
+        trustPills: [
+          { icon: '🎁', text: '7-Day Free Trial', cls: 'bg-emerald-500/12 border-emerald-400/30 text-emerald-200' },
+          { icon: '⚡', text: 'Live in 2 Minutes', cls: 'bg-indigo-500/15 border-indigo-400/30 text-indigo-100' },
+          { icon: '💎', text: 'Annual $99 • Lifetime $299', cls: 'bg-amber-500/12 border-amber-400/30 text-amber-200' }
+        ],
         tabs: [
-          {
-            label: '✈️ Telegram 24/7',
-            cardTitle: '24/7 Telegram Z-Report & Audit',
-            cardBadge: 'Instant Alert',
-            cardBadgeClass: 'bg-sky-500/15 text-sky-300 border-sky-400/30',
-            caption: 'Every booking, payment, expense, and closed shift report is delivered to the owner in Telegram right away.',
-            progressPct: 25,
-            vis: `
-              <div class="rounded-xl bg-[#0e1536] border border-indigo-400/20 p-3 space-y-2 text-[11px]">
-                <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
-                  <span class="font-bold text-sky-300">🤖 @ReservHotel_bot • Shift 1 Z-Report</span>
-                  <span class="text-[10px] font-bold text-emerald-300">Sent ✓</span>
-                </div>
-                <div class="flex items-center justify-between text-indigo-100/85"><span>💵 Cash received:</span><b class="text-emerald-300">3,850,000 UZS</b></div>
-                <div class="flex items-center justify-between text-indigo-100/85"><span>💸 Expenses:</span><b class="text-rose-300">−400,000 UZS</b></div>
-                <div class="flex items-center justify-between pt-1 border-t border-white/10 text-white font-extrabold"><span>💰 Net cash in register:</span><span class="text-emerald-300">3,450,000 UZS</span></div>
-              </div>`
-          },
-          {
-            label: '📅 Bookings Calendar',
-            cardTitle: 'Live bookings calendar',
-            cardBadge: '0% Overbooking ✓',
-            cardBadgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35',
-            caption: 'Move and extend stays in one motion. Built-in overbooking protection plus instant late check-out alerts.',
-            progressPct: 50,
-            vis: `
-              <div class="relative rounded-xl bg-[#0a0f28] border border-white/10 p-3 space-y-2.5 overflow-hidden">
-                <div class="pointer-events-none absolute top-0 bottom-0 left-[51%] w-[1.5px] bg-indigo-400/80 z-10">
-                  <span class="block w-2.5 h-2.5 rounded-full bg-[#0a0f28] border-2 border-white -ml-[4.2px] mt-1"></span>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-indigo-200/85">№ 102</span>
-                  <div class="col-span-6 h-6 rounded-md bg-emerald-500 px-2.5 flex items-center justify-between text-white">
-                    <span class="truncate">A. Karimov</span>
-                    <span class="text-[9.5px] bg-black/20 px-1.5 py-0.5 rounded">Paid</span>
-                  </div>
-                  <div class="col-span-4 h-6 rounded-md bg-[#5b54e6] px-2 flex items-center justify-center text-white text-[10px] truncate">
-                    Booked • 3d
-                  </div>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-rose-300">№ 105</span>
-                  <div class="col-span-10 h-6 rounded-md bg-gradient-to-r from-red-600 to-rose-700 px-2.5 flex items-center justify-between text-white border border-rose-300/40">
-                    <span class="truncate">S. Alimov</span>
-                    <span class="text-[9.5px] bg-white text-rose-700 px-1.5 py-0.5 rounded font-extrabold shrink-0">⏰ Late out +2h</span>
-                  </div>
-                </div>
-                <div class="grid grid-cols-12 items-center gap-2 text-[11px] font-bold">
-                  <span class="col-span-2 text-indigo-200/85">№ 204</span>
-                  <div class="col-span-2"></div>
-                  <div class="col-span-8 h-6 rounded-md bg-amber-500 px-2.5 flex items-center justify-between text-[#131b3a]">
-                    <span class="truncate">M. Azizova</span>
-                    <span class="text-[9.5px] bg-white/90 text-rose-700 px-1.5 py-0.5 rounded font-extrabold shrink-0">−250,000 UZS</span>
-                  </div>
-                </div>
-              </div>`
-          },
-          {
-            label: '📈 Finance',
-            cardTitle: 'Monthly net revenue trend',
-            cardBadge: '✓ Balance due: 0',
-            cardBadgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35',
-            caption: 'See clearly which rooms and channels generate top profit. Bring guest balances down to zero.',
-            progressPct: 75,
-            vis: `
-              <div class="space-y-2.5">
-                <div class="grid grid-cols-3 gap-2">
-                  <div class="rounded-xl bg-[#0e1536] border border-emerald-400/35 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">Occupancy</div>
-                    <div class="text-sm font-extrabold text-emerald-400 mt-0.5">87%</div>
-                  </div>
-                  <div class="rounded-xl bg-[#0e1536] border border-indigo-400/30 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">ADR</div>
-                    <div class="text-sm font-extrabold text-white mt-0.5">340,000</div>
-                  </div>
-                  <div class="rounded-xl bg-[#0e1536] border border-amber-400/35 px-2.5 py-2">
-                    <div class="text-[9.5px] text-indigo-200/75 font-semibold">RevPAR</div>
-                    <div class="text-sm font-extrabold text-amber-300 mt-0.5">296,000</div>
-                  </div>
-                </div>
-                <div class="rounded-xl bg-[#0a0f28] border border-white/10 px-3 py-2">
-                  <svg class="w-full h-12 overflow-visible" viewBox="0 0 300 54">
-                    <defs>
-                      <linearGradient id="rhAreaGradEn" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#6366f1" stop-opacity="0.42"/>
-                        <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0"/>
-                      </linearGradient>
-                      <linearGradient id="rhLineGradEn" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stop-color="#6366f1"/>
-                        <stop offset="65%" stop-color="#818cf8"/>
-                        <stop offset="100%" stop-color="#10b981"/>
-                      </linearGradient>
-                    </defs>
-                    <path d="M4,46 C52,42 84,22 132,24 C178,26 218,16 292,6 L292,50 L4,50 Z" fill="url(#rhAreaGradEn)"/>
-                    <path d="M4,46 C52,42 84,22 132,24 C178,26 218,16 292,6" fill="none" stroke="url(#rhLineGradEn)" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="292" cy="6" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
-                  </svg>
-                </div>
-              </div>`
-          },
-          {
-            label: '💎 ROI in 1 week',
-            cardTitle: 'Fast payback with zero bloat',
-            cardBadge: '7 days free',
-            cardBadgeClass: 'bg-indigo-500/20 text-indigo-200 border-indigo-400/35',
-            caption: 'Prevent notebook mistakes and cash discrepancies so the $99 annual plan pays for itself early.',
-            progressPct: 100,
-            vis: `
-              <div class="grid grid-cols-2 gap-2.5 text-[11px]">
-                <div class="rounded-xl bg-[#0e1536] border border-white/10 p-2.5 space-y-1">
-                  <div class="text-[10px] text-indigo-200/75 font-semibold">📅 1-Year Plan</div>
-                  <div class="text-base font-extrabold text-white">$99 <span class="text-[10px] font-medium text-indigo-200/70">/ year</span></div>
-                  <div class="text-[10px] text-emerald-300 font-semibold">All features unlocked</div>
-                </div>
-                <div class="rounded-xl bg-[#0e1536] border border-emerald-400/35 p-2.5 space-y-1">
-                  <div class="text-[10px] text-emerald-300 font-semibold">💎 Lifetime License</div>
-                  <div class="text-base font-extrabold text-white">$299 <span class="text-[10px] font-medium text-indigo-200/70">/ one-time</span></div>
-                  <div class="text-[10px] text-amber-300 font-semibold">0 renewal fees forever</div>
-                </div>
-              </div>`
-          }
-        ]
+          { short: '✈️ Telegram 24/7' },
+          { short: '📅 Bookings Calendar' },
+          { short: '📈 RevPAR' },
+          { short: '💎 Instant ROI' }
+        ],
+        stage: {
+          tgTitle: '🔒 SHIFT 1 CLOSED (Z-REPORT)',
+          tgTime: 'Just now • 20:01',
+          tgTotalLbl: 'Total Rev',
+          tgCashLbl: 'Cash In',
+          tgExpLbl: 'Expenses',
+          tgNetLbl: 'Net Cash in Drawer:',
+          tgAuditBadge: '🛡️ Audit Trail',
+          tgAuditLine: 'Admin Jasur • Room №205 • Paid +500,000 UZS',
+          tgCaption: '100% transparent staff oversight with zero hidden expenses — every payment and Z-report hits your Telegram in 2 seconds.',
+
+          mxTitle: 'Live Bookings Calendar',
+          mxBadge: '0% Overbooking ✓',
+          mxPaid: 'Paid',
+          mxLate: '⏰ Late Check-out +2h',
+          mxDebt: '−250,000 UZS',
+          mxBooked: 'Booked • 3n',
+          mxCaption: 'Drag-and-drop room moves and stay extensions in one fluid motion. Built-in overbooking protection and late check-out alerts.',
+
+          finOcc: 'Occupancy Rate',
+          finAdr: 'Avg. Rate (ADR)',
+          finRev: 'RevPAR',
+          finDebtZero: '✓ Unpaid Debts: 0',
+          finChartTitle: 'Monthly Net Revenue Trend',
+          finCaption: 'Track real profitability per room and acquisition channel with executive KPIs and live spline analytics.',
+
+          roiOldTitle: 'Paper / Excel',
+          roiOldList: [
+            'Double bookings (overbooking) & angry guests',
+            'Unrecorded cash leaks & unaccounted expenses',
+            'Forgotten guest balances & messy shift handovers'
+          ],
+          roiNewTitle: 'ReservHotel PMS',
+          roiNewList: [
+            'Just $8.25/mo ($99/yr) or $299 Lifetime',
+            'Costs less than a single night’s stay',
+            'Pays for itself in week 1 by catching 1 missed debt'
+          ],
+          roiCaption: 'Not an expense — the highest-ROI safeguard protecting your hospitality revenue every single day.'
+        }
       }
     };
 
-    function handlePromoPanelTilt(e) {
-      const panel = document.getElementById('appleLoginPromoPanel');
-      const stage = document.getElementById('rhTiltStage');
-      const inner = document.getElementById('rhTiltInner');
-      if (!panel) return;
-      const pr = panel.getBoundingClientRect();
-      const px = ((e.clientX - pr.left) / pr.width) * 100;
-      const py = ((e.clientY - pr.top) / pr.height) * 100;
-      panel.style.setProperty('--pmx', px.toFixed(1) + '%');
-      panel.style.setProperty('--pmy', py.toFixed(1) + '%');
-
-      if (stage) {
-        const sr = stage.getBoundingClientRect();
-        const nx = ((e.clientX - sr.left) / sr.width) - 0.5;
-        const ny = ((e.clientY - sr.top) / sr.height) - 0.5;
-        const rotY = Math.max(-5, Math.min(5, nx * 8));
-        const rotX = Math.max(-4, Math.min(4, -ny * 7));
-        stage.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`;
-        if (inner) {
-          inner.style.setProperty('--cmx', (e.clientX - sr.left).toFixed(1) + 'px');
-          inner.style.setProperty('--cmy', (e.clientY - sr.top).toFixed(1) + 'px');
-        }
+    function animateShowcaseValue(el, endVal, suffix = '', duration = 700) {
+      if (!el) return;
+      const startTime = performance.now();
+      function frame(now) {
+        const p = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const cur = Math.round(endVal * eased);
+        el.textContent = cur.toLocaleString('ru-RU') + suffix;
+        if (p < 1) requestAnimationFrame(frame);
       }
+      requestAnimationFrame(frame);
     }
 
-    function resetPromoPanelTilt() {
-      const stage = document.getElementById('rhTiltStage');
-      if (stage) stage.style.transform = 'rotateX(0deg) rotateY(0deg)';
-    }
-
-    function selectShowcaseTab(idx, isManual = true) {
-      activeShowcaseTabIdx = idx;
-      if (isManual && showcaseAutoTimer) {
-        clearInterval(showcaseAutoTimer);
-        showcaseAutoTimer = null;
-      }
-      renderUnifiedShowcaseStage();
-    }
-
-    function renderUnifiedShowcaseStage() {
-      const tabsEl = document.getElementById('rhShowcaseTabs');
-      const innerEl = document.getElementById('rhTiltInner');
-      if (!tabsEl || !innerEl) return;
-      const lang = ['uz', 'ru', 'en'].includes(currentLang) ? currentLang : 'uz';
-      const data = SCREENSHOT_SHOWCASE_DATA[lang];
-      const tab = data.tabs[activeShowcaseTabIdx % data.tabs.length];
-
-      tabsEl.innerHTML = data.tabs.map((t, i) => `
-        <button type="button" onclick="selectShowcaseTab(${i}, true)" class="rh-sc-tab ${i === activeShowcaseTabIdx ? 'is-active' : ''}">
-          ${t.label}
+    function renderShowcaseTabsRow() {
+      const l = ['uz', 'ru', 'en'].includes(currentLang) ? currentLang : 'uz';
+      const t = SHOWCASE_COPY[l];
+      const row = document.getElementById('stageTabsRow');
+      if (!row) return;
+      row.innerHTML = t.tabs.map((tab, i) => `
+        <button type="button" onclick="selectShowcaseTab(${i})" class="stage-tab-btn ${i === showcaseActiveTab ? 'active' : 'bg-white/[0.04] border-white/10 text-indigo-200/80 hover:bg-white/[0.09] hover:text-white'} px-2 py-2 rounded-xl border text-[10.5px] font-bold truncate text-center">
+          ${tab.short}
         </button>
       `).join('');
+    }
 
-      innerEl.innerHTML = `
-        <div class="rh-stage-anim space-y-2.5 flex-1 flex flex-col justify-between">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-[12.5px] font-bold text-indigo-100 flex items-center gap-1.5">
-              <span>${tab.cardTitle}</span>
-            </span>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${tab.cardBadgeClass} shrink-0">
-              ${tab.cardBadge}
-            </span>
-          </div>
-          ${tab.vis}
-          <p class="text-[11px] text-indigo-100/75 leading-snug pt-0.5">${tab.caption}</p>
-        </div>
-        <div class="rh-sc-progress-track">
-          <div class="rh-sc-progress-fill" style="width:${tab.progressPct}%"></div>
-        </div>
-      `;
+    function renderShowcaseStageBody() {
+      const l = ['uz', 'ru', 'en'].includes(currentLang) ? currentLang : 'uz';
+      const s = SHOWCASE_COPY[l].stage;
+      const body = document.getElementById('stageDynamicBody');
+      if (!body) return;
+
+      if (showcaseActiveTab === 0) {
+        body.innerHTML = `
+          <div class="panel-enter space-y-2.5">
+            <div class="rounded-2xl bg-gradient-to-br from-[#121c44]/95 to-[#0a1029]/95 border border-sky-400/30 p-3 shadow-lg space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-full bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sm">✈️</span>
+                  <div>
+                    <div class="text-[11px] font-extrabold text-white leading-tight">${s.tgTitle}</div>
+                    <div class="text-[9.5px] text-sky-300/85 font-semibold">ReservHotel Bot • ${s.tgTime}</div>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/35 text-emerald-300 text-[9px] font-extrabold">LIVE</span>
+              </div>
+
+              <div class="grid grid-cols-3 gap-1.5 text-center">
+                <div class="rounded-xl bg-white/[0.05] border border-white/10 p-1.5">
+                  <div class="text-[9px] text-indigo-200/70">${s.tgTotalLbl}</div>
+                  <div class="text-[11.5px] font-extrabold text-white mt-0.5">4 850 000</div>
+                </div>
+                <div class="rounded-xl bg-white/[0.05] border border-white/10 p-1.5">
+                  <div class="text-[9px] text-indigo-200/70">${s.tgCashLbl}</div>
+                  <div class="text-[11.5px] font-extrabold text-emerald-300 mt-0.5">2 900 000</div>
+                </div>
+                <div class="rounded-xl bg-rose-500/15 border border-rose-400/25 p-1.5">
+                  <div class="text-[9px] text-rose-200/80">${s.tgExpLbl}</div>
+                  <div class="text-[11.5px] font-extrabold text-rose-300 mt-0.5">−350 000</div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-emerald-500/18 border border-emerald-400/35 text-[11px] font-extrabold text-emerald-200">
+                <span>${s.tgNetLbl}</span>
+                <span class="text-white">2 550 000 so‘m</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.05] border border-indigo-400/25 text-[10px]">
+              <span class="px-2 py-0.5 rounded-md bg-[#5b54e6]/30 text-indigo-200 font-bold shrink-0">${s.tgAuditBadge}</span>
+              <span class="text-indigo-100/90 font-semibold truncate">${s.tgAuditLine}</span>
+            </div>
+
+            <p class="text-[11px] text-indigo-100/80 leading-relaxed">${s.tgCaption}</p>
+          </div>`;
+      } else if (showcaseActiveTab === 1) {
+        body.innerHTML = `
+          <div class="panel-enter space-y-2.5">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-bold text-white flex items-center gap-1.5"><span>📅</span><span>${s.mxTitle}</span></span>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-extrabold text-[9.5px]">${s.mxBadge}</span>
+            </div>
+
+            <div class="relative rounded-2xl bg-[#090e26]/90 border border-white/10 p-2.5 space-y-2 overflow-hidden">
+              <div class="live-beacon absolute top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#818cf8] via-[#5b54e6] to-transparent z-20 pointer-events-none shadow-[0_0_12px_#818cf8]">
+                <div class="w-2.5 h-2.5 rounded-full bg-[#5b54e6] border-2 border-white -ml-[4px] mt-1"></div>
+              </div>
+
+              <div class="flex items-center gap-2 text-[10px]">
+                <span class="w-11 font-extrabold text-indigo-200/85 shrink-0">№ 102</span>
+                <div class="flex-1 h-7 rounded-lg bg-white/[0.04] border border-white/5 relative flex items-center px-1">
+                  <div class="glide-bar h-5 w-[62%] rounded-md bg-gradient-to-r from-emerald-500 to-emerald-600 px-2 flex items-center justify-between text-white font-bold shadow-md">
+                    <span class="truncate">A. Karimov</span>
+                    <span class="text-[8.5px] bg-white/20 px-1 rounded">${s.mxPaid}</span>
+                  </div>
+                  <div class="ml-1.5 h-5 flex-1 rounded-md bg-gradient-to-r from-[#5b54e6] to-indigo-700 px-1.5 flex items-center justify-center text-white font-bold text-[9px] truncate">
+                    ${s.mxBooked}
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 text-[10px]">
+                <span class="w-11 font-extrabold text-rose-300 shrink-0">№ 105</span>
+                <div class="flex-1 h-7 rounded-lg bg-white/[0.04] border border-white/5 relative flex items-center px-1">
+                  <div class="late-pulse h-5 w-[76%] rounded-md bg-gradient-to-r from-red-600 to-rose-700 border border-rose-300/60 px-2 flex items-center justify-between text-white font-bold">
+                    <span class="truncate">S. Alimov</span>
+                    <span class="text-[8.5px] bg-white text-rose-700 px-1.5 rounded font-extrabold shrink-0">${s.mxLate}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 text-[10px]">
+                <span class="w-11 font-extrabold text-indigo-200/85 shrink-0">№ 204</span>
+                <div class="flex-1 h-7 rounded-lg bg-white/[0.04] border border-white/5 relative flex items-center px-1">
+                  <div class="glide-bar ml-[20%] h-5 w-[72%] rounded-md bg-gradient-to-r from-orange-500 to-amber-600 px-2 flex items-center justify-between text-white font-bold shadow-md">
+                    <span class="truncate">M. Azizova</span>
+                    <span class="text-[8.5px] bg-white text-rose-600 px-1.5 rounded font-extrabold shrink-0">${s.mxDebt}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-indigo-100/80 leading-relaxed">${s.mxCaption}</p>
+          </div>`;
+      } else if (showcaseActiveTab === 2) {
+        body.innerHTML = `
+          <div class="panel-enter space-y-2.5">
+            <div class="grid grid-cols-3 gap-2">
+              <div class="rounded-xl bg-white/[0.06] border border-emerald-400/25 p-2">
+                <div class="text-[9px] font-semibold text-indigo-200/75 truncate">${s.finOcc}</div>
+                <div id="kpiOccCounter" class="text-base font-black text-emerald-300 mt-0.5">0%</div>
+              </div>
+              <div class="rounded-xl bg-white/[0.06] border border-indigo-400/25 p-2">
+                <div class="text-[9px] font-semibold text-indigo-200/75 truncate">${s.finAdr}</div>
+                <div id="kpiAdrCounter" class="text-base font-black text-white mt-0.5">0</div>
+              </div>
+              <div class="rounded-xl bg-white/[0.06] border border-amber-400/25 p-2">
+                <div class="text-[9px] font-semibold text-indigo-200/75 truncate">${s.finRev}</div>
+                <div id="kpiRevCounter" class="text-base font-black text-amber-300 mt-0.5">0</div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl bg-[#090e26]/90 border border-white/10 p-2.5 space-y-1">
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="font-bold text-indigo-100">${s.finChartTitle}</span>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/35 text-emerald-300 font-extrabold text-[9px]">${s.finDebtZero}</span>
+              </div>
+              <svg viewBox="0 0 360 88" class="w-full h-[76px] overflow-visible">
+                <defs>
+                  <linearGradient id="revAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#818cf8" stop-opacity="0.48"/>
+                    <stop offset="100%" stop-color="#5b54e6" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="revLineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#5b54e6"/>
+                    <stop offset="55%" stop-color="#818cf8"/>
+                    <stop offset="100%" stop-color="#10b981"/>
+                  </linearGradient>
+                </defs>
+                <path class="spline-area" d="M 4 72 C 48 64, 65 44, 110 48 C 155 52, 178 24, 224 28 C 270 32, 304 12, 356 8 L 356 86 L 4 86 Z" fill="url(#revAreaGrad)"/>
+                <path class="spline-stroke" d="M 4 72 C 48 64, 65 44, 110 48 C 155 52, 178 24, 224 28 C 270 32, 304 12, 356 8" fill="none" stroke="url(#revLineGrad)" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="356" cy="8" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+              </svg>
+            </div>
+
+            <p class="text-[11px] text-indigo-100/80 leading-relaxed">${s.finCaption}</p>
+          </div>`;
+
+        animateShowcaseValue(document.getElementById('kpiOccCounter'), 87, '%', 750);
+        animateShowcaseValue(document.getElementById('kpiAdrCounter'), 340000, '', 850);
+        animateShowcaseValue(document.getElementById('kpiRevCounter'), 296000, '', 900);
+      } else {
+        body.innerHTML = `
+          <div class="panel-enter space-y-2.5">
+            <div class="grid grid-cols-2 gap-2">
+              <div class="rounded-2xl bg-rose-500/[0.08] border border-rose-400/25 p-3 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11.5px] font-extrabold text-rose-200">${s.roiOldTitle}</span>
+                  <span class="text-xs">❌</span>
+                </div>
+                <ul class="space-y-1 text-[10.5px] text-rose-100/80 leading-snug">
+                  ${s.roiOldList.map(item => `<li class="flex items-start gap-1.5"><span class="text-rose-400 font-bold">✕</span><span>${item}</span></li>`).join('')}
+                </ul>
+              </div>
+
+              <div class="rounded-2xl bg-gradient-to-br from-emerald-500/18 to-[#5b54e6]/25 border border-emerald-400/45 p-3 space-y-1.5 shadow-lg">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11.5px] font-extrabold text-white">${s.roiNewTitle}</span>
+                  <span class="px-1.5 py-0.5 rounded bg-emerald-400 text-[#060918] font-black text-[9px]">ROI 10x</span>
+                </div>
+                <ul class="space-y-1 text-[10.5px] text-emerald-50/95 leading-snug font-medium">
+                  ${s.roiNewList.map(item => `<li class="flex items-start gap-1.5"><span class="text-emerald-400 font-extrabold">✓</span><span>${item}</span></li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-indigo-100/85 leading-relaxed">${s.roiCaption}</p>
+          </div>`;
+      }
+
+      restartShowcaseProgress();
+    }
+
+    function restartShowcaseProgress() {
+      const bar = document.getElementById('cycleProgress');
+      if (!bar) return;
+      bar.classList.remove('tab-progress-bar', 'paused');
+      void bar.offsetWidth;
+      bar.classList.add('tab-progress-bar');
+      if (showcaseIsPaused) bar.classList.add('paused');
+    }
+
+    function scheduleNextShowcaseTab() {
+      clearTimeout(showcaseCycleTimeout);
+      if (showcaseIsPaused) return;
+      showcaseCycleTimeout = setTimeout(() => {
+        const loginEl = document.getElementById('loginScreen');
+        if (loginEl && !loginEl.classList.contains('hidden')) {
+          showcaseActiveTab = (showcaseActiveTab + 1) % 4;
+          renderShowcaseTabsRow();
+          renderShowcaseStageBody();
+        }
+        scheduleNextShowcaseTab();
+      }, 6000);
+    }
+
+    function selectShowcaseTab(idx) {
+      showcaseActiveTab = idx;
+      renderShowcaseTabsRow();
+      renderShowcaseStageBody();
+      scheduleNextShowcaseTab();
+    }
+
+    function pauseShowcaseCycle(state) {
+      showcaseIsPaused = state;
+      const bar = document.getElementById('cycleProgress');
+      if (bar) bar.classList.toggle('paused', state);
+      if (state) clearTimeout(showcaseCycleTimeout);
+      else scheduleNextShowcaseTab();
+    }
+
+    function handleShowcasePointerMove(e) {
+      const leftStage = document.getElementById('appleLoginPromoPanel');
+      const tiltCard = document.getElementById('tiltCard');
+      if (!leftStage) return;
+      const r = leftStage.getBoundingClientRect();
+      leftStage.style.setProperty('--spot-x', (e.clientX - r.left).toFixed(1) + 'px');
+      leftStage.style.setProperty('--spot-y', (e.clientY - r.top).toFixed(1) + 'px');
+
+      if (window.innerWidth >= 1024 && tiltCard) {
+        const cr = tiltCard.getBoundingClientRect();
+        const nx = ((e.clientX - cr.left) / cr.width) - 0.5;
+        const ny = ((e.clientY - cr.top) / cr.height) - 0.5;
+        const rotY = Math.max(-5, Math.min(5, nx * 8));
+        const rotX = Math.max(-4, Math.min(4, -ny * 6));
+        tiltCard.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`;
+      }
+    }
+
+    function handleShowcasePointerLeave() {
+      const tiltCard = document.getElementById('tiltCard');
+      if (tiltCard) tiltCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
     }
 
     function renderAppleLoginBento() {
-      const lang = ['uz', 'ru', 'en'].includes(currentLang) ? currentLang : 'uz';
-      const data = SCREENSHOT_SHOWCASE_DATA[lang];
-      const badgeEl = document.getElementById('promoBadgeText');
-      const headEl = document.getElementById('promoHeadline');
-      const subEl = document.getElementById('promoSubtext');
-      const flEl = document.getElementById('promoFooterLeft');
-      const frEl = document.getElementById('promoFooterRight');
+      const l = ['uz', 'ru', 'en'].includes(currentLang) ? currentLang : 'uz';
+      const c = SHOWCASE_COPY[l];
+      const badgeEl = document.getElementById('txtTopBadge');
+      const headEl = document.getElementById('txtHeadline');
+      const subEl = document.getElementById('txtSubheadline');
+      const trustEl = document.getElementById('trustStrip');
 
-      if (badgeEl) badgeEl.textContent = data.badge;
-      if (headEl) headEl.innerHTML = data.headline;
-      if (subEl) subEl.textContent = data.subtext;
-      if (flEl) flEl.innerHTML = data.footerLeft;
-      if (frEl) frEl.textContent = data.footerRight;
-
-      renderUnifiedShowcaseStage();
-
-      if (!showcaseAutoTimer) {
-        showcaseAutoTimer = setInterval(() => {
-          const loginEl = document.getElementById('loginScreen');
-          if (!loginEl || loginEl.classList.contains('hidden')) return;
-          activeShowcaseTabIdx = (activeShowcaseTabIdx + 1) % 4;
-          renderUnifiedShowcaseStage();
-        }, 5500);
+      if (badgeEl) badgeEl.textContent = c.topBadge;
+      if (headEl) headEl.innerHTML = c.headline;
+      if (subEl) subEl.textContent = c.subheadline;
+      if (trustEl) {
+        trustEl.innerHTML = c.trustPills.map(p => `
+          <div class="px-2.5 py-2 rounded-xl border ${p.cls} flex items-center justify-center gap-1.5 text-center backdrop-blur-md">
+            <span>${p.icon}</span><span class="truncate">${p.text}</span>
+          </div>
+        `).join('');
       }
+
+      renderShowcaseTabsRow();
+      renderShowcaseStageBody();
+      scheduleNextShowcaseTab();
     }
 
     // Dastur ichidagi KPI kartalar uchun nozik Apple nur effekti
