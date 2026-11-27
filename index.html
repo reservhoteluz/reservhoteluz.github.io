@@ -875,6 +875,15 @@
       }
     }
 
+  
+    /* Hide hotel-specific header widgets in CEO / SaaS Admin panel */
+    body.is-saas-tab #headerCapacityBadge,
+    body.is-saas-tab #headerKpiGroup,
+    body.is-saas-tab #headerSearchBtn,
+    body.is-saas-tab #headerCreateBookingBtn {
+      display: none !important;
+    }
+
   </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -1225,7 +1234,7 @@
           </span>
         </div>
 
-        <div class="hidden xl:flex items-center gap-1.5 text-[11px] font-semibold shrink-0">
+        <div id="headerKpiGroup" class="hidden xl:flex items-center gap-1.5 text-[11px] font-semibold shrink-0">
           <div class="px-2.5 py-1.5 rounded-lg bg-[#5b54e6]/10 text-[#131b3a] border border-[#5b54e6]/25 whitespace-nowrap">
             🛏️ Yashamoqda: <span id="kpiStaying" class="text-[#5b54e6] font-extrabold">0</span>
           </div>
@@ -1241,7 +1250,7 @@
         </div>
 
         <div class="flex items-center gap-1.5 shrink-0">
-          <button type="button" onclick="openGlobalSearch()" title="Tezkor qidiruv (Ctrl + K)" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap transition">
+          <button type="button" id="headerSearchBtn" onclick="openGlobalSearch()" title="Tezkor qidiruv (Ctrl + K)" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap transition">
             <span>🔍</span>
             <span class="hidden md:inline text-slate-500">Qidirish</span>
             <kbd class="hidden 2xl:inline-block px-1.5 py-0.5 text-[10px] font-bold bg-[#f4f5ff] border border-[#d8defa] rounded text-slate-500">Ctrl+K</kbd>
@@ -1257,7 +1266,7 @@
           <button onclick="syncFromCloud(true)" title="Bazani yangilash" class="p-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold shrink-0">
             🔄
           </button>
-          <button onclick="openBookingModal()" class="px-3 py-1.5 bg-[#5b54e6] hover:bg-[#4942d4] text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1 whitespace-nowrap shrink-0">
+          <button id="headerCreateBookingBtn" onclick="openBookingModal()" class="px-3 py-1.5 bg-[#5b54e6] hover:bg-[#4942d4] text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1 whitespace-nowrap shrink-0">
             <span>+</span> <span>Bron yaratish</span>
           </button>
         </div>
@@ -4830,6 +4839,7 @@ Davom etasizmi?`, {
       if (tabName === 'users' && !isHotelOwnerOrMaster()) return;
       if (tabName === 'saas' && !isMasterAdmin()) return;
       activeTabName = tabName;
+      document.body.classList.toggle('is-saas-tab', tabName === 'saas');
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       const activeTabEl = document.getElementById('tab-' + tabName);
       activeTabEl.classList.remove('hidden', 'tab-animate-in');
