@@ -128,6 +128,24 @@
     .bar-out { background: linear-gradient(135deg, #64748b, #475569); opacity: 0.88; }
     .bar-canceled { background: linear-gradient(135deg, #dc2626, #991b1b); border: 1.5px dashed rgba(255,255,255,0.75); opacity: 0.92; }
     .bar-ooo { background: repeating-linear-gradient(135deg, #334155 0px, #334155 7px, #1e293b 7px, #1e293b 14px); border: 1.5px solid #f59e0b; color: #fef3c7; }
+    @keyframes lateCheckoutPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.72), 0 3px 10px rgba(185, 28, 28, 0.45); }
+      50% { box-shadow: 0 0 0 5px rgba(220, 38, 38, 0), 0 4px 16px rgba(220, 38, 38, 0.75); }
+    }
+    .bar-late-checkout {
+      background: linear-gradient(135deg, #dc2626, #991b1b) !important;
+      border: 1.5px solid #fecaca !important;
+      color: #ffffff !important;
+      animation: lateCheckoutPulse 1.8s ease-in-out infinite;
+    }
+    .room-cell-late {
+      background-color: #fef2f2 !important;
+      border-left: 4px solid #dc2626 !important;
+    }
+    body.dark-mode .room-cell-late {
+      background-color: rgba(220, 38, 38, 0.24) !important;
+      border-left: 4px solid #ef4444 !important;
+    }
 
     
     .day-cell.drop-target-valid { background-color: rgba(16, 185, 129, 0.22) !important; outline: 2px dashed #10b981; outline-offset: -2px; }
@@ -845,48 +863,48 @@
     <!-- MAIN WORKSPACE (Logo rangiga mos yorqin indigo-oq muhit) -->
     <div class="flex-1 flex flex-col min-w-0 bg-gradient-to-br from-[#eef0ff] via-[#f4f5fc] to-[#e7ebff]">
       
-      <header class="h-14 bg-gradient-to-r from-white via-[#f8f9ff] to-[#eef1ff] border-b border-[#d8defa] px-5 flex items-center justify-between gap-4 shrink-0">
-        <div class="flex items-center gap-3">
-          <button onclick="toggleSidebar()" class="md:hidden p-1.5 rounded-lg border border-[#d8defa] text-[#131b3a]">☰</button>
-          <h2 id="pageTitle" class="text-base font-bold text-[#131b3a]">Bronlar kalendari</h2>
-          <span id="headerCapacityBadge" class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#5b54e6]/10 text-[#5b54e6] border border-[#5b54e6]/25">
+      <header class="h-14 bg-gradient-to-r from-white via-[#f8f9ff] to-[#eef1ff] border-b border-[#d8defa] px-3.5 lg:px-5 flex items-center justify-between gap-2.5 shrink-0">
+        <div class="flex items-center gap-2 min-w-0 shrink-0">
+          <button onclick="toggleSidebar()" class="md:hidden p-1.5 rounded-lg border border-[#d8defa] text-[#131b3a] shrink-0">☰</button>
+          <h2 id="pageTitle" class="text-sm lg:text-base font-bold text-[#131b3a] whitespace-nowrap">Bronlar kalendari</h2>
+          <span id="headerCapacityBadge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#5b54e6]/10 text-[#5b54e6] border border-[#5b54e6]/25 whitespace-nowrap shrink-0">
             0 xona • 0 o‘rin
           </span>
         </div>
 
-        <div class="hidden xl:flex items-center gap-2 text-xs font-semibold">
-          <div class="px-3 py-1.5 rounded-lg bg-[#5b54e6]/10 text-[#131b3a] border border-[#5b54e6]/25">
+        <div class="hidden xl:flex items-center gap-1.5 text-[11px] font-semibold shrink-0">
+          <div class="px-2.5 py-1.5 rounded-lg bg-[#5b54e6]/10 text-[#131b3a] border border-[#5b54e6]/25 whitespace-nowrap">
             🛏️ Yashamoqda: <span id="kpiStaying" class="text-[#5b54e6] font-extrabold">0</span>
           </div>
-          <div class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
-            📥 Bugun keladi: <span id="kpiArrivals">0</span>
+          <div class="px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">
+            📥 Bugun keladi: <span id="kpiArrivals" class="font-extrabold">0</span>
           </div>
-          <div class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 border border-amber-200">
-            📤 Bugun ketadi: <span id="kpiDepartures">0</span>
+          <div class="px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
+            📤 Bugun ketadi: <span id="kpiDepartures" class="font-extrabold">0</span>
           </div>
-          <div class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200">
-            ⚠️ Qarzdorlar: <span id="kpiDebtors">0</span>
+          <div class="px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 whitespace-nowrap">
+            ⚠️ Qarzdorlar: <span id="kpiDebtors" class="font-extrabold">0</span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="openGlobalSearch()" title="Tezkor qidiruv (Ctrl + K)" class="px-2.5 py-2 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold flex items-center gap-1.5 transition">
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button type="button" onclick="openGlobalSearch()" title="Tezkor qidiruv (Ctrl + K)" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap transition">
             <span>🔍</span>
             <span class="hidden md:inline text-slate-500">Qidirish</span>
-            <kbd class="hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-bold bg-[#f4f5ff] border border-[#d8defa] rounded text-slate-500">Ctrl+K</kbd>
+            <kbd class="hidden 2xl:inline-block px-1.5 py-0.5 text-[10px] font-bold bg-[#f4f5ff] border border-[#d8defa] rounded text-slate-500">Ctrl+K</kbd>
           </button>
-          <button type="button" id="themeToggleBtn" onclick="toggleDarkMode()" title="Kunduzgi / Tungi smena rejimi" class="p-2 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-bold transition">
+          <button type="button" id="themeToggleBtn" onclick="toggleDarkMode()" title="Kunduzgi / Tungi smena rejimi" class="p-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-bold shrink-0 transition">
             🌙
           </button>
-          <div class="flex items-center gap-0.5 bg-[#f4f5ff] p-1 rounded-lg border border-[#d8defa] text-[11px] font-bold">
-            <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2 py-1 rounded transition">UZ</button>
-            <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-2 py-1 rounded transition">RU</button>
-            <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-2 py-1 rounded transition">EN</button>
+          <div class="flex items-center gap-0.5 bg-[#f4f5ff] p-0.5 rounded-lg border border-[#d8defa] text-[11px] font-bold shrink-0">
+            <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-1.5 py-1 rounded transition">UZ</button>
+            <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-1.5 py-1 rounded transition">RU</button>
+            <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-1.5 py-1 rounded transition">EN</button>
           </div>
-          <button onclick="syncFromCloud(true)" title="Bazani yangilash" class="p-2 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold">
+          <button onclick="syncFromCloud(true)" title="Bazani yangilash" class="p-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold shrink-0">
             🔄
           </button>
-          <button onclick="openBookingModal()" class="px-3.5 py-2 bg-[#5b54e6] hover:bg-[#4942d4] text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
+          <button onclick="openBookingModal()" class="px-3 py-1.5 bg-[#5b54e6] hover:bg-[#4942d4] text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1 whitespace-nowrap shrink-0">
             <span>+</span> <span>Bron yaratish</span>
           </button>
         </div>
@@ -966,6 +984,7 @@
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-500 inline-block"></span> Chiqdi</span>
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-700 border border-dashed border-white inline-block"></span> Bekor qilingan</span>
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-700 border border-amber-400 inline-block"></span> Ta’mirda (Yopiq)</span>
+            <span class="flex items-center gap-1.5 font-bold text-rose-700"><span class="w-3 h-3 rounded bg-red-600 ring-2 ring-red-300 inline-block"></span> ⏰ Kech chiqish (Late check-out)</span>
           </div>
           <div class="text-[#5b54e6] font-semibold">💡 Holat tugmasini bosib qo‘lda ham (Toza / Tozalash / Band) o‘zgartirishingiz mumkin</div>
         </div>
@@ -1280,7 +1299,7 @@
           <form onsubmit="addAllowedUser(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-100">
             <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Xodim Gmail manzili</label><input type="email" id="newUserEmail" required placeholder="xodim@gmail.com" class="w-full px-3 py-2 border border-[#d8defa] rounded-lg text-xs bg-white" /></div>
             <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Ismi / Lavozimi</label><input type="text" id="newUserName" required placeholder="1-smena Admin" class="w-full px-3 py-2 border border-[#d8defa] rounded-lg text-xs bg-white" /></div>
-            <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Huquq & Parol (kamida 6 belgi)</label><div class="flex gap-2"><select id="newUserRole" class="w-1/2 px-2.5 py-2 border border-[#d8defa] rounded-lg text-xs bg-white"><option value="Admin">Admin</option><option value="Reception">Reception</option></select><input type="text" id="newUserPin" minlength="6" required value="123456" placeholder="Kamida 6 belgi" class="w-1/2 px-2.5 py-2 border border-[#d8defa] rounded-lg text-xs bg-white" /></div></div>
+            <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Huquq & Parol (kamida 6 belgi)</label><div class="flex gap-2"><select id="newUserRole" class="w-1/2 px-2.5 py-2 border border-[#d8defa] rounded-lg text-xs bg-white"><option value="Admin">Admin</option><option value="Reception">Reception</option></select><input type="text" id="newUserPin" minlength="6" required autocomplete="new-password" placeholder="Masalan: 778899" class="w-1/2 px-2.5 py-2 border border-[#d8defa] rounded-lg text-xs bg-white" /></div></div>
             <div class="flex items-end"><button type="submit" class="w-full py-2 bg-[#5b54e6] hover:bg-[#4942d4] text-white font-semibold rounded-lg text-xs">+ Xodim qo‘shish</button></div>
           </form>
         </div>
@@ -1662,6 +1681,13 @@
             <div class="text-[11px] text-amber-800/90">Ushbu sanalarda xonaga bron qo‘yib bo‘lmaydi va u moliyaviy qarzga hisoblanmaydi.</div>
             <button type="button" onclick="releaseOutOfOrderBooking()" class="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
               ✅ Ta’mirdan chiqarish (Sotuvga ochish)
+            </button>
+          </div>
+          <div id="drawerLateCheckoutInfo" class="hidden bg-rose-50 border-2 border-rose-500 rounded-xl p-3.5 text-rose-900 space-y-2 shadow-sm">
+            <div class="font-extrabold text-rose-700 text-xs flex items-center gap-1.5"><span>⏰</span><span id="drawerLateCheckoutTitle">KECH CHIQISH (LATE CHECK-OUT)</span></div>
+            <div id="drawerLateCheckoutText" class="text-[11px] font-semibold text-rose-800">Belgilangan chiqish vaqtidan o‘tib ketdi!</div>
+            <button type="button" onclick="quickStatusChange('Chiqdi')" class="w-full py-2 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition">
+              🏁 Hoziroq Check-out qilish
             </button>
           </div>
           <div id="drawerLockedNotice" class="hidden bg-slate-100 border border-slate-300 rounded-xl p-3 text-slate-700 font-semibold text-[11px] flex items-center gap-2">
@@ -3294,7 +3320,7 @@
             && document.getElementById('bookingModal').classList.contains('hidden')
             && document.getElementById('cancelModal').classList.contains('hidden')) syncFromCloud(false);
       }, 6000);
-      setInterval(() => { if (currentUser) { syncDailyInTimesLive(false); updateTodayLinePosition(); } }, 30000);
+      setInterval(() => { if (currentUser) { syncDailyInTimesLive(false); updateTodayLinePosition(); checkLateCheckoutLiveUpdate(); } }, 30000);
     }
 
     function getBookingPayments(b) {
@@ -3306,6 +3332,81 @@
       if (!list || !list.length) return "To'lanmagan";
       const u = [...new Set(list.map(p => p.method))];
       return u.length === 1 ? u[0] : "Aralash to'lov";
+    }
+    function isBookingLateCheckout(b) {
+      if (!b || b.status !== 'Band') return false;
+      const cOut = toIsoDate(b.checkOut);
+      if (!cOut) return false;
+      const outMs = getLocalMs(cOut, b.checkOutTime || '12:00');
+      return outMs > 0 && Date.now() > outMs;
+    }
+    function getLateCheckoutDurationText(b, longForm = false) {
+      if (!b) return '';
+      const outMs = getLocalMs(toIsoDate(b.checkOut), b.checkOutTime || '12:00');
+      const diffMin = Math.max(1, Math.floor((Date.now() - outMs) / 60000));
+      const days = Math.floor(diffMin / 1440);
+      const hrs = Math.floor((diffMin % 1440) / 60);
+      const mins = diffMin % 60;
+      const lang = (typeof currentLang === 'string' && ['uz', 'ru', 'en'].includes(currentLang)) ? currentLang : 'uz';
+      if (longForm) {
+        const units = lang === 'ru'
+          ? { d: 'дн.', h: 'ч', m: 'мин' }
+          : (lang === 'en' ? { d: 'd', h: 'h', m: 'm' } : { d: 'kun', h: 'soat', m: 'daqiqa' });
+        const parts = [];
+        if (days > 0) parts.push(`${days} ${units.d}`);
+        if (hrs > 0) parts.push(`${hrs} ${units.h}`);
+        if (mins > 0 || !parts.length) parts.push(`${mins} ${units.m}`);
+        return parts.join(' ');
+      }
+      const sUnits = lang === 'ru'
+        ? { d: 'д', h: 'ч', m: 'м' }
+        : (lang === 'en' ? { d: 'd', h: 'h', m: 'm' } : { d: 'k', h: 's', m: 'd' });
+      if (days > 0) return `+${days}${sUnits.d} ${hrs}${sUnits.h}`;
+      if (hrs > 0) return `+${hrs}${sUnits.h} ${mins}${sUnits.m}`;
+      return `+${mins}${sUnits.m}`;
+    }
+    function getLateCheckoutLabels(b) {
+      const lang = (typeof currentLang === 'string' && ['uz', 'ru', 'en'].includes(currentLang)) ? currentLang : 'uz';
+      const durShort = getLateCheckoutDurationText(b, false);
+      const durLong = getLateCheckoutDurationText(b, true);
+      const outDate = b ? (b.checkOut || '') : '';
+      const outTime = b ? (b.checkOutTime || '12:00') : '12:00';
+      if (lang === 'ru') {
+        return {
+          pill: '⏰ Поздний выезд',
+          barBadge: `⏰ Поздний выезд (${durShort})`,
+          tooltip: `Поздний выезд: просрочено на ${durLong}!`,
+          drawerTitle: 'ПОЗДНИЙ ВЫЕЗД (LATE CHECK-OUT)',
+          drawerMsg: `Время выезда (${outDate} ${outTime}) просрочено на ${durLong}!`
+        };
+      }
+      if (lang === 'en') {
+        return {
+          pill: '⏰ Late check-out',
+          barBadge: `⏰ Late check-out (${durShort})`,
+          tooltip: `Late check-out: overdue by ${durLong}!`,
+          drawerTitle: 'LATE CHECK-OUT (OVERDUE)',
+          drawerMsg: `Scheduled check-out (${outDate} ${outTime}) is overdue by ${durLong}!`
+        };
+      }
+      return {
+        pill: '⏰ Kech chiqish',
+        barBadge: `⏰ Kech chiqish (${durShort})`,
+        tooltip: `Kech chiqish: ${durLong} o‘tib ketdi!`,
+        drawerTitle: 'KECH CHIQISH (LATE CHECK-OUT)',
+        drawerMsg: `Belgilangan chiqish vaqti (${outDate} ${outTime}) dan ${durLong} o‘tib ketdi!`
+      };
+    }
+    function getRoomLateCheckoutBooking(roomId) {
+      return bookings.find(b => b.room === roomId && isBookingLateCheckout(b)) || null;
+    }
+    let lastLateCheckoutSig = '';
+    function checkLateCheckoutLiveUpdate() {
+      const sig = bookings.filter(isBookingLateCheckout).map(b => b.id).sort().join(',');
+      if (sig !== lastLateCheckoutSig) {
+        lastLateCheckoutSig = sig;
+        if (!isDragging && activeTabName === 'matrix') renderMatrix();
+      }
     }
     function isRoomCheckedInToday(roomId) { const t = toIsoDate(new Date()); return bookings.some(b => b.room === roomId && b.status === 'Band' && b.checkIn <= t && b.checkOut > t); }
     function isRoomOutOfOrderToday(roomId) { const t = toIsoDate(new Date()); return bookings.some(b => b.room === roomId && b.status === "Ta'mirda" && b.checkIn <= t && b.checkOut > t); }
@@ -4109,7 +4210,7 @@
       dates.forEach(dt => { if (!monthGroups.length || monthGroups[monthGroups.length - 1].label !== dt.monthLabel) monthGroups.push({ label: dt.monthLabel, span: 1 }); else monthGroups[monthGroups.length - 1].span++; });
 
       let theadHtml = `<tr><th rowspan="2" class="sticky-corner bg-[#131b3a] text-white text-xs font-bold px-3 text-left border-r border-white/15" style="width:155px; min-width:155px;">Xona / Qavat</th><th rowspan="2" class="sticky-corner-clean bg-[#131b3a] text-white text-xs font-bold px-2 text-center border-r border-white/15" style="width:75px; min-width:75px;">Holati</th>`;
-      monthGroups.forEach(mg => { theadHtml += `<th colspan="${mg.span}" class="sticky-header-top bg-[#1b2554] text-indigo-200 text-xs font-bold py-1.5 px-2 border-r border-white/15 border-b border-white/15 text-center">${mg.label}</th>`; });
+      monthGroups.forEach(mg => { theadHtml += `<th colspan="${mg.span}" class="sticky-header-top bg-[#1b2554] text-indigo-200 text-xs font-bold py-1.5 px-2 border-r border-white/15 border-b border-white/15 text-left"><span class="sticky left-[142px] md:left-[238px] inline-block px-1.5 whitespace-nowrap">${mg.label}</span></th>`; });
       theadHtml += `</tr><tr>`;
       dates.forEach(dt => {
         const bgClass = dt.isToday ? 'bg-[#5b54e6] text-white' : (dt.isWeekend ? 'bg-[#f5f6ff] text-rose-600' : 'bg-[#f8f9ff] text-[#131b3a]');
@@ -4131,7 +4232,13 @@
 
         floorRooms.forEach(room => {
           const cleanBadge = getRoomStatusBadgeHtml(room);
-          tbodyHtml += `<tr><td class="sticky-col-room px-3 py-1.5 border-b border-slate-200" style="border-left:3px solid ${floorColor};"><div class="flex items-center justify-between gap-1"><span class="font-extrabold text-[#131b3a] text-xs">№ ${room.id}</span><span class="hidden sm:inline text-[10px] text-slate-400 font-medium">${room.beds} o‘rin</span></div></td><td class="sticky-col-clean text-center border-b border-slate-200">${cleanBadge}</td>`;
+          const lateBk = getRoomLateCheckoutBooking(room.id);
+          const roomCellLateCls = lateBk ? 'room-cell-late' : '';
+          const lateMeta = lateBk ? getLateCheckoutLabels(lateBk) : null;
+          const lateRoomPill = lateBk
+            ? `<button type="button" onclick="openGuestDrawer('${lateBk.id}')" title="${lateMeta.tooltip}" class="mt-0.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-rose-600 text-white font-extrabold text-[9.5px] leading-none shadow-xs animate-pulse">${lateMeta.pill}</button>`
+            : '';
+          tbodyHtml += `<tr><td class="sticky-col-room ${roomCellLateCls} px-3 py-1.5 border-b border-slate-200" style="border-left:3px solid ${lateBk ? '#dc2626' : floorColor};"><div class="flex items-center justify-between gap-1"><span class="font-extrabold ${lateBk ? 'text-rose-700' : 'text-[#131b3a]'} text-xs">№ ${room.id}</span><span class="hidden sm:inline text-[10px] text-slate-400 font-medium">${room.beds} o‘rin</span></div>${lateRoomPill}</td><td class="sticky-col-clean ${roomCellLateCls} text-center border-b border-slate-200">${cleanBadge}</td>`;
           dates.forEach(dt => {
             const cellClasses = ['day-cell']; if (dt.isWeekend) cellClasses.push('weekend'); if (dt.isToday) cellClasses.push('today-col'); if (dt.iso < todayStr) cellClasses.push('past-col');
             let barHtml = '';
@@ -4152,18 +4259,24 @@
                 const paid = pListBar.length ? pListBar.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0);
                 const unpaidAmt = getBookingUnpaidAmount(b);
                 const inDebt = unpaidAmt > 0;
+                const isLateOut = isBookingLateCheckout(b);
                 let barClass = 'bar-paid';
                 if (b.status === 'Bekor qilingan') barClass = 'bar-canceled';
                 else if (b.status === "Ta'mirda") barClass = 'bar-ooo';
                 else if (b.status === 'Chiqdi') barClass = 'bar-out';
                 else if (b.status === 'Bron') barClass = 'bar-booked';
+                else if (isLateOut) barClass = 'bar-late-checkout';
                 else if (inDebt && paid <= 0) barClass = 'bar-debt';
                 else if (inDebt && paid > 0) barClass = 'bar-partial';
+                const lateLabels = isLateOut ? getLateCheckoutLabels(b) : null;
+                const lateBadgeHtml = isLateOut
+                  ? `<span class="shrink-0 mr-1.5 px-1.5 py-0.5 rounded bg-white text-rose-700 font-extrabold text-[10px] leading-none shadow-xs">${lateLabels.barBadge}</span>`
+                  : '';
                 const debtBadgeHtml = (b.status === 'Band' && unpaidAmt > 0)
                   ? `<span class="shrink-0 mr-2.5 px-1.5 py-0.5 rounded bg-white/95 text-rose-600 font-extrabold text-[10px] leading-none shadow-xs">-${unpaidAmt.toLocaleString('ru-RU')} so‘m</span>`
                   : '';
                 const safeName = b.guestName || (b.status === "Ta'mirda" ? 'Ta’mirda' : 'Mehmon');
-                const displayLabel = b.status === 'Bekor qilingan' ? `✕ ${safeName}` : (b.status === "Ta'mirda" ? `🔧 ${safeName}` : safeName);
+                const displayLabel = b.status === 'Bekor qilingan' ? `✕ ${safeName}` : (b.status === "Ta'mirda" ? `🔧 ${safeName}` : (isLateOut ? `⏰ ${safeName}` : safeName));
                 const canDragMove = (b.status === 'Bron' || b.status === 'Band' || b.status === "Ta'mirda");
                 const canResize = (b.status === 'Band' || b.status === 'Bron' || b.status === "Ta'mirda");
                 const downHandler = canDragMove
@@ -4172,7 +4285,8 @@
                 const resizeHandleHtml = canResize
                   ? `<div class="booking-resize-handle" title="O‘ngga cho‘zib kun qo‘shish" onmousedown="startBookingResize(event, '${b.id}')" onclick="event.stopPropagation()"></div>`
                   : '';
-                barHtml += `<div draggable="false" ${downHandler} onclick="event.stopPropagation(); if(!justFinishedResizing && !justFinishedMoving) openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}${unpaidAmt > 0 ? ' • Qarz: ' + formatMoney(unpaidAmt) : ''}${canDragMove ? ' (Surib ko‘chirish yoki o‘ng chetidan cho‘zib kun qo‘shish mumkin)' : ''}" class="booking-bar ${barClass} ${canDragMove ? 'is-draggable' : ''}" data-booking-id="${b.id}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span>${debtBadgeHtml}${resizeHandleHtml}</div>`;
+                const lateTitlePart = isLateOut ? ` • ⏰ ${lateLabels.tooltip}` : '';
+                barHtml += `<div draggable="false" ${downHandler} onclick="event.stopPropagation(); if(!justFinishedResizing && !justFinishedMoving) openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}${lateTitlePart}${unpaidAmt > 0 ? ' • Qarz: ' + formatMoney(unpaidAmt) : ''}${canDragMove ? ' (Surib ko‘chirish yoki o‘ng chetidan cho‘zib kun qo‘shish mumkin)' : ''}" class="booking-bar ${barClass} ${canDragMove ? 'is-draggable' : ''}" data-booking-id="${b.id}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span><span class="flex items-center shrink-0">${lateBadgeHtml}${debtBadgeHtml}</span>${resizeHandleHtml}</div>`;
               }
             });
             const todayLine = dt.isToday ? `<div class="today-line" style="left:${todayPct}%;"></div>` : '';
@@ -4260,7 +4374,7 @@
       const dayStartMs = getLocalMs(dateIso, '12:00');
       const dayEndMs = getLocalMs(addDays(dateIso, 1), '12:00');
       return list.some(b => {
-        if (b.room !== roomId || b.status === 'Bekor qilingan') return false;
+        if (b.room !== roomId || b.status === 'Bekor qilingan' || b.status === 'Chiqdi') return false;
         const cIn = toIsoDate(b.checkIn);
         const cOut = toIsoDate(b.checkOut);
         if (!cIn || !cOut) return false;
@@ -4986,6 +5100,16 @@
       const isOooBooking = b.status === "Ta'mirda";
       const oooInfoEl = document.getElementById('drawerOooInfo');
       if (oooInfoEl) oooInfoEl.classList.toggle('hidden', !isOooBooking);
+      const isLateBooking = isBookingLateCheckout(b);
+      const lateInfoEl = document.getElementById('drawerLateCheckoutInfo');
+      const lateTitleEl = document.getElementById('drawerLateCheckoutTitle');
+      const lateTextEl = document.getElementById('drawerLateCheckoutText');
+      if (lateInfoEl) lateInfoEl.classList.toggle('hidden', !isLateBooking);
+      if (isLateBooking) {
+        const lbl = getLateCheckoutLabels(b);
+        if (lateTitleEl) lateTitleEl.textContent = lbl.drawerTitle;
+        if (lateTextEl) lateTextEl.textContent = lbl.drawerMsg;
+      }
 
       const isClosedBooking = (b.status === 'Chiqdi' || b.status === 'Bekor qilingan');
       const isChief = isHotelChiefAdmin();
@@ -5254,7 +5378,7 @@
           <td class="p-3.5 font-bold text-emerald-600">${formatMoney(p)}</td>
           <td class="p-3.5 font-bold ${inDebt ? 'text-rose-600' : 'text-slate-400'}">${inDebt ? formatMoney(debt) : '0 so‘m'}</td>
           <td class="p-3.5 text-[11px]">${b.payType || "To'lanmagan"}</td>
-          <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${sc}">${b.status}</span></td>
+          <td class="p-3.5"><div class="flex flex-wrap items-center gap-1"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${sc}">${b.status}</span>${isBookingLateCheckout(b) ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-600 text-white animate-pulse">${getLateCheckoutLabels(b).pill}</span>` : ''}</div></td>
           <td class="p-3.5 text-right text-[#5b54e6] font-bold">Ochish →</td>
         </tr>`;
       }).join('');
@@ -5681,9 +5805,9 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
           <td class="p-3.5"><input type="text" id="editUserName_${idx}" value="${u.name}" class="edit-input w-full min-w-[140px] max-w-[190px]" /></td>
           <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-[#eef0ff] text-[#5b54e6] font-bold">${u.role}</span></td>
           <td class="p-3.5">
-            <div class="flex items-center gap-1">
-              <input type="password" id="editUserPin_${idx}" minlength="6" value="${u.pin}" class="edit-input w-full max-w-[100px] font-mono font-bold" />
-              <button type="button" onclick="toggleInputPassword('editUserPin_${idx}', this)" title="Ko‘rish / Yashirish" class="text-slate-400 hover:text-[#5b54e6] text-xs px-1">👁️</button>
+            <div class="inline-flex items-center gap-1">
+              <input type="password" id="editUserPin_${idx}" minlength="6" value="${u.pin}" class="edit-input w-20 font-mono font-bold" />
+              <button type="button" onclick="toggleInputPassword('editUserPin_${idx}', this)" title="Ko‘rish / Yashirish" class="text-slate-400 hover:text-[#5b54e6] text-xs px-1 shrink-0">👁️</button>
             </div>
           </td>
           <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${u.active ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${u.active ? 'Faol' : 'Bloklangan'}</span></td>
@@ -6113,6 +6237,10 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
         '❌ Bekor qilish / O‘chirishda': '❌ При отмене / удалении',
         '🔒 Smena yopilganda (Z-hisobot)': '🔒 При закрытии смены (Z-отчёт)',
         '💸 Smenada xarajat yozilganda': '💸 При расходе в смене',
+        '⏰ Kech chiqish (Late check-out)': '⏰ Поздний выезд (Late check-out)',
+        '🏁 Hoziroq Check-out qilish': '🏁 Выполнить Check-out сейчас',
+        'KECH CHIQISH (LATE CHECK-OUT)': 'ПОЗДНИЙ ВЫЕЗД (LATE CHECK-OUT)',
+        'Belgilangan chiqish vaqtidan o‘tib ketdi!': 'Время выезда просрочено!',
         'Band (To‘langan)': 'Заселён (Оплачено)',
         'Qisman to‘langan': 'Частично оплачено',
         'Qarzdor': 'Должник',
@@ -6361,6 +6489,10 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
         '❌ Bekor qilish / O‘chirishda': '❌ On cancel / delete',
         '🔒 Smena yopilganda (Z-hisobot)': '🔒 On shift close (Z-report)',
         '💸 Smenada xarajat yozilganda': '💸 On shift expense',
+        '⏰ Kech chiqish (Late check-out)': '⏰ Late check-out (Overdue)',
+        '🏁 Hoziroq Check-out qilish': '🏁 Check-out Now',
+        'KECH CHIQISH (LATE CHECK-OUT)': 'LATE CHECK-OUT (OVERDUE)',
+        'Belgilangan chiqish vaqtidan o‘tib ketdi!': 'Scheduled check-out time has passed!',
         'Band (To‘langan)': 'Checked-in (Paid)',
         'Qisman to‘langan': 'Partially paid',
         'Qarzdor': 'Unpaid',
@@ -6592,7 +6724,19 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       localStorage.setItem('rh_lang', lang);
       document.documentElement.lang = lang;
       updateLangButtonsUI();
-      if (currentUser) refreshAllViews(true);
+      if (currentUser) {
+        refreshAllViews(true);
+        if (activeDrawerBookingId) {
+          const openB = bookings.find(x => x.id === activeDrawerBookingId);
+          if (openB && isBookingLateCheckout(openB)) {
+            const lbl = getLateCheckoutLabels(openB);
+            const lt = document.getElementById('drawerLateCheckoutTitle');
+            const lm = document.getElementById('drawerLateCheckoutText');
+            if (lt) lt.textContent = lbl.drawerTitle;
+            if (lm) lm.textContent = lbl.drawerMsg;
+          }
+        }
+      }
       applyLanguageToSubtree(document.body);
     }
 
