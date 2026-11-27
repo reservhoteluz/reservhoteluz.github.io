@@ -32,7 +32,7 @@
     .sticky-corner-clean { position: sticky; top: 0; left: 155px; z-index: 40; width: 75px; min-width: 75px; }
     .sticky-footer-bottom { position: sticky; bottom: 0; z-index: 28; background: #f2f4ff; border-top: 2px solid #cbd5e1; }
 
-    /* Mobil ekranlar uchun qulay shaxmatka va pastki ilova menyusi */
+    /* Mobil ekranlar uchun qulay bronlar kalendari va pastki ilova menyusi */
     @media (max-width: 767px) {
       .matrix-container {
         max-height: calc(100vh - 225px);
@@ -1361,7 +1361,7 @@
       <!-- SINOV MUDDATI (DEMO) ESLATMA BANNERI -->
       <div id="trialStatusBanner" class="hidden px-5 py-2.5 text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shrink-0 border-b"></div>
 
-      <!-- ==================== TAB 1: SHAXMATKA KALENDARI ==================== -->
+      <!-- ==================== TAB 1: BRONLAR KALENDARI ==================== -->
       <main id="tab-matrix" class="tab-content flex-1 flex flex-col p-2.5 sm:p-4 overflow-hidden">
         <!-- YANGI DEMO MIJOZLAR UCHUN 3 QADAMLI TEZ BOSHLASH (ONBOARDING) -->
         <div id="onboardingGuideCard" class="hidden mb-2.5 p-3 rounded-xl bg-gradient-to-r from-[#eef0ff] via-white to-emerald-50/70 border border-[#5b54e6]/30 shadow-2xs">
@@ -7102,7 +7102,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
         // Sidebar & Nav
         'Mehmonxonalar ro‘yxati': 'Список отелей',
         'Yangi mehmonxona qo‘shish': 'Добавить новый отель',
-        'Bronlar kalendari': 'Шахматка (Календарь)',
+        'Bronlar kalendari': 'Календарь броней',
         'Kunlik hisobot': 'Ежедневный отчёт',
         'Bronlar va Mehmonlar': 'Брони и Гости',
         'Moliya va Kassa': 'Финансы и Касса',
@@ -7354,7 +7354,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
         // Sidebar & Nav
         'Mehmonxonalar ro‘yxati': 'Hotels list',
         'Yangi mehmonxona qo‘shish': 'Add new hotel',
-        'Bronlar kalendari': 'Room Calendar',
+        'Bronlar kalendari': 'Bookings Calendar',
         'Kunlik hisobot': 'Daily Report',
         'Bronlar va Mehmonlar': 'Bookings & Guests',
         'Moliya va Kassa': 'Finance & Cash',
@@ -7734,7 +7734,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
             ]
           },
           {
-            label: '📅 Shaxmatka',
+            label: '📅 Bronlar kalendari',
             title: 'Intellektual Kalendar — 0% Overbooking',
             desc: 'Sichqoncha bilan bronlarni surib ko‘chiring, muddatni cho‘zing va kechikkan mehmonlarni real vaqtda nazorat qiling.',
             vis: `
@@ -7843,8 +7843,8 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
             ]
           },
           {
-            label: '📅 Шахматка',
-            title: 'Интеллектуальная шахматка — 0% Овербукинга',
+            label: '📅 Календарь броней',
+            title: 'Интеллектуальный календарь броней — 0% Овербукинга',
             desc: 'Переносите брони одним движением мыши, продлевайте проживание и контролируйте поздний выезд в реальном времени.',
             vis: `
               <div class="rounded-xl bg-white/5 border border-indigo-400/25 p-2.5 space-y-1.5 text-[10px] font-bold">
@@ -7952,8 +7952,8 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
             ]
           },
           {
-            label: '📅 Room Matrix',
-            title: 'Smart Reservation Matrix — 0% Overbooking',
+            label: '📅 Bookings Calendar',
+            title: 'Smart Bookings Calendar — 0% Overbooking',
             desc: 'Drag and drop bookings across rooms, extend stays in seconds, and spot late check-outs with live visual alerts.',
             vis: `
               <div class="rounded-xl bg-white/5 border border-indigo-400/25 p-2.5 space-y-1.5 text-[10px] font-bold">
