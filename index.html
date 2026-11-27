@@ -1922,7 +1922,7 @@
       return rhAuthSession.idToken;
     }
 
-    async function firebaseAuthSignUp(email, password) {
+    async function firebaseAuthSignUp(email, password, saveSession = true) {
       const cleanEmail = String(email || '').trim().toLowerCase();
       const cleanPass = String(password || '').trim();
       const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${encodeURIComponent(FIREBASE_CONFIG.apiKey)}`, {
@@ -1935,7 +1935,7 @@
         const code = (data && data.error && data.error.message) || 'AUTH_SIGNUP_FAILED';
         return { ok: false, code, error: data.error };
       }
-      saveAuthSession(data);
+      if (saveSession) saveAuthSession(data);
       return { ok: true, data };
     }
 
@@ -2293,38 +2293,58 @@
         await loadSaasRegistry();
         if (currentHotelId === DEFAULT_HOTEL_ID) await migrateLegacyFayzDataIfNeeded();
         const res = await dbGet(`/hotels/${currentHotelId}.json`);
+        if (!res.ok) {
+          throw new Error(`HTTP_${res.status}`);
+        }
         const data = await res.json();
-        if (data) {
-          bookings = Array.isArray(data.bookings) ? data.bookings : (data.bookings ? Object.values(data.bookings) : []);
+        if (data && typeof data === 'object' && !data.error) {
+          const cloudBookings = Array.isArray(data.bookings) ? data.bookings : (data.bookings ? Object.values(data.bookings) : []);
           const cloudRooms = Array.isArray(data.rooms) ? data.rooms : (data.rooms ? Object.values(data.rooms) : null);
-          if (cloudRooms && cloudRooms.length > 0 && activeTabName !== 'rates') rooms = cloudRooms;
-          else if (!cloudRooms || cloudRooms.length === 0) rooms = currentHotelId === DEFAULT_HOTEL_ID ? DEFAULT_FAYZ_ROOMS : DEFAULT_NEW_HOTEL_ROOMS;
-          if (activeTabName !== 'users') allowedUsers = Array.isArray(data.users) ? data.users : (data.users ? Object.values(data.users) : []);
-          dailyExpenses = Array.isArray(data.dailyExpenses) ? data.dailyExpenses : (data.dailyExpenses ? Object.values(data.dailyExpenses) : []);
-          dailyManualEntries = Array.isArray(data.dailyManualEntries) ? data.dailyManualEntries : (data.dailyManualEntries ? Object.values(data.dailyManualEntries) : []);
-          dailyShiftAdmins = (data.dailyShiftAdmins && typeof data.dailyShiftAdmins === 'object') ? data.dailyShiftAdmins : {};
-          dailyShiftLocks = (data.dailyShiftLocks && typeof data.dailyShiftLocks === 'object') ? data.dailyShiftLocks : {};
-          auditLogs = Array.isArray(data.auditLogs) ? data.auditLogs : (data.auditLogs ? Object.values(data.auditLogs) : []);
-          if (data.hotelShiftCount) hotelShiftCount = Math.min(4, Math.max(1, Number(data.hotelShiftCount) || 2));
-          const upgradedPins = upgradeLegacyUserPins();
-          saveAllLocal();
-          if (upgradedPins) {
-            await saveSaasRegistry();
+          const cloudUsers = Array.isArray(data.users) ? data.users : (data.users ? Object.values(data.users) : []);
+          const cloudExpenses = Array.isArray(data.dailyExpenses) ? data.dailyExpenses : (data.dailyExpenses ? Object.values(data.dailyExpenses) : []);
+          const cloudManual = Array.isArray(data.dailyManualEntries) ? data.dailyManualEntries : (data.dailyManualEntries ? Object.values(data.dailyManualEntries) : []);
+
+          // Never wipe local bookings/entries with an empty cloud response if local data exists
+          const hasCloudPayload = cloudBookings.length > 0 || cloudManual.length > 0 || cloudExpenses.length > 0 || (cloudRooms && cloudRooms.length > 0);
+          const hasLocalPayload = (Array.isArray(bookings) && bookings.length > 0) || (Array.isArray(dailyManualEntries) && dailyManualEntries.length > 0);
+
+          if (hasCloudPayload || !hasLocalPayload) {
+            bookings = cloudBookings;
+            if (cloudRooms && cloudRooms.length > 0 && activeTabName !== 'rates') rooms = cloudRooms;
+            else if (!cloudRooms || cloudRooms.length === 0) rooms = currentHotelId === DEFAULT_HOTEL_ID ? DEFAULT_FAYZ_ROOMS : DEFAULT_NEW_HOTEL_ROOMS;
+            if (activeTabName !== 'users') allowedUsers = cloudUsers;
+            dailyExpenses = cloudExpenses;
+            dailyManualEntries = cloudManual;
+            dailyShiftAdmins = (data.dailyShiftAdmins && typeof data.dailyShiftAdmins === 'object') ? data.dailyShiftAdmins : {};
+            dailyShiftLocks = (data.dailyShiftLocks && typeof data.dailyShiftLocks === 'object') ? data.dailyShiftLocks : {};
+            auditLogs = Array.isArray(data.auditLogs) ? data.auditLogs : (data.auditLogs ? Object.values(data.auditLogs) : []);
+            if (data.hotelShiftCount) hotelShiftCount = Math.min(4, Math.max(1, Number(data.hotelShiftCount) || 2));
+            const upgradedPins = upgradeLegacyUserPins();
+            saveAllLocal();
+            if (upgradedPins) {
+              await saveSaasRegistry();
+              await pushAllToCloud(false);
+            }
+          }
+        } else if (!data) {
+          const hasLocalPayload = (Array.isArray(bookings) && bookings.length > 0) || (Array.isArray(dailyManualEntries) && dailyManualEntries.length > 0);
+          if (!hasLocalPayload) {
+            const hotelMeta = saasRegistry.hotels[currentHotelId];
+            rooms = currentHotelId === DEFAULT_HOTEL_ID ? DEFAULT_FAYZ_ROOMS : DEFAULT_NEW_HOTEL_ROOMS;
+            bookings = [];
+            allowedUsers = hotelMeta ? [{ email: hotelMeta.ownerEmail, name: hotelMeta.ownerName, role: 'Admin', pin: hotelMeta.ownerPin, active: true, isOwner: true }] : [];
+            dailyExpenses = []; dailyManualEntries = []; dailyShiftAdmins = {}; dailyShiftLocks = {}; auditLogs = [];
+            saveAllLocal();
+            await pushAllToCloud(false);
+          } else {
+            // Local data exists while cloud node is empty -> push local data up safely
             await pushAllToCloud(false);
           }
-        } else {
-          const hotelMeta = saasRegistry.hotels[currentHotelId];
-          rooms = currentHotelId === DEFAULT_HOTEL_ID ? DEFAULT_FAYZ_ROOMS : DEFAULT_NEW_HOTEL_ROOMS;
-          bookings = [];
-          allowedUsers = hotelMeta ? [{ email: hotelMeta.ownerEmail, name: hotelMeta.ownerName, role: 'Admin', pin: hotelMeta.ownerPin, active: true, isOwner: true }] : [];
-          dailyExpenses = []; dailyManualEntries = []; dailyShiftAdmins = {}; dailyShiftLocks = {}; auditLogs = [];
-          saveAllLocal();
-          await pushAllToCloud(false);
         }
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
         updateHotelSwitcherUI();
         if (currentUser && !isDragging) refreshAllViews(activeTabName !== 'rates' && activeTabName !== 'users');
-        if (showAlert) alert('Barcha ma\'lumotlar bulutli bazadan yangilandi!');
+        if (showAlert) alert('Barcha ma’lumotlar bulutli bazadan yangilandi!');
       } catch (err) {
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Ulanish xatosi';
       } finally { isSyncingNow = false; }
@@ -2868,6 +2888,7 @@
       const isYearlyPlan = lp.includes('yillik');
       const trialDays = isDemoPlan ? Math.max(1, Number(document.getElementById('newHotelTrialDays').value) || 7) : (isYearlyPlan ? 365 : 0);
       const trialExpiresAt = trialDays > 0 ? addDays(toIsoDate(new Date()), trialDays) : '';
+      await firebaseAuthSignUp(ownerEmail, ownerPin, false);
       saasRegistry.hotels[newHotelId] = { id: newHotelId, name, ownerEmail, ownerName, ownerPin, plan, trialDays, trialExpiresAt, active: true, createdAt: toIsoDate(new Date()) };
       saasRegistry.emailMap[ownerEmail] = { hotelId: newHotelId, name: ownerName, role: 'Admin', pin: ownerPin, active: true, isOwner: true };
       await saveSaasRegistry();
@@ -5098,7 +5119,7 @@
       if (pwdErr) { alert(pwdErr); return; }
       if (saasRegistry.emailMap[email]) { alert('Ushbu Gmail manzili tizimda allaqachon bor!'); return; }
 
-      await firebaseAuthSignUp(email, pin);
+      await firebaseAuthSignUp(email, pin, false);
       allowedUsers.push({ email, name, role, pin, active: true, isOwner: false });
       saasRegistry.emailMap[email] = { hotelId: currentHotelId, name, role, pin, active: true, isOwner: false };
       saveAllLocal(); renderAllowedUsers(); await saveSaasRegistry(); await pushAllToCloud(false); e.target.reset();
