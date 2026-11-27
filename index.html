@@ -1694,13 +1694,14 @@
           </div>
           <form onsubmit="saveTelegramSettings(event)" class="p-5 space-y-4 text-xs">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block font-bold text-[#131b3a] mb-1">1. Telegram Bot Token (@BotFather dan olinadi)</label>
-                <div class="flex items-center gap-1.5">
-                  <input type="password" id="tgBotTokenInput" autocomplete="off" placeholder="1234567890:AAHxxxxxxxxxxxxxxxxxxxxxxxx" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono text-xs bg-white focus:outline-none focus:ring-2 focus:ring-sky-500" />
-                  <button type="button" onclick="toggleInputPassword('tgBotTokenInput', this)" title="Ko‘rish / Yashirish" class="px-2.5 py-2 rounded-xl border border-slate-300 bg-slate-50 hover:bg-slate-100 text-xs">👁️</button>
+              <div class="p-3.5 rounded-xl bg-sky-50/80 border border-sky-200 flex flex-col justify-between gap-2">
+                <div>
+                  <div class="font-bold text-[#131b3a] text-xs">1. ReservHotel Rasmiy Telegram Boti</div>
+                  <div id="tgGlobalBotInfoBox" class="text-[11px] text-slate-600 mt-1">Botga kiring va <b>Start</b> tugmasini bosing (yoki rahbarlar guruhiga qo‘shing).</div>
                 </div>
-                <p class="text-[10.5px] text-slate-500 mt-1">Telegramda <b>@BotFather</b> ga kirib <code>/newbot</code> buyrug‘i orqali 30 soniyada shaxsiy bot oching.</p>
+                <a id="tgGlobalBotLink" href="#" target="_blank" class="hidden inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition">
+                  <span>✈️</span> <span id="tgGlobalBotLinkText">Botni ochish</span>
+                </a>
               </div>
               <div>
                 <label class="block font-bold text-[#131b3a] mb-1">2. Rahbar (yoki Guruh) Chat ID raqami</label>
@@ -1708,7 +1709,7 @@
                   <input type="text" id="tgChatIdInput" autocomplete="off" placeholder="Masalan: 987654321 yoki -1001234567890" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-xs bg-white focus:outline-none focus:ring-2 focus:ring-sky-500" />
                   <button type="button" onclick="detectTelegramChatId()" class="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-[11px] shrink-0 transition">🔍 Avto-topish</button>
                 </div>
-                <p class="text-[10.5px] text-slate-500 mt-1">Botingizga kirib <b>Start</b> bosing, so‘ng «🔍 Avto-topish» tugmasini bosing — ID o‘zi topiladi.</p>
+                <p class="text-[10.5px] text-slate-500 mt-1">Botga <b>Start</b> bosgandan so‘ng «🔍 Avto-topish» tugmasini bosing — Chat ID o‘zi chiqadi.</p>
               </div>
             </div>
 
@@ -1843,6 +1844,33 @@
               </button>
             </form>
           </div>
+        </div>
+
+        <!-- 2.5 YAGONA GLOBAL TELEGRAM BOT (BARCHA MEHMONXONALAR UCHUN) -->
+        <div class="bg-white/95 rounded-xl border border-sky-200 p-4 space-y-3 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h4 class="font-bold text-[#131b3a] text-sm">🤖 Yagona Global Telegram Bot (Barcha mehmonxonalar uchun)</h4>
+              <p class="text-[11px] text-slate-500">Bitta bot tokenini shu yerga kiriting — barcha mehmonxonalar alohida bot ochmasdan, faqat o‘z Chat ID sini ulab ishlataveradi</p>
+            </div>
+            <span id="saasGlobalBotStatusBadge" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold">Ulanmagan</span>
+          </div>
+          <form onsubmit="saveGlobalTelegramBot(event)" class="grid grid-cols-1 md:grid-cols-12 gap-2.5 text-xs items-center">
+            <div class="md:col-span-3">
+              <input type="text" id="saasGlobalTgUsername" placeholder="@ReservHotel_bot"
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white font-bold text-[#131b3a]" />
+            </div>
+            <div class="md:col-span-6 flex items-center gap-1.5">
+              <input type="password" id="saasGlobalTgToken" autocomplete="off" placeholder="1234567890:AAHxxxxxxxxxxxxxxxxxxxxxxxx (BotFather Token)"
+                class="flex-1 px-3 py-2 border border-slate-300 rounded-lg font-mono bg-white focus:outline-none focus:ring-2 focus:ring-sky-500" />
+              <button type="button" onclick="toggleInputPassword('saasGlobalTgToken', this)" title="Ko‘rish / Yashirish" class="px-2.5 py-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100">👁️</button>
+            </div>
+            <div class="md:col-span-3">
+              <button type="submit" class="w-full py-2 px-4 bg-gradient-to-r from-[#5b54e6] to-[#0284c7] hover:opacity-95 text-white font-bold rounded-lg shadow-xs">
+                💾 Global Botni saqlash
+              </button>
+            </div>
+          </form>
         </div>
 
         <!-- 3. MIJOZLAR JADVALI (MINI-CRM, FAOLLIK, FEATURE FLAGS, O'CHIRISH) -->
@@ -2956,6 +2984,7 @@
           if (reg.ceo.pinHash) localStorage.setItem('rh_saas_ceo_hash', String(reg.ceo.pinHash));
         }
         saasRegistry.broadcast = (reg && reg.broadcast && typeof reg.broadcast === 'object') ? reg.broadcast : { active: false, type: 'info', text: '' };
+        saasRegistry.globalTelegramBot = (reg && reg.globalTelegramBot && typeof reg.globalTelegramBot === 'object') ? reg.globalTelegramBot : { token: '', username: '' };
         if (!saasRegistry.hotels.fayz_house) {
           saasRegistry.hotels.fayz_house = { id: 'fayz_house', name: 'Fayz House', ownerEmail: MASTER_ADMIN_EMAIL, ownerName: 'Bosh Administrator', ownerPinHash: MASTER_FALLBACK_HASH, plan: 'Umrbod litsenziya (Asosiy)', active: true, createdAt: '2026-01-01' };
         }
@@ -2981,6 +3010,9 @@
       }
       if (saasRegistry.broadcast) {
         patch['broadcast'] = saasRegistry.broadcast;
+      }
+      if (saasRegistry.globalTelegramBot) {
+        patch['globalTelegramBot'] = saasRegistry.globalTelegramBot;
       }
       await dbPatch('/saas_registry.json', patch);
     }
@@ -3760,6 +3792,24 @@
       el.classList.remove('hidden');
     }
 
+    async function saveGlobalTelegramBot(e) {
+      e.preventDefault();
+      if (!isMasterAdmin()) return;
+      const username = String((document.getElementById('saasGlobalTgUsername') && document.getElementById('saasGlobalTgUsername').value) || '').trim();
+      const token = String((document.getElementById('saasGlobalTgToken') && document.getElementById('saasGlobalTgToken').value) || '').trim();
+      saasRegistry.globalTelegramBot = { username, token, updatedAt: new Date().toISOString() };
+      await patchSaasRegistry({ globalTelegramBot: saasRegistry.globalTelegramBot });
+      renderSaasHotels();
+      renderTelegramSettingsUI();
+      showToast(token ? '🤖 Yagona Global Telegram Bot barcha mehmonxonalar uchun ulandi!' : 'Global Telegram Bot o‘chirildi.', 'success');
+    }
+
+    function getActiveTelegramBotToken(fallbackCfg = null) {
+      const gTok = saasRegistry.globalTelegramBot && String(saasRegistry.globalTelegramBot.token || '').trim();
+      if (gTok) return gTok;
+      return String((fallbackCfg && fallbackCfg.botToken) || (telegramSettings && telegramSettings.botToken) || '').trim();
+    }
+
     async function saveGlobalBroadcast(e) {
       e.preventDefault();
       if (!isMasterAdmin()) return;
@@ -3888,6 +3938,18 @@ Davom etasizmi?`, {
       if (bcAct) bcAct.checked = Boolean(bc.active);
       if (bcType) bcType.value = bc.type || 'info';
       if (bcText && document.activeElement !== bcText) bcText.value = bc.text || '';
+      const gBot = saasRegistry.globalTelegramBot || { token: '', username: '' };
+      const gUserEl = document.getElementById('saasGlobalTgUsername');
+      const gTokEl = document.getElementById('saasGlobalTgToken');
+      const gBadge = document.getElementById('saasGlobalBotStatusBadge');
+      if (gUserEl && document.activeElement !== gUserEl) gUserEl.value = gBot.username || '';
+      if (gTokEl && document.activeElement !== gTokEl) gTokEl.value = gBot.token || '';
+      if (gBadge) {
+        gBadge.textContent = gBot.token ? 'Faol ✓' : 'Ulanmagan';
+        gBadge.className = gBot.token
+          ? 'px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-700 text-[11px] font-bold'
+          : 'px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold';
+      }
 
       // Compute SaaS Analytics KPIs
       const allHotels = Object.values(saasRegistry.hotels || {});
@@ -6386,6 +6448,23 @@ Davom etasizmi?`, {
       return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    function getHotelTelegramStartCode() {
+      return String(currentHotelId || 'hotel').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60);
+    }
+
+    function copyTelegramGroupCommand() {
+      const cmd = `/start ${getHotelTelegramStartCode()}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cmd).then(() => {
+          showToast(`📋 Nusxalandi: ${cmd} — endi guruhingizga yuboring!`, 'success', 3200);
+        }).catch(() => {
+          showToast(`Guruhga yozing: ${cmd}`, 'info', 4000);
+        });
+      } else {
+        showToast(`Guruhga yozing: ${cmd}`, 'info', 4000);
+      }
+    }
+
     function renderTelegramSettingsUI() {
       const sec = document.getElementById('telegramNotifySection');
       if (!sec) return;
@@ -6395,10 +6474,31 @@ Davom etasizmi?`, {
       }
       sec.classList.remove('hidden');
       const cfg = telegramSettings || DEFAULT_TELEGRAM_SETTINGS;
+      const gBot = saasRegistry.globalTelegramBot || { token: '', username: '' };
+      const infoBox = document.getElementById('tgGlobalBotInfoBox');
+      const linkEl = document.getElementById('tgGlobalBotLink');
+      const linkTxt = document.getElementById('tgGlobalBotLinkText');
+      const startCode = getHotelTelegramStartCode();
+      if (gBot.token) {
+        const cleanUser = String(gBot.username || '').replace(/^@/, '').trim();
+        if (infoBox) infoBox.innerHTML = cleanUser
+          ? `Rasmiy bot: <b>@${escapeTgHtml(cleanUser)}</b>. Shaxsiy chat uchun pastdagi tugmani bosing. Guruh uchun botni qo‘shib <button type="button" onclick="copyTelegramGroupCommand()" class="px-1.5 py-0.5 rounded bg-white border border-sky-300 font-mono font-bold text-sky-800 hover:bg-sky-100 transition" title="Nusxalash">/start ${escapeTgHtml(startCode)} 📋</button> yuboring.`
+          : `Yagona ReservHotel Telegram boti ulangan ✓. Botga <button type="button" onclick="copyTelegramGroupCommand()" class="px-1.5 py-0.5 rounded bg-white border border-sky-300 font-mono font-bold text-sky-800 hover:bg-sky-100 transition">/start ${escapeTgHtml(startCode)} 📋</button> yuboring.`;
+        if (linkEl && cleanUser) {
+          linkEl.href = `https://t.me/${cleanUser}?start=${encodeURIComponent(startCode)}`;
+          if (linkTxt) linkTxt.textContent = `@${cleanUser} ni ochish (Noyob kod bilan) →`;
+          linkEl.classList.remove('hidden');
+        } else if (linkEl) {
+          linkEl.classList.add('hidden');
+        }
+      } else {
+        if (infoBox) infoBox.innerHTML = `<span class="text-amber-700 font-semibold">⚠️ Global Telegram Bot hali tizim rahbari (CEO) tomonidan ulanmagan.</span>`;
+        if (linkEl) linkEl.classList.add('hidden');
+      }
+
       const setVal = (id, val) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = val || ''; };
       const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = Boolean(val); };
       setChk('tgEnabledToggle', cfg.enabled);
-      setVal('tgBotTokenInput', cfg.botToken);
       setVal('tgChatIdInput', cfg.chatId);
       setChk('tgEvtNewBooking', cfg.onNewBooking !== false);
       setChk('tgEvtPayment', cfg.onPayment !== false);
@@ -6411,7 +6511,6 @@ Davom etasizmi?`, {
     function readTelegramSettingsFromForm() {
       return {
         enabled: Boolean(document.getElementById('tgEnabledToggle') && document.getElementById('tgEnabledToggle').checked),
-        botToken: String((document.getElementById('tgBotTokenInput') && document.getElementById('tgBotTokenInput').value) || '').trim(),
         chatId: String((document.getElementById('tgChatIdInput') && document.getElementById('tgChatIdInput').value) || '').trim(),
         onNewBooking: Boolean(document.getElementById('tgEvtNewBooking') && document.getElementById('tgEvtNewBooking').checked),
         onPayment: Boolean(document.getElementById('tgEvtPayment') && document.getElementById('tgEvtPayment').checked),
@@ -6429,11 +6528,11 @@ Davom etasizmi?`, {
         return;
       }
       const nextCfg = readTelegramSettingsFromForm();
-      if (nextCfg.enabled && (!nextCfg.botToken || !nextCfg.chatId)) {
-        showToast('⚠️ Bildirishnomalarni yoqish uchun Bot Token va Chat ID ni kiriting!', 'error');
+      if (nextCfg.enabled && !nextCfg.chatId) {
+        showToast('⚠️ Bildirishnomalarni yoqish uchun Chat ID raqamini kiriting!', 'error');
         return;
       }
-      telegramSettings = nextCfg;
+      telegramSettings = { ...DEFAULT_TELEGRAM_SETTINGS, ...nextCfg };
       recordAuditAction('Telegram sozlamalari saqlandi', `Holat: ${nextCfg.enabled ? 'Yoqilgan' : 'O‘chirilgan'} • Chat ID: ${nextCfg.chatId || '-'}`);
       saveAllLocal();
       await patchHotelCloud({ telegramSettings });
@@ -6441,33 +6540,41 @@ Davom etasizmi?`, {
     }
 
     async function detectTelegramChatId() {
-      const token = String((document.getElementById('tgBotTokenInput') && document.getElementById('tgBotTokenInput').value) || '').trim();
+      const token = getActiveTelegramBotToken();
       if (!token) {
-        showToast('⚠️ Avval 1-maydonga Telegram Bot Tokenni kiriting!', 'error');
+        showToast('⚠️ Global Telegram Bot hali CEO panelida ulanmagan!', 'error');
         return;
       }
+      const startCode = getHotelTelegramStartCode();
+      const targetLower = startCode.toLowerCase();
+      const hotelName = (saasRegistry.hotels && saasRegistry.hotels[currentHotelId] && saasRegistry.hotels[currentHotelId].name) || currentHotelId;
       try {
-        const res = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/getUpdates?limit=15`);
+        const res = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/getUpdates?limit=50`);
         const data = await res.json();
         if (!data || !data.ok) {
-          showToast('⛔ Bot Token noto‘g‘ri yoki Telegramga ulanib bo‘lmadi!', 'error');
+          showToast('⛔ Global Bot Token noto‘g‘ri yoki Telegramga ulanib bo‘lmadi!', 'error');
           return;
         }
         const updates = Array.isArray(data.result) ? data.result : [];
         let foundChat = null;
         for (let i = updates.length - 1; i >= 0; i--) {
           const u = updates[i];
-          const chat = (u.message && u.message.chat) || (u.my_chat_member && u.my_chat_member.chat) || (u.channel_post && u.channel_post.chat);
-          if (chat && chat.id) { foundChat = chat; break; }
+          const msg = u.message || u.channel_post;
+          if (!msg || !msg.chat || !msg.chat.id) continue;
+          const txt = String(msg.text || msg.caption || '').trim().toLowerCase();
+          if (txt.includes(targetLower)) {
+            foundChat = msg.chat;
+            break;
+          }
         }
         if (!foundChat) {
-          showToast('ℹ️ Chat ID topilmadi! Telegramda botingizga kirib /start bosing va yana urinib ko‘ring.', 'info', 4800);
+          showToast(`ℹ️ "${hotelName}" uchun noyob ulash kodi topilmadi! Botni yuqoridagi tugma orqali ochib Start bosing (yoki guruhda /start ${startCode} yozing) va qayta bosing.`, 'info', 5500);
           return;
         }
         const chatInp = document.getElementById('tgChatIdInput');
         if (chatInp) chatInp.value = String(foundChat.id);
         const title = foundChat.title || [foundChat.first_name, foundChat.last_name].filter(Boolean).join(' ') || foundChat.username || 'Telegram';
-        showToast(`✅ Chat ID topildi: ${foundChat.id} (${title})`, 'success', 4200);
+        showToast(`✅ "${hotelName}" uchun Chat ID topildi: ${foundChat.id} (${title})`, 'success', 4500);
       } catch (err) {
         showToast('⛔ Telegram API ga ulanishda xatolik yuz berdi.', 'error');
       }
@@ -6477,7 +6584,8 @@ Davom etasizmi?`, {
       if (!forceCfg && isCeoGhostMode()) return { ok: false, reason: 'ghost_mode' };
       if (!forceCfg && !isHotelFeatureEnabled('telegram')) return { ok: false, reason: 'feature_disabled' };
       const cfg = forceCfg || telegramSettings;
-      if (!cfg || !cfg.botToken || !cfg.chatId) return { ok: false, reason: 'missing_config' };
+      const botToken = getActiveTelegramBotToken(cfg);
+      if (!cfg || !botToken || !cfg.chatId) return { ok: false, reason: 'missing_config' };
       if (!forceCfg && (!cfg.enabled || (eventKey && cfg[eventKey] === false))) return { ok: false, reason: 'disabled' };
       const hotel = (saasRegistry.hotels && saasRegistry.hotels[currentHotelId]) || { name: 'ReservHotel' };
       const actor = currentUser ? `${currentUser.name || 'Admin'} (${currentUser.role || ''})` : 'Tizim';
@@ -6486,7 +6594,7 @@ ${bodyHtml}
 
 👤 <i>${escapeTgHtml(actor)} • ${toIsoDate(new Date())} ${getCurrentTimeStr()}</i>`;
       try {
-        const res = await fetch(`https://api.telegram.org/bot${encodeURIComponent(cfg.botToken)}/sendMessage`, {
+        const res = await fetch(`https://api.telegram.org/bot${encodeURIComponent(botToken)}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -6505,8 +6613,13 @@ ${bodyHtml}
 
     async function sendTestTelegramNotification() {
       const cfg = readTelegramSettingsFromForm();
-      if (!cfg.botToken || !cfg.chatId) {
-        showToast('⚠️ Test yuborish uchun Bot Token va Chat ID ni kiriting!', 'error');
+      const token = getActiveTelegramBotToken(cfg);
+      if (!token) {
+        showToast('⚠️ Global Telegram Bot hali CEO panelida ulanmagan!', 'error');
+        return;
+      }
+      if (!cfg.chatId) {
+        showToast('⚠️ Test yuborish uchun Chat ID ni kiriting (yoki 🔍 Avto-topish bosing)!', 'error');
         return;
       }
       showToast('⏳ Test xabar yuborilmoqda...', 'info', 2000);
@@ -6515,7 +6628,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       if (result.ok) {
         showToast('✅ Test xabar Telegramga muvaffaqiyatli yetib bordi!', 'success');
       } else {
-        showToast(`⛔ Xabar yuborilmadi: ${result.description || 'Token yoki Chat ID ni tekshiring'}`, 'error', 5000);
+        showToast(`⛔ Xabar yuborilmadi: ${result.description || 'Chat ID ni tekshiring va botga /start bosing'}`, 'error', 5000);
       }
     }
 
