@@ -734,6 +734,147 @@
     body.dark-mode .rh-apple-sheen::before {
       background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(129, 140, 248, 0.14), transparent 72%);
     }
+  
+    /* ==================== APPLE PROMOTION 120 FPS ENGINE (macOS / iOS FLUIDITY) ==================== */
+    :root {
+      --apple-spring: cubic-bezier(0.22, 1, 0.36, 1);
+      --apple-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --apple-fast: 180ms;
+      --apple-med: 320ms;
+    }
+
+    html, body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* GPU-composited sticky layers so 120Hz scrolling never jitters */
+    .matrix-container {
+      transform: translateZ(0);
+      will-change: scroll-position;
+    }
+    .sticky-col-room, .sticky-col-clean, .sticky-header-top, .sticky-corner, .sticky-corner-clean, .sticky-footer-bottom {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    /* Keep 120fps (<8.3ms frame) even with hundreds of rows */
+    #bookingsTableBody tr,
+    #auditLogsBody tr,
+    #roomsConfigBody tr,
+    #saasHotelsBody tr {
+      content-visibility: auto;
+      contain-intrinsic-size: 48px;
+      transition: background-color 140ms var(--apple-spring);
+    }
+
+    /* macOS Sonoma / iOS 18 Frosted Glass Vibrancy */
+    header,
+    #mobileBottomNav,
+    #hotelSwitcherMenu,
+    #guestSuggestDropdown {
+      backdrop-filter: blur(22px) saturate(185%) !important;
+      -webkit-backdrop-filter: blur(22px) saturate(185%) !important;
+    }
+
+    /* Specular glass edge & spring physics for all modals */
+    #bookingModal > div,
+    #createHotelModal > div,
+    #cancelModal > div,
+    #tariffOfferModal > div,
+    #globalSearchModal > div,
+    #rhDialogModal > div {
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      box-shadow: 0 32px 70px -16px rgba(9, 13, 34, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.28) inset !important;
+    }
+
+    /* Ultra-fluid GPU slide-over drawer (120Hz) */
+    #guestDrawer {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: opacity 240ms var(--apple-spring);
+    }
+    #guestDrawerPanel {
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translate3d(100%, 0, 0);
+      transition: transform 360ms var(--apple-spring);
+    }
+    #guestDrawer.drawer-open #guestDrawerPanel {
+      transform: translate3d(0, 0, 0);
+    }
+
+    /* Tactile iOS/macOS spring press & hover lift */
+    button, .nav-btn, .mob-nav-btn {
+      -webkit-tap-highlight-color: transparent;
+      transition: transform var(--apple-fast) var(--apple-spring), background-color var(--apple-fast) ease, box-shadow var(--apple-fast) ease, color var(--apple-fast) ease;
+    }
+    button:active:not(:disabled) {
+      transform: scale(0.965) translateZ(0);
+    }
+
+    /* GPU-composited booking bars & cards */
+    .booking-bar {
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+      transition: transform 180ms var(--apple-spring), box-shadow 180ms var(--apple-spring), filter 180ms ease;
+    }
+    .booking-bar:hover {
+      transform: translate3d(0, -1.5px, 0) scale(1.008);
+    }
+    .booking-bar:active {
+      transform: scale(0.985) translateZ(0);
+    }
+
+    /* Smooth tab transition (GPU only) */
+    @keyframes appleTabGlide {
+      0% { opacity: 0; transform: translate3d(0, 10px, 0) scale(0.992); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    .tab-animate-in {
+      animation: appleTabGlide 280ms var(--apple-spring) forwards !important;
+      will-change: transform, opacity;
+    }
+
+    /* Dynamic Apple Glass Spotlight Sheen on KPI & Chart Cards */
+    .fin-kpi-card,
+    .fin-chart-card,
+    #tab-daily > div.grid > div,
+    #tab-saas > div.grid > div {
+      position: relative;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      transition: transform 260ms var(--apple-spring), box-shadow 260ms var(--apple-spring), border-color 220ms ease;
+    }
+    .fin-kpi-card:hover,
+    .fin-chart-card:hover,
+    #tab-daily > div.grid > div:hover,
+    #tab-saas > div.grid > div:hover {
+      transform: translate3d(0, -3px, 0);
+      box-shadow: 0 18px 34px -12px rgba(19, 27, 58, 0.18);
+    }
+
+    /* Smooth Toast with GPU translate3d */
+    @keyframes appleToastIn {
+      0% { opacity: 0; transform: translate3d(28px, 0, 0) scale(0.94); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    .rh-toast {
+      will-change: transform, opacity;
+      animation: appleToastIn 300ms var(--apple-spring) forwards !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
   </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -1121,6 +1262,14 @@
           </button>
         </div>
       </header>
+
+      <!-- GLOBAL E'LON BANNERI (CEO BROADCAST) -->
+      <div id="globalBroadcastBanner" class="hidden px-5 py-2 text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shrink-0 border-b"></div>
+      <!-- CEO GHOST / SUPPORT MODE INDIKATORI -->
+      <div id="ceoGhostBanner" class="hidden px-5 py-1.5 bg-slate-900 text-amber-300 text-[11px] font-bold flex items-center justify-between gap-2 shrink-0 border-b border-amber-400/30">
+        <span>👻 Ko‘rinmas rejim (Ghost Mode) YOQILGAN — harakatlaringiz «Amallar tarixi»ga yozilmaydi va mehmonxona Telegram botiga xabar bormaydi.</span>
+        <button type="button" onclick="toggleCeoGhostMode()" class="px-2.5 py-0.5 rounded bg-amber-400 text-[#131b3a] font-extrabold text-[10.5px] hover:bg-amber-300">O‘chirish</button>
+      </div>
 
       <!-- SINOV MUDDATI (DEMO) ESLATMA BANNERI -->
       <div id="trialStatusBanner" class="hidden px-5 py-2.5 text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shrink-0 border-b"></div>
@@ -1600,34 +1749,117 @@
       <main id="tab-saas" class="tab-content hidden flex-1 overflow-y-auto p-5 space-y-5">
         <div class="bg-gradient-to-r from-[#090d22] via-[#131b3a] to-[#5b54e6] text-white rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-md">
           <div>
-            <div class="text-xs font-bold text-amber-300 uppercase tracking-wider">👑 Master-Admin Boshqaruv Markazi</div>
-            <h3 class="text-lg font-extrabold mt-0.5">Sotilgan Mehmonxonalar va Umrbod Litsenziyalar</h3>
-            <p class="text-xs text-indigo-100/85 mt-1">Har bir mehmonxona alohida yopiq bazada ishlaydi • Barcha mijozlar va litsenziyalar nazorati</p>
+            <div class="text-xs font-bold text-amber-300 uppercase tracking-wider">👑 Master-Admin Boshqaruv Markazi (Faqat CEO)</div>
+            <h3 class="text-lg font-extrabold mt-0.5">SaaS Analitika, Mijozlar CRM va Global Nazorat</h3>
+            <p class="text-xs text-indigo-100/85 mt-1">Har bir mehmonxona alohida yopiq bazada ishlaydi • Litsenziyalar, tariflar va texnik yordam boshqaruvi</p>
           </div>
-          <button onclick="openCreateHotelModal()" class="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-[#131b3a] font-extrabold rounded-xl text-xs shadow-sm">+ Yangi mehmonxona (Mijoz) qo‘shish</button>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="ceoGhostToggleBtn" onclick="toggleCeoGhostMode()" class="px-3.5 py-2.5 bg-white/15 hover:bg-white/25 text-white border border-white/25 font-bold rounded-xl text-xs transition">
+              👻 Ko‘rinmas rejim: O‘chiq
+            </button>
+            <button type="button" onclick="downloadGlobalSaasBackup()" class="px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-[#090d22] font-extrabold rounded-xl text-xs shadow-sm transition">
+              💾 Global Backup
+            </button>
+            <button type="button" onclick="openCreateHotelModal()" class="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-[#131b3a] font-extrabold rounded-xl text-xs shadow-sm transition">
+              + Yangi mehmonxona
+            </button>
+          </div>
         </div>
 
-        <!-- CEO / CREATOR KODINI O'ZGARTIRISH PANELI -->
-        <div class="bg-white/95 rounded-xl border border-[#5b54e6]/30 p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
-          <div>
-            <h4 class="font-bold text-[#131b3a] text-sm">🔑 CEO / Creator kirish kodini o‘zgartirish</h4>
-            <p class="text-[11px] text-slate-500">Yangi kod kamida 6 ta belgidan iborat bo‘lishi kerak • Darhol bulut bazasida yangilanadi</p>
+        <!-- 1. SAAS MOLIYA VA SOTUV ANALITIKASI (KPI) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white/95 p-4 rounded-2xl border border-[#d8defa] shadow-sm">
+            <div class="text-[11px] font-bold text-slate-500 uppercase">🏨 Jami mehmonxonalar</div>
+            <div id="saasKpiTotal" class="text-2xl font-extrabold text-[#131b3a] mt-1">0</div>
+            <div id="saasKpiActiveSub" class="text-[11px] text-emerald-600 font-semibold mt-1">Faol: 0 • Bloklangan: 0</div>
           </div>
-          <form onsubmit="changeCeoPin(event)" class="flex flex-wrap items-center gap-2 text-xs">
-            <input type="password" id="newCeoPinInput" minlength="6" required placeholder="Yangi CEO kod (min. 6 belgi)"
-              class="px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold bg-white w-52 focus:outline-none focus:ring-2 focus:ring-[#5b54e6]" />
-            <input type="password" id="confirmCeoPinInput" minlength="6" required placeholder="Kodni tasdiqlang"
-              class="px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold bg-white w-44 focus:outline-none focus:ring-2 focus:ring-[#5b54e6]" />
-            <button type="submit" class="px-4 py-2 bg-[#5b54e6] hover:bg-[#4942d4] text-white font-bold rounded-lg shadow-xs">
-              💾 Kodni almashtirish
-            </button>
-          </form>
+          <div class="bg-gradient-to-br from-white to-emerald-50/70 p-4 rounded-2xl border border-emerald-200 shadow-sm">
+            <div class="text-[11px] font-bold text-emerald-700 uppercase">💰 Taxminiy SaaS Daromad</div>
+            <div id="saasKpiRevenue" class="text-2xl font-extrabold text-emerald-600 mt-1">$0</div>
+            <div id="saasKpiPaidSub" class="text-[11px] text-slate-600 font-semibold mt-1">Yillik ($99): 0 • Umrbod ($299): 0</div>
+          </div>
+          <div class="bg-gradient-to-br from-white to-indigo-50/70 p-4 rounded-2xl border border-[#5b54e6]/30 shadow-sm">
+            <div class="text-[11px] font-bold text-[#5b54e6] uppercase">🎁 Faol Demolar & Konversiya</div>
+            <div id="saasKpiConversion" class="text-2xl font-extrabold text-[#131b3a] mt-1">0%</div>
+            <div id="saasKpiDemoSub" class="text-[11px] text-slate-600 font-semibold mt-1">Faol demo: 0 • Tugagan: 0</div>
+          </div>
+          <div class="bg-gradient-to-br from-white to-amber-50/80 p-4 rounded-2xl border border-amber-300 shadow-sm">
+            <div class="text-[11px] font-bold text-amber-800 uppercase">⏳ Tez orada tugaydiganlar</div>
+            <div id="saasKpiExpiring" class="text-2xl font-extrabold text-amber-700 mt-1">0 ta</div>
+            <div class="text-[11px] text-amber-700/80 font-medium mt-1">2 kun ichida muddati tugaydi</div>
+          </div>
         </div>
-        <div class="bg-white/95 rounded-xl border border-[#d8defa] overflow-x-auto shadow-sm">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead><tr class="bg-[#f5f6ff] border-b border-slate-200 text-[#131b3a] uppercase text-[11px]"><th class="p-3.5">Mehmonxona nomi</th><th class="p-3.5">Egasi (Gmail)</th><th class="p-3.5">Parol (min. 6 belgi)</th><th class="p-3.5">Tarif / Litsenziya</th><th class="p-3.5">Holati</th><th class="p-3.5 text-right">Boshqarish</th></tr></thead>
-            <tbody id="saasHotelsBody" class="divide-y divide-slate-100"></tbody>
-          </table>
+
+        <!-- 2. GLOBAL E'LON (BROADCAST) VA CEO KODINI ALMASHTIRISH -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <!-- Global Broadcast -->
+          <div class="bg-white/95 rounded-xl border border-sky-200 p-4 space-y-3 shadow-sm">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-[#131b3a] text-sm">📢 Global E’lon (Barcha mehmonxonalarga)</h4>
+                <p class="text-[11px] text-slate-500">Yoqilsa, barcha mijozlar ekranining yuqorisida ko‘rinadi</p>
+              </div>
+              <label class="inline-flex items-center gap-1.5 text-xs font-bold text-[#131b3a] cursor-pointer">
+                <input type="checkbox" id="saasBroadcastActive" class="w-4 h-4 accent-[#5b54e6]" />
+                <span>Faol</span>
+              </label>
+            </div>
+            <form onsubmit="saveGlobalBroadcast(event)" class="flex flex-wrap items-center gap-2 text-xs">
+              <select id="saasBroadcastType" class="px-2.5 py-2 border border-slate-300 rounded-lg font-bold bg-white">
+                <option value="info">ℹ️ Yangilik (Ko‘k)</option>
+                <option value="warning">⚠️ Texnik ish (Sariq)</option>
+                <option value="success">🎉 Aksiya / Tabrik (Yashil)</option>
+              </select>
+              <input type="text" id="saasBroadcastText" placeholder="Masalan: Yangi funksiya qo‘shildi! Telegram bot orqali 24/7 nazorat..."
+                class="flex-1 min-w-[200px] px-3 py-2 border border-slate-300 rounded-lg bg-white font-medium" />
+              <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-lg shadow-xs">
+                📤 Saqlash
+              </button>
+            </form>
+          </div>
+
+          <!-- CEO / CREATOR KODINI O'ZGARTIRISH PANELI -->
+          <div class="bg-white/95 rounded-xl border border-[#5b54e6]/30 p-4 space-y-3 shadow-sm">
+            <div>
+              <h4 class="font-bold text-[#131b3a] text-sm">🔑 CEO / Creator kirish kodini o‘zgartirish</h4>
+              <p class="text-[11px] text-slate-500">Yangi kod kamida 6 ta belgidan iborat bo‘lishi kerak • Darhol bulutda yangilanadi</p>
+            </div>
+            <form onsubmit="changeCeoPin(event)" class="flex flex-wrap items-center gap-2 text-xs">
+              <input type="password" id="newCeoPinInput" minlength="6" required placeholder="Yangi CEO kod (min. 6)"
+                class="flex-1 min-w-[140px] px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold bg-white focus:outline-none focus:ring-2 focus:ring-[#5b54e6]" />
+              <input type="password" id="confirmCeoPinInput" minlength="6" required placeholder="Kodni tasdiqlang"
+                class="flex-1 min-w-[130px] px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold bg-white focus:outline-none focus:ring-2 focus:ring-[#5b54e6]" />
+              <button type="submit" class="px-4 py-2 bg-[#5b54e6] hover:bg-[#4942d4] text-white font-bold rounded-lg shadow-xs">
+                💾 Almashtirish
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 3. MIJOZLAR JADVALI (MINI-CRM, FAOLLIK, FEATURE FLAGS, O'CHIRISH) -->
+        <div class="bg-white/95 rounded-xl border border-[#d8defa] overflow-hidden shadow-sm">
+          <div class="px-4 py-3 bg-[#f8f9ff] border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+            <div class="font-bold text-[#131b3a] text-xs">📋 Barcha Mijozlar, Faollik va Mini-CRM</div>
+            <button type="button" onclick="loadAllHotelsActivityStats()" id="loadActivityStatsBtn" class="px-3 py-1.5 rounded-lg bg-[#eef0ff] hover:bg-[#dfe3ff] text-[#5b54e6] font-bold text-[11px] transition">
+              📊 Faollikni yangilash (Xona / Bron)
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs min-w-[1050px]">
+              <thead>
+                <tr class="bg-[#f5f6ff] border-b border-slate-200 text-[#131b3a] uppercase text-[10.5px]">
+                  <th class="p-3">Mehmonxona & Faollik</th>
+                  <th class="p-3">Egasi & Aloqa</th>
+                  <th class="p-3">Parol</th>
+                  <th class="p-3">Tarif / Litsenziya</th>
+                  <th class="p-3">Mini-CRM (Status & Izoh)</th>
+                  <th class="p-3">Funksiyalar</th>
+                  <th class="p-3 text-right">Boshqarish</th>
+                </tr>
+              </thead>
+              <tbody id="saasHotelsBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>
@@ -2714,6 +2946,7 @@
           saasRegistry.ceo = reg.ceo;
           if (reg.ceo.pinHash) localStorage.setItem('rh_saas_ceo_hash', String(reg.ceo.pinHash));
         }
+        saasRegistry.broadcast = (reg && reg.broadcast && typeof reg.broadcast === 'object') ? reg.broadcast : { active: false, type: 'info', text: '' };
         if (!saasRegistry.hotels.fayz_house) {
           saasRegistry.hotels.fayz_house = { id: 'fayz_house', name: 'Fayz House', ownerEmail: MASTER_ADMIN_EMAIL, ownerName: 'Bosh Administrator', ownerPinHash: MASTER_FALLBACK_HASH, plan: 'Umrbod litsenziya (Asosiy)', active: true, createdAt: '2026-01-01' };
         }
@@ -2736,6 +2969,9 @@
       });
       if (saasRegistry.ceo) {
         patch['ceo'] = saasRegistry.ceo;
+      }
+      if (saasRegistry.broadcast) {
+        patch['broadcast'] = saasRegistry.broadcast;
       }
       await dbPatch('/saas_registry.json', patch);
     }
@@ -2784,6 +3020,19 @@
           throw new Error(`HTTP_${res.status}`);
         }
         const data = await res.json();
+        const cloudStamp = (data && typeof data === 'object' && data.updatedAt) ? String(data.updatedAt) : '';
+        const isUnchangedPoll = !showAlert && Boolean(cloudStamp) && cloudStamp === window._rhLastCloudStamp && window._rhLastCloudHotel === currentHotelId;
+        if (isUnchangedPoll) {
+          if (syncTextEl) {
+            const okTxt = typeof translateUiString === 'function' ? translateUiString('Bulutli tizim: Faol ✓') : 'Bulutli tizim: Faol ✓';
+            if (syncTextEl.textContent !== okTxt) syncTextEl.textContent = okTxt;
+          }
+          return;
+        }
+        if (cloudStamp) {
+          window._rhLastCloudStamp = cloudStamp;
+          window._rhLastCloudHotel = currentHotelId;
+        }
         if (data && typeof data === 'object' && !data.error) {
           const cloudBookings = parseCloudCollection(data.bookings, (b, k) => b.id || ('bk_' + k), 'bookings');
           const cloudRoomsRaw = parseCloudCollection(data.rooms, (r, k) => r.id || ('rm_' + k), 'rooms');
@@ -2833,7 +3082,7 @@
             await pushAllToCloud(false);
           }
         }
-        if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
+        if (syncTextEl) syncTextEl.textContent = typeof translateUiString === 'function' ? translateUiString('Bulutli tizim: Faol ✓') : 'Bulutli tizim: Faol ✓';
         updateHotelSwitcherUI();
         if (currentUser && !isDragging) refreshAllViews(activeTabName !== 'rates' && activeTabName !== 'users');
         if (showAlert) alert('Barcha ma’lumotlar bulutli bazadan yangilandi!');
@@ -3339,6 +3588,8 @@
       }
       document.getElementById('activeHotelAvatar').textContent = (hotel.name || 'H').trim().charAt(0).toUpperCase();
       updateTrialBannerAndLock();
+      renderGlobalBroadcastBanner();
+      updateCeoGhostUI();
 
       const chevron = document.getElementById('switcherChevron');
       if (!isMasterAdmin()) { chevron.classList.add('hidden'); document.getElementById('hotelSwitcherMenu').classList.add('hidden'); }
@@ -3447,45 +3698,290 @@
       alert('✅ CEO / Creator kirish kodi muvaffaqiyatli almashtirildi!');
     }
 
+    const saasHotelStatsCache = {};
+
+    function isCeoGhostMode() {
+      return isCeoCreator() && sessionStorage.getItem('rh_ceo_ghost_mode') === '1';
+    }
+
+    function toggleCeoGhostMode() {
+      if (!isCeoCreator()) return;
+      const next = !isCeoGhostMode();
+      sessionStorage.setItem('rh_ceo_ghost_mode', next ? '1' : '0');
+      updateCeoGhostUI();
+      showToast(next ? '👻 Ko‘rinmas rejim yoqildi! Harakatlaringiz tarixga va Telegramga yuborilmaydi.' : '👁️ Ko‘rinmas rejim o‘chirildi.', 'info');
+    }
+
+    function updateCeoGhostUI() {
+      const active = isCeoGhostMode();
+      const banner = document.getElementById('ceoGhostBanner');
+      if (banner) banner.classList.toggle('hidden', !active);
+      const btn = document.getElementById('ceoGhostToggleBtn');
+      if (btn) {
+        btn.textContent = active ? '👻 Ko‘rinmas rejim: YOQILGAN' : '👻 Ko‘rinmas rejim: O‘chiq';
+        btn.className = active
+          ? 'px-3.5 py-2.5 bg-amber-400 text-[#131b3a] font-extrabold rounded-xl text-xs shadow-sm transition'
+          : 'px-3.5 py-2.5 bg-white/15 hover:bg-white/25 text-white border border-white/25 font-bold rounded-xl text-xs transition';
+      }
+    }
+
+    function isHotelFeatureEnabled(featureKey) {
+      const h = saasRegistry.hotels && saasRegistry.hotels[currentHotelId];
+      if (!h || !h.features || typeof h.features !== 'object') return true;
+      return h.features[featureKey] !== false;
+    }
+
+    function renderGlobalBroadcastBanner() {
+      const el = document.getElementById('globalBroadcastBanner');
+      if (!el || !currentUser) return;
+      const bc = saasRegistry.broadcast;
+      if (!bc || !bc.active || !String(bc.text || '').trim()) {
+        el.classList.add('hidden');
+        return;
+      }
+      const styles = {
+        info: 'bg-sky-50 text-sky-900 border-sky-200',
+        warning: 'bg-amber-50 text-amber-900 border-amber-300',
+        success: 'bg-emerald-50 text-emerald-900 border-emerald-200'
+      };
+      const icons = { info: '📢', warning: '⚠️', success: '🎉' };
+      const t = styles[bc.type] ? bc.type : 'info';
+      el.className = `px-5 py-2 text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shrink-0 border-b ${styles[t]}`;
+      el.innerHTML = `<div class="flex items-center gap-2"><span>${icons[t]}</span><span>${escapeTgHtml(bc.text)}</span></div><button type="button" onclick="this.parentElement.classList.add('hidden')" class="text-[11px] opacity-70 hover:opacity-100 font-bold">✕</button>`;
+      el.classList.remove('hidden');
+    }
+
+    async function saveGlobalBroadcast(e) {
+      e.preventDefault();
+      if (!isMasterAdmin()) return;
+      const active = Boolean(document.getElementById('saasBroadcastActive').checked);
+      const type = document.getElementById('saasBroadcastType').value || 'info';
+      const text = String(document.getElementById('saasBroadcastText').value || '').trim();
+      saasRegistry.broadcast = { active, type, text, updatedAt: new Date().toISOString() };
+      await patchSaasRegistry({ broadcast: saasRegistry.broadcast });
+      renderGlobalBroadcastBanner();
+      showToast(active ? '📢 Global e’lon barcha mehmonxonalar uchun yoqildi!' : 'Global e’lon o‘chirildi.', 'success');
+    }
+
+    async function toggleHotelFeatureFlag(hotelId, featureKey) {
+      if (!isMasterAdmin()) return;
+      const h = saasRegistry.hotels && saasRegistry.hotels[hotelId];
+      if (!h) return;
+      if (!h.features || typeof h.features !== 'object') h.features = { telegram: true, excel: true };
+      h.features[featureKey] = h.features[featureKey] === false ? true : false;
+      await patchSaasRegistry({ [`hotels/${safeFbKey(hotelId)}`]: h });
+      renderSaasHotels();
+      showToast(`"${h.name}" uchun ${featureKey.toUpperCase()} funksiyasi ${h.features[featureKey] ? 'yoqildi' : 'o‘chirildi'}.`, 'info');
+    }
+
+    async function saveHotelCrmInfo(hotelId) {
+      if (!isMasterAdmin()) return;
+      const h = saasRegistry.hotels && saasRegistry.hotels[hotelId];
+      if (!h) return;
+      const stEl = document.getElementById(`crmStatus_${hotelId}`);
+      const noteEl = document.getElementById(`crmNote_${hotelId}`);
+      if (stEl) h.crmStatus = stEl.value;
+      if (noteEl) h.crmNote = noteEl.value.trim();
+      await patchSaasRegistry({ [`hotels/${safeFbKey(hotelId)}`]: h });
+      showToast(`✅ "${h.name}" CRM izohi saqlandi!`, 'success', 2000);
+    }
+
+    async function deleteTenantHotelPermanently(hotelId) {
+      if (!isMasterAdmin() || hotelId === DEFAULT_HOTEL_ID) return;
+      const h = saasRegistry.hotels && saasRegistry.hotels[hotelId];
+      if (!h) return;
+      const ok = await rhConfirm(`DIQQAT! "${h.name}" mehmonxonasi va uning BARCHA bazasi (xonalar, bronlar, kassa, xodimlar) Firebase’dan BUTUNLAY o‘chiriladi!
+
+Davom etasizmi?`, {
+        title: 'Mehmonxonani butunlay o‘chirish',
+        okText: '🗑 Ha, butunlay o‘chirish',
+        danger: true
+      });
+      if (!ok) return;
+
+      const regPatch = { [`hotels/${safeFbKey(hotelId)}`]: null };
+      Object.entries(saasRegistry.emailMap || {}).forEach(([em, info]) => {
+        if (info && info.hotelId === hotelId) {
+          regPatch[`emailMap/${encodeEmailKey(em)}`] = null;
+          delete saasRegistry.emailMap[em];
+        }
+      });
+      delete saasRegistry.hotels[hotelId];
+      await patchSaasRegistry(regPatch);
+      await dbDelete(`/hotels/${hotelId}.json`);
+      if (currentHotelId === hotelId) {
+        await switchActiveHotel(DEFAULT_HOTEL_ID);
+      }
+      renderSaasHotels();
+      updateHotelSwitcherUI();
+      showToast(`🗑 "${h.name}" bazasi butunlay o‘chirildi!`, 'success');
+    }
+
+    async function loadAllHotelsActivityStats() {
+      if (!isMasterAdmin()) return;
+      const btn = document.getElementById('loadActivityStatsBtn');
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Yuklanmoqda...'; }
+      try {
+        const hotelIds = Object.keys(saasRegistry.hotels || {});
+        await Promise.all(hotelIds.map(async (hId) => {
+          try {
+            const res = await dbGet(`/hotels/${hId}.json`);
+            const d = await res.json();
+            if (d && typeof d === 'object') {
+              const rCount = d.rooms ? (Array.isArray(d.rooms) ? d.rooms.filter(Boolean).length : Object.keys(d.rooms).length) : 0;
+              const bCount = d.bookings ? (Array.isArray(d.bookings) ? d.bookings.filter(Boolean).length : Object.keys(d.bookings).length) : 0;
+              const upd = d.updatedAt ? String(d.updatedAt).slice(0, 16).replace('T', ' ') : '-';
+              saasHotelStatsCache[hId] = { rooms: rCount, bookings: bCount, updatedAt: upd };
+            } else {
+              saasHotelStatsCache[hId] = { rooms: 0, bookings: 0, updatedAt: 'Bo‘sh' };
+            }
+          } catch (e) {}
+        }));
+        renderSaasHotels();
+        showToast('📊 Barcha mehmonxonalar faolligi yangilandi!', 'success', 2200);
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '📊 Faollikni yangilash (Xona / Bron)'; }
+      }
+    }
+
+    async function downloadGlobalSaasBackup() {
+      if (!isMasterAdmin()) return;
+      showToast('⏳ Barcha mehmonxonalar bazasi yuklanmoqda...', 'info', 2500);
+      try {
+        const [regRes, hotelsRes] = await Promise.all([dbGet('/saas_registry.json'), dbGet('/hotels.json')]);
+        const [registryData, hotelsData] = await Promise.all([regRes.json(), hotelsRes.json()]);
+        const payload = {
+          system: 'ReservHotel SaaS GLOBAL BACKUP',
+          exportedAt: new Date().toISOString(),
+          saas_registry: registryData || {},
+          hotels: hotelsData || {}
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `ReservHotel_GLOBAL_BACKUP_${toIsoDate(new Date())}.json`;
+        a.click();
+        showToast('✅ Global Backup muvaffaqiyatli yuklab olindi!', 'success');
+      } catch (e) {
+        showToast('⛔ Global Backup yuklashda xatolik yuz berdi.', 'error');
+      }
+    }
+
     function renderSaasHotels() {
       if (!isMasterAdmin()) return;
+      updateCeoGhostUI();
+
+      // Sync Broadcast form inputs
+      const bc = saasRegistry.broadcast || { active: false, type: 'info', text: '' };
+      const bcAct = document.getElementById('saasBroadcastActive');
+      const bcType = document.getElementById('saasBroadcastType');
+      const bcText = document.getElementById('saasBroadcastText');
+      if (bcAct) bcAct.checked = Boolean(bc.active);
+      if (bcType) bcType.value = bc.type || 'info';
+      if (bcText && document.activeElement !== bcText) bcText.value = bc.text || '';
+
+      // Compute SaaS Analytics KPIs
+      const allHotels = Object.values(saasRegistry.hotels || {});
+      let activeCount = 0, blockedCount = 0, yearlyCount = 0, lifetimeCount = 0, demoActiveCount = 0, demoExpiredCount = 0, expiringSoonCount = 0;
+      allHotels.forEach(h => {
+        if (h.active === false) blockedCount++; else activeCount++;
+        const lp = String(h.plan || '').toLowerCase();
+        const isTrial = isTrialHotel(h);
+        const daysLeft = getTrialDaysLeft(h);
+        if (lp.includes('umrbod')) {
+          if (h.id !== DEFAULT_HOTEL_ID) lifetimeCount++;
+        } else if (lp.includes('yillik')) {
+          yearlyCount++;
+        } else if (isTrial) {
+          if (daysLeft !== null && daysLeft < 0) demoExpiredCount++;
+          else {
+            demoActiveCount++;
+            if (daysLeft !== null && daysLeft <= 2) expiringSoonCount++;
+          }
+        }
+      });
+      const paidTotal = yearlyCount + lifetimeCount;
+      const estRevenue = (yearlyCount * 99) + (lifetimeCount * 299);
+      const convBase = paidTotal + demoActiveCount + demoExpiredCount;
+      const convPct = convBase > 0 ? Math.round((paidTotal / convBase) * 100) : 0;
+
+      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      setTxt('saasKpiTotal', `${allHotels.length} ta`);
+      setTxt('saasKpiActiveSub', `Faol: ${activeCount} • Bloklangan: ${blockedCount}`);
+      setTxt('saasKpiRevenue', `$${estRevenue.toLocaleString('en-US')}`);
+      setTxt('saasKpiPaidSub', `Yillik ($99): ${yearlyCount} • Umrbod ($299): ${lifetimeCount}`);
+      setTxt('saasKpiConversion', `${convPct}%`);
+      setTxt('saasKpiDemoSub', `Faol demo: ${demoActiveCount} • Tugagan: ${demoExpiredCount}`);
+      setTxt('saasKpiExpiring', `${expiringSoonCount} ta`);
+
       const tbody = document.getElementById('saasHotelsBody');
-      tbody.innerHTML = Object.values(saasRegistry.hotels || {}).map(h => {
+      tbody.innerHTML = allHotels.map(h => {
         const isMain = h.id === DEFAULT_HOTEL_ID, isCurrent = h.id === currentHotelId;
         const isTrial = isTrialHotel(h);
         const daysLeft = getTrialDaysLeft(h);
         const expDate = getTrialExpiryDate(h);
         const expired = isTrial && daysLeft !== null && daysLeft < 0;
+        const st = saasHotelStatsCache[h.id];
+        const statsHtml = st
+          ? `<div class="text-[10px] text-slate-500 mt-0.5 font-medium">🛏️ ${st.rooms} xona • 📋 ${st.bookings} bron <span class="text-slate-400">(${st.updatedAt})</span></div>`
+          : `<div class="text-[10px] text-slate-400 mt-0.5">Yaratilgan: ${h.createdAt || '-'}</div>`;
 
         let planHtml = `<div class="font-semibold text-slate-700">💎 ${h.plan || 'Umrbod litsenziya'}</div>`;
         if (isTrial) {
           const subBadge = expired
             ? `<div class="text-[10px] font-bold text-rose-600 mt-0.5">Tugagan: ${expDate}</div>`
             : `<div class="text-[10px] font-bold ${daysLeft <= 2 ? 'text-amber-600' : 'text-[#5b54e6]'} mt-0.5">${daysLeft === 0 ? 'Bugun tugaydi' : daysLeft + ' kun qoldi'} (${expDate} gacha)</div>`;
-          const selfTag = h.selfRegistered ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 font-extrabold text-[9.5px]">Reklama / Self</span>` : '';
-          planHtml = `<div class="font-semibold text-amber-700">⏳ 7 kunlik Demo ${selfTag}</div>${subBadge}`;
+          const selfTag = h.selfRegistered ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 font-extrabold text-[9.5px]">Self</span>` : '';
+          planHtml = `<div class="font-semibold text-amber-700">⏳ Demo ${selfTag}</div>${subBadge}`;
         }
 
-        let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700">Faol</span>`;
-        if (h.active === false) {
-          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700">Bloklangan</span>`;
-        } else if (expired) {
-          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700">Muddati tugagan</span>`;
-        }
+        const cleanPhone = String(h.ownerPhone || '').replace(/[^\d+]/g, '');
+        const contactLinks = cleanPhone
+          ? `<div class="flex items-center gap-1 mt-1"><a href="tel:${cleanPhone}" class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">📞 ${h.ownerPhone}</a><a href="https://t.me/${cleanPhone}" target="_blank" class="px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold">✈️ TG</a></div>`
+          : '';
+
+        const crmStatus = h.crmStatus || (isTrial ? 'Yangi Demo' : 'Sotib oldi');
+        const crmNote = h.crmNote || '';
+        const tgOn = !(h.features && h.features.telegram === false);
+        const exOn = !(h.features && h.features.excel === false);
 
         return `<tr class="${isCurrent ? 'bg-[#eef0ff]/70' : ''}">
-          <td class="p-3.5 font-extrabold text-[#131b3a]">${h.name} ${isCurrent ? '<span class="ml-1 px-1.5 py-0.5 rounded bg-[#5b54e6] text-white text-[10px]">Ochiq</span>' : ''}</td>
-          <td class="p-3.5 font-semibold text-slate-700">${h.ownerEmail} <div class="text-[10px] text-slate-500">${h.ownerName || ''} ${h.ownerPhone ? '• 📞 ' + h.ownerPhone : ''}</div></td>
-          <td class="p-3.5 font-mono font-bold text-[#5b54e6]">
+          <td class="p-3">
+            <div class="font-extrabold text-[#131b3a]">${h.name} ${isCurrent ? '<span class="ml-1 px-1.5 py-0.5 rounded bg-[#5b54e6] text-white text-[9.5px]">Ochiq</span>' : ''} ${h.active === false ? '<span class="ml-1 px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 text-[9.5px]">Blok</span>' : ''}</div>
+            ${statsHtml}
+          </td>
+          <td class="p-3 font-semibold text-slate-700">
+            <div>${h.ownerEmail}</div>
+            <div class="text-[10px] text-slate-500">${h.ownerName || ''}</div>
+            ${contactLinks}
+          </td>
+          <td class="p-3 font-mono font-bold text-[#5b54e6] whitespace-nowrap">
             <span id="saasPin_${h.id}" data-real="${h.ownerPin || 'Shifrlangan 🔒'}" data-shown="0">••••••</span>
             <button type="button" onclick="toggleSpanPassword('saasPin_${h.id}', this)" title="Ko‘rish / Yashirish" class="ml-1 text-slate-400 hover:text-[#5b54e6] text-xs">👁️</button>
           </td>
-          <td class="p-3.5">${planHtml}</td>
-          <td class="p-3.5">${statusBadge}</td>
-          <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
-            <button onclick="switchActiveHotel('${h.id}'); switchTab('matrix');" class="px-2.5 py-1 rounded bg-[#5b54e6] text-white font-bold hover:bg-[#4942d4] text-[11px]">Kirish →</button>
-            ${(!isMain && isTrial) ? `<button onclick="upgradeHotelToYearly('${h.id}')" class="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px]">📅 1 yil ($99)</button><button onclick="upgradeHotelToLifetime('${h.id}')" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">💎 Umrbod ($299)</button><button onclick="extendHotelTrial('${h.id}', 7)" class="px-2.5 py-1 rounded bg-indigo-50 text-[#5b54e6] border border-[#5b54e6]/30 font-bold text-[11px]">+7 kun</button>` : ''}
-            ${isMain ? '' : `<button onclick="toggleTenantHotelActive('${h.id}')" class="px-2.5 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 font-bold text-[11px]">${h.active !== false ? 'Bloklash' : 'Faollash'}</button>`}
+          <td class="p-3">${planHtml}</td>
+          <td class="p-3">
+            <div class="flex flex-col gap-1 min-w-[170px]">
+              <select id="crmStatus_${h.id}" onchange="saveHotelCrmInfo('${h.id}')" class="px-2 py-1 rounded-lg border border-slate-200 bg-white text-[10.5px] font-bold text-[#131b3a]">
+                <option value="Yangi Demo" ${crmStatus === 'Yangi Demo' ? 'selected' : ''}>🆕 Yangi Demo</option>
+                <option value="Qo'ng'iroq qilindi" ${crmStatus === "Qo'ng'iroq qilindi" ? 'selected' : ''}>📞 Qo‘ng‘iroq qilindi</option>
+                <option value="O'ylab ko'ryapti" ${crmStatus === "O'ylab ko'ryapti" ? 'selected' : ''}>🤔 O‘ylab ko‘ryapti</option>
+                <option value="Sotib oldi" ${crmStatus === 'Sotib oldi' ? 'selected' : ''}>💎 Sotib oldi</option>
+                <option value="Rad etdi" ${crmStatus === 'Rad etdi' ? 'selected' : ''}>❌ Rad etdi</option>
+              </select>
+              <input type="text" id="crmNote_${h.id}" value="${escapeTgHtml(crmNote)}" onblur="saveHotelCrmInfo('${h.id}')" onkeydown="if(event.key==='Enter'){this.blur();}" placeholder="CEO izohi..." class="px-2 py-1 rounded-lg border border-slate-200 bg-white text-[10.5px] text-slate-700" />
+            </div>
+          </td>
+          <td class="p-3 whitespace-nowrap">
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="toggleHotelFeatureFlag('${h.id}', 'telegram')" title="Telegram bildirishnomalar ruxsati" class="px-2 py-1 rounded-lg text-[10px] font-bold border ${tgOn ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-slate-100 text-slate-400 border-slate-200 line-through'}">✈️ TG</button>
+              <button type="button" onclick="toggleHotelFeatureFlag('${h.id}', 'excel')" title="Excel eksport ruxsati" class="px-2 py-1 rounded-lg text-[10px] font-bold border ${exOn ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-400 border-slate-200 line-through'}">📊 XLS</button>
+            </div>
+          </td>
+          <td class="p-3 text-right space-x-1 whitespace-nowrap">
+            <button onclick="switchActiveHotel('${h.id}'); switchTab('matrix');" class="px-2.5 py-1 rounded bg-[#5b54e6] text-white font-bold hover:bg-[#4942d4] text-[10.5px]">Kirish →</button>
+            ${(!isMain && isTrial) ? `<button onclick="upgradeHotelToYearly('${h.id}')" class="px-2 py-1 rounded bg-sky-600 hover:bg-sky-700 text-white font-bold text-[10.5px]">$99</button><button onclick="upgradeHotelToLifetime('${h.id}')" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10.5px]">$299</button><button onclick="extendHotelTrial('${h.id}', 7)" class="px-2 py-1 rounded bg-indigo-50 text-[#5b54e6] border border-[#5b54e6]/30 font-bold text-[10.5px]">+7k</button>` : ''}
+            ${isMain ? '' : `<button onclick="toggleTenantHotelActive('${h.id}')" class="px-2 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 font-bold text-[10.5px]">${h.active !== false ? 'Blok' : 'Ochish'}</button><button onclick="deleteTenantHotelPermanently('${h.id}')" title="Bazani butunlay o‘chirish" class="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-[10.5px]">🗑</button>`}
           </td>
         </tr>`;
       }).join('');
@@ -4168,6 +4664,7 @@
     }
 
     function exportDailyToExcel() {
+      if (!isCeoCreator() && !isHotelFeatureEnabled('excel')) { showToast('🔒 Excel eksport ushbu tarifda o‘chirilgan.', 'error'); return; }
       const data = getDailyReportData(), hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
       const buildShiftExcel = s => `<h3>${s.shiftNum}-SMENA (${s.startTime} – ${s.endTime}) — Admin: ${s.adminName || '-'}</h3><table border="1" cellspacing="0" cellpadding="6"><tr><th>Xona</th><th>Mehmon</th><th>Kirish → Chiqish</th><th>Narxi</th><th>To'langan</th><th>Turi</th></tr>${s.rows.map(r => `<tr><td>№ ${r.room}</td><td>${r.guestName}</td><td>${r.datesText}</td><td>${r.rate}</td><td>${r.paid}</td><td>${r.payType}</td></tr>`).join('') || '<tr><td colspan="6">Yo\'q</td></tr>'}</table><p>Jami: ${s.totalIncome} | Naqd: ${s.cashIn} | Xarajat: ${s.totalExp} | Sof naqd: <b>${s.netCash}</b></p><br/>`;
       const html = `<html><head><meta charset="UTF-8" /></head><body><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${data.shifts.map(buildShiftExcel).join('')}</body></html>`;
@@ -4324,6 +4821,9 @@
       if (!isTypingInDailyTab()) renderDailyReport();
       renderBookingsTable(); renderFinance();
       if (includeConfig) { renderRoomsConfig(); renderAllowedUsers(); if (isMasterAdmin()) renderSaasHotels(); }
+      if (typeof currentLang !== 'undefined' && currentLang !== 'uz' && typeof applyLanguageToSubtree === 'function') {
+        applyLanguageToSubtree(document.body);
+      }
     }
 
     function switchTab(tabName) {
@@ -5485,7 +5985,7 @@
     }
 
     function recordAuditAction(actionType, details) {
-      if (!currentUser) return;
+      if (!currentUser || isCeoGhostMode()) return;
       const entry = {
         id: 'aud_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
         time: `${toIsoDate(new Date())} ${getCurrentTimeStr()}`,
@@ -5879,7 +6379,7 @@
     function renderTelegramSettingsUI() {
       const sec = document.getElementById('telegramNotifySection');
       if (!sec) return;
-      if (!isHotelChiefAdmin()) {
+      if (!isHotelChiefAdmin() || (!isCeoCreator() && !isHotelFeatureEnabled('telegram'))) {
         sec.classList.add('hidden');
         return;
       }
@@ -5964,6 +6464,8 @@
     }
 
     async function sendHotelTelegramNotification(eventKey, bodyHtml, forceCfg = null) {
+      if (!forceCfg && isCeoGhostMode()) return { ok: false, reason: 'ghost_mode' };
+      if (!forceCfg && !isHotelFeatureEnabled('telegram')) return { ok: false, reason: 'feature_disabled' };
       const cfg = forceCfg || telegramSettings;
       if (!cfg || !cfg.botToken || !cfg.chatId) return { ok: false, reason: 'missing_config' };
       if (!forceCfg && (!cfg.enabled || (eventKey && cfg[eventKey] === false))) return { ok: false, reason: 'disabled' };
@@ -6276,6 +6778,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
 
     function exportFullExcelArchive() {
       if (!isHotelChiefAdmin()) { showToast('🔒 To‘liq Excel arxiv faqat bosh administrator uchun!', 'error'); return; }
+      if (!isCeoCreator() && !isHotelFeatureEnabled('excel')) { showToast('🔒 Excel eksport ushbu tarifda o‘chirilgan.', 'error'); return; }
       const hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
       const dateStr = toIsoDate(new Date());
       const validBookings = bookings.filter(isValidBookingRecord);
@@ -7310,7 +7813,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
     const i18nObserver = new MutationObserver(() => {
       if (isApplyingI18n || currentLang === 'uz' || isDragging || moveDragState || isResizingBooking) return;
       clearTimeout(i18nObserverTimer);
-      i18nObserverTimer = setTimeout(() => applyLanguageToSubtree(document.body), 120);
+      i18nObserverTimer = setTimeout(() => applyLanguageToSubtree(document.body), 0);
     });
     window.addEventListener('DOMContentLoaded', () => {
       updateLangButtonsUI();
@@ -7464,6 +7967,98 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
 
     loadStoredAuthSession();
     if (currentUser) initApp();
+  </script>
+
+  <script>
+    // ==================== APPLE PROMOTION 120 FPS INERTIA & FLUID ENGINE ====================
+    (function initAppleProMotion120Fps() {
+      // 1. macOS-style silky inertia wheel scrolling (lerp @ native 120Hz/144Hz/165Hz)
+      const scrollStates = new WeakMap();
+
+      function getScrollableTarget(el) {
+        while (el && el !== document.body && el !== document.documentElement) {
+          const style = window.getComputedStyle(el);
+          const canY = (style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 2;
+          const canX = (style.overflowX === 'auto' || style.overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 2;
+          if (canY || canX) return { el, canY, canX };
+          el = el.parentElement;
+        }
+        return null;
+      }
+
+      function animateScroll(el) {
+        const st = scrollStates.get(el);
+        if (!st) return;
+        const ease = 0.14; // macOS inertia damping
+        const dx = st.targetX - st.curX;
+        const dy = st.targetY - st.curY;
+
+        if (Math.abs(dx) < 0.4 && Math.abs(dy) < 0.4) {
+          el.scrollLeft = st.targetX;
+          el.scrollTop = st.targetY;
+          st.running = false;
+          return;
+        }
+        st.curX += dx * ease;
+        st.curY += dy * ease;
+        el.scrollLeft = st.curX;
+        el.scrollTop = st.curY;
+        requestAnimationFrame(() => animateScroll(el));
+      }
+
+      window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || document.body.classList.contains('is-fast-dragging')) return;
+        const hit = getScrollableTarget(e.target);
+        if (!hit) return;
+        const { el, canY, canX } = hit;
+
+        let deltaX = e.deltaX;
+        let deltaY = e.deltaY;
+        if (e.shiftKey && canX && deltaY !== 0 && deltaX === 0) {
+          deltaX = deltaY;
+          deltaY = 0;
+        }
+        if ((deltaY !== 0 && !canY) && (deltaX === 0 || !canX)) return;
+
+        e.preventDefault();
+        let st = scrollStates.get(el);
+        if (!st || !st.running) {
+          st = { curX: el.scrollLeft, curY: el.scrollTop, targetX: el.scrollLeft, targetY: el.scrollTop, running: false };
+          scrollStates.set(el, st);
+        }
+
+        const maxScrollX = Math.max(0, el.scrollWidth - el.clientWidth);
+        const maxScrollY = Math.max(0, el.scrollHeight - el.clientHeight);
+        st.targetX = Math.max(0, Math.min(maxScrollX, st.targetX + deltaX * 1.05));
+        st.targetY = Math.max(0, Math.min(maxScrollY, st.targetY + deltaY * 1.05));
+
+        if (!st.running) {
+          st.running = true;
+          requestAnimationFrame(() => animateScroll(el));
+        }
+      }, { passive: false });
+
+      // 2. 120Hz rAF Spotlight Sheen
+      let rafPending = false;
+      let lastEv = null;
+      function updateSpotlight() {
+        rafPending = false;
+        if (!lastEv) return;
+        const card = lastEv.target && lastEv.target.closest && lastEv.target.closest('.apple-bento-card, .rh-apple-sheen, .fin-kpi-card, .fin-chart-card');
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', (lastEv.clientX - r.left).toFixed(1) + 'px');
+        card.style.setProperty('--my', (lastEv.clientY - r.top).toFixed(1) + 'px');
+      }
+      document.addEventListener('pointermove', (e) => {
+        if (document.body.classList.contains('is-fast-dragging')) return;
+        lastEv = e;
+        if (!rafPending) {
+          rafPending = true;
+          requestAnimationFrame(updateSpotlight);
+        }
+      }, { passive: true });
+    })();
   </script>
 </body>
 </html>
