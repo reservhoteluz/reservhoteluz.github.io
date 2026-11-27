@@ -3552,6 +3552,12 @@
         const hotelOwnerEntry = saasRegistry.emailMap[email] || { pinHash: MASTER_FALLBACK_HASH, name: 'Fayz House Bosh Admini' };
         const isMasterHotelMatch = await verifyPinAgainst(pin, hotelOwnerEntry.pin, hotelOwnerEntry.pinHash, MASTER_FALLBACK_HASH);
         if (isMasterHotelMatch) {
+          const mainHotel = saasRegistry.hotels && saasRegistry.hotels[DEFAULT_HOTEL_ID];
+          if (mainHotel && mainHotel.active === false) {
+            errBox.textContent = 'Ushbu mehmonxona litsenziyasi vaqtincha bloklangan! Bog‘lanish: +998 90 127 77 33';
+            errBox.classList.remove('hidden');
+            return;
+          }
           currentUser = {
             email: CEO_CREATOR_EMAIL,
             name: hotelOwnerEntry.name || 'Fayz House Bosh Admini',
@@ -4052,17 +4058,39 @@ Davom etasizmi?`, {
           <td class="p-3 text-right space-x-1 whitespace-nowrap">
             <button onclick="switchActiveHotel('${h.id}'); switchTab('matrix');" class="px-2.5 py-1 rounded bg-[#5b54e6] text-white font-bold hover:bg-[#4942d4] text-[10.5px]">Kirish →</button>
             ${(!isMain && isTrial) ? `<button onclick="upgradeHotelToYearly('${h.id}')" class="px-2 py-1 rounded bg-sky-600 hover:bg-sky-700 text-white font-bold text-[10.5px]">$99</button><button onclick="upgradeHotelToLifetime('${h.id}')" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10.5px]">$299</button><button onclick="extendHotelTrial('${h.id}', 7)" class="px-2 py-1 rounded bg-indigo-50 text-[#5b54e6] border border-[#5b54e6]/30 font-bold text-[10.5px]">+7k</button>` : ''}
-            ${isMain ? '' : `<button onclick="toggleTenantHotelActive('${h.id}')" class="px-2 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 font-bold text-[10.5px]">${h.active !== false ? 'Blok' : 'Ochish'}</button><button onclick="deleteTenantHotelPermanently('${h.id}')" title="Bazani butunlay o‘chirish" class="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-[10.5px]">🗑</button>`}
+            <button onclick="toggleTenantHotelActive('${h.id}')" class="px-2 py-1 rounded ${h.active !== false ? 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200' : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'} border font-bold text-[10.5px]">${h.active !== false ? '🔒 Bloklash' : '🔓 Ochish'}</button>${isMain ? '' : `<button onclick="deleteTenantHotelPermanently('${h.id}')" title="Bazani butunlay o‘chirish" class="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-[10.5px]">🗑</button>`}
           </td>
         </tr>`;
       }).join('');
     }
 
     async function toggleTenantHotelActive(hotelId) {
-      if (!isMasterAdmin() || hotelId === DEFAULT_HOTEL_ID) return;
+      if (!isMasterAdmin()) return;
       const h = saasRegistry.hotels[hotelId]; if (!h) return;
-      h.active = h.active === false ? true : false;
-      await saveSaasRegistry(); renderSaasHotels(); updateHotelSwitcherUI();
+      const willBlock = h.active !== false;
+      const ok = await rhConfirm(
+        willBlock
+          ? `"${h.name}" (${h.plan || 'Litsenziya'}) tizimini bloklamoqchimisiz?
+
+Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqariladi (ma’lumotlari saqlanib qoladi). Faqat siz (CEO) kira olasiz.`
+          : `"${h.name}" tizimini blokdan chiqarib, qayta faollashtirmoqchimisiz?`,
+        {
+          title: willBlock ? 'Tizimni bloklash' : 'Blokdan chiqarish',
+          okText: willBlock ? '🔒 Ha, bloklash' : '🔓 Faollashtirish',
+          danger: willBlock
+        }
+      );
+      if (!ok) return;
+      h.active = !willBlock;
+      await patchSaasRegistry({ [`hotels/${safeFbKey(hotelId)}`]: h });
+      renderSaasHotels();
+      updateHotelSwitcherUI();
+      showToast(
+        willBlock
+          ? `🔒 "${h.name}" bloklandi! Mijozlar 5 soniya ichida tizimdan chiqariladi.`
+          : `🔓 "${h.name}" blokdan chiqarildi va qayta faollashtirildi!`,
+        willBlock ? 'info' : 'success'
+      );
     }
 
     function initApp() {
