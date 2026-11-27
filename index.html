@@ -516,6 +516,193 @@
     .rh-win-3 { animation: rhWindowBlink 2.2s ease-in-out 1.5s infinite; }
     .rh-splash-title { opacity: 0; animation: rhTextUp 0.65s ease-out 0.45s forwards; }
     .rh-splash-bar { animation: rhBarLoad 1.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+    /* ==================== APPLE USLUBIDAGI BENTO MORPH VA DASTUR VIZUAL EFFEKTLARI ==================== */
+    .apple-promo-panel {
+      background: radial-gradient(circle at 15% 15%, rgba(91, 84, 230, 0.34), transparent 52%),
+                  radial-gradient(circle at 88% 85%, rgba(16, 185, 129, 0.16), transparent 50%),
+                  linear-gradient(155deg, #090d1f 0%, #111838 55%, #192152 100%);
+    }
+    .apple-lang-seg {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .apple-bento-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      min-height: 224px;
+    }
+    .apple-bento-slot {
+      position: relative;
+      height: 106px;
+    }
+    .apple-bento-card {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      padding: 14px 15px;
+      background: rgba(255, 255, 255, 0.065);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 14px rgba(4, 7, 20, 0.25);
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 2;
+      transition:
+        transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.28s ease,
+        filter 0.28s ease;
+    }
+    .apple-bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.14), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .apple-bento-card:hover::before,
+    .apple-bento-card.is-expanded::before {
+      opacity: 1;
+    }
+    /* Anchor direction so expanded card stays neatly inside the left panel */
+    .apple-bento-slot[data-pos="tl"] .apple-bento-card { top: 0; left: 0; right: auto; bottom: auto; width: 100%; height: 100%; }
+    .apple-bento-slot[data-pos="tr"] .apple-bento-card { top: 0; right: 0; left: auto; bottom: auto; width: 100%; height: 100%; }
+    .apple-bento-slot[data-pos="bl"] .apple-bento-card { bottom: 0; left: 0; right: auto; top: auto; width: 100%; height: 100%; }
+    .apple-bento-slot[data-pos="br"] .apple-bento-card { bottom: 0; right: 0; left: auto; top: auto; width: 100%; height: 100%; }
+
+    .apple-bento-grid.has-active .apple-bento-card:not(.is-expanded) {
+      opacity: 0.32;
+      filter: blur(1.5px);
+      transform: scale(0.96);
+    }
+    .apple-bento-card.is-expanded {
+      z-index: 30;
+      width: calc(200% + 12px) !important;
+      height: 296px !important;
+      padding: 18px 20px;
+      background: linear-gradient(155deg, rgba(20, 29, 68, 0.97), rgba(11, 16, 40, 0.98));
+      border-color: rgba(165, 180, 252, 0.55);
+      box-shadow:
+        0 28px 60px -12px rgba(4, 7, 22, 0.78),
+        0 0 0 1px rgba(129, 140, 248, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+    .apple-bento-extra {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(8px);
+      overflow: hidden;
+      transition: opacity 0.28s ease 0.08s, transform 0.34s cubic-bezier(0.22, 1, 0.36, 1) 0.06s, max-height 0.36s ease;
+    }
+    .apple-bento-card.is-expanded .apple-bento-extra {
+      opacity: 1;
+      max-height: 210px;
+      transform: translateY(0);
+    }
+    .apple-bento-short {
+      transition: opacity 0.2s ease, max-height 0.25s ease;
+    }
+    .apple-bento-card.is-expanded .apple-bento-short {
+      opacity: 0;
+      max-height: 0;
+      margin-top: 0 !important;
+      overflow: hidden;
+    }
+    .apple-mini-vis {
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 12px;
+      padding: 9px 11px;
+    }
+
+    /* ==================== BUTUN DASTUR ICHIDAGI APPLE VISUAL EFFEKTLARI ==================== */
+    header {
+      backdrop-filter: blur(18px) saturate(165%) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+      box-shadow: 0 4px 20px -10px rgba(19, 27, 58, 0.12);
+    }
+    .nav-btn {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .nav-btn:hover {
+      transform: translateX(3px);
+    }
+    .nav-btn.bg-\[\#5b54e6\] {
+      box-shadow: 0 8px 20px -6px rgba(91, 84, 230, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+    .booking-bar {
+      box-shadow: 0 3px 10px -2px rgba(19, 27, 58, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, filter 0.2s ease;
+    }
+    .booking-bar:hover {
+      transform: translateY(-1.5px) scale(1.006);
+      filter: brightness(1.04);
+    }
+    /* Apple Glass Card Hover Elevation across Daily, Bookings, Finance, Rates, Users */
+    #tab-daily > div.grid > div,
+    #tab-finance .fin-kpi-card,
+    #tab-finance .fin-chart-card,
+    #onboardingGuideCard button,
+    header .hidden.xl\:flex > div {
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease, border-color 0.25s ease;
+    }
+    #tab-daily > div.grid > div:hover,
+    header .hidden.xl\:flex > div:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -10px rgba(19, 27, 58, 0.16);
+    }
+    /* Interactive Apple Modal Spring Pop-In */
+    @keyframes appleModalPop {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    #bookingModal:not(.hidden) > div,
+    #createHotelModal:not(.hidden) > div,
+    #cancelModal:not(.hidden) > div,
+    #tariffOfferModal:not(.hidden) > div,
+    #globalSearchModal:not(.hidden) > div,
+    #rhDialogModal:not(.hidden) > div {
+      animation: appleModalPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    /* Apple-style tactile button press */
+    button:active:not(:disabled) {
+      transform: scale(0.975);
+    }
+    /* Smooth spotlight card sheen inside workspace */
+    .rh-apple-sheen {
+      position: relative;
+      overflow: hidden;
+    }
+    .rh-apple-sheen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(91, 84, 230, 0.08), transparent 72%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .rh-apple-sheen:hover::before {
+      opacity: 1;
+    }
+    body.dark-mode .rh-apple-sheen::before {
+      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(129, 140, 248, 0.14), transparent 72%);
+    }
   </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -570,50 +757,43 @@
 
   <!-- ==================== 1. YOPIQ KIRISH EKRANI (INSTAGRAM USLUBIDA) ==================== -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-[#090d22] via-[#131b3a] to-[#1b2554] backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 rounded-3xl shadow-2xl overflow-hidden border border-[#5b54e6]/30 bg-white my-auto">
-      <!-- CHAP TOMON: PREMIUM SAAS TAQDIMOT (FAQAT KOMPYUTERDA) -->
-      <div class="hidden lg:flex lg:col-span-6 bg-gradient-to-br from-[#0b1024] via-[#131b3a] to-[#241f6b] p-9 text-white flex-col justify-between relative overflow-hidden">
+    <div class="w-full max-w-[1080px] grid grid-cols-1 lg:grid-cols-12 rounded-3xl shadow-2xl overflow-hidden border border-[#5b54e6]/30 bg-white my-auto">
+      <!-- CHAP TOMON: APPLE USLUBIDAGI BENTO TAQDIMOT VA TIL TANLASH -->
+      <div id="appleLoginPromoPanel" class="hidden lg:flex lg:col-span-6 apple-promo-panel p-8 text-white flex-col justify-between relative overflow-hidden">
         <div class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#5b54e6]/25 blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none"></div>
-        <div class="relative z-10 space-y-5">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-bold text-indigo-200">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Cloud Hotel PMS • 24/7 Bulutli Boshqaruv</span>
-          </div>
-          <h2 class="text-3xl font-extrabold leading-tight tracking-tight">
-            Mehmonxonangizni <span class="text-indigo-300">100% nazorat</span> qiling — daftarsiz va xatosiz
-          </h2>
-          <p class="text-xs text-indigo-100/80 leading-relaxed">
-            Bronlar kalendari, 2 smenali kassa hisoboti, avtomatik qarzdorlik nazorati va moliyaviy analitika — barchasi bitta tezkor tizimda.
-          </p>
 
-          <div class="grid grid-cols-2 gap-3 pt-2">
-            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <div class="text-lg">📅</div>
-              <div class="text-xs font-extrabold text-white">Jonli Kalendar</div>
-              <div class="text-[11px] text-indigo-200/75">Band sanalar himoyasi, surib ko‘chirish va cho‘zish</div>
+        <div class="relative z-10 space-y-4">
+          <!-- Yuqori qator: Status va Apple uslubidagi Til tanlash paneli -->
+          <div class="flex items-center justify-between gap-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-semibold text-indigo-100 backdrop-blur-md">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="promoBadgeText">Bulutli boshqaruv tizimi • 24/7</span>
             </div>
-            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <div class="text-lg">💰</div>
-              <div class="text-xs font-extrabold text-white">Smena & Kassa</div>
-              <div class="text-[11px] text-indigo-200/75">Naqd, karta, xarajat va sof foyda hisobi</div>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <div class="text-lg">🛡️</div>
-              <div class="text-xs font-extrabold text-white">Amallar Tarixi</div>
-              <div class="text-[11px] text-indigo-200/75">Xodimlarning har bir harakati nazoratda</div>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <div class="text-lg">📱</div>
-              <div class="text-xs font-extrabold text-white">Telefon & PC</div>
-              <div class="text-[11px] text-indigo-200/75">Dunyoning istalgan nuqtasidan jonli kuzatuv</div>
+            <div class="apple-lang-seg inline-flex items-center gap-0.5 p-1 rounded-xl text-[11px] font-bold">
+              <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2.5 py-1 rounded-lg transition">O‘zbek</button>
+              <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-2.5 py-1 rounded-lg transition">Русский</button>
+              <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-2.5 py-1 rounded-lg transition">English</button>
             </div>
           </div>
+
+          <!-- Sarlavha va adabiy tavsif -->
+          <div class="space-y-2 pt-1">
+            <h2 id="promoHeadline" class="text-[27px] font-extrabold leading-[1.18] tracking-tight text-white">
+              Mehmonxonangizni <span class="text-indigo-300">to‘liq nazorat</span> qiling — daftarsiz va xatosiz
+            </h2>
+            <p id="promoSubtext" class="text-[12.5px] text-indigo-100/80 leading-relaxed">
+              Xonalar kalendari, smenali kassa hisoboti, qarzdorlik nazorati va moliyaviy tahlil — barchasi yagona tezkor tizimda. Batafsil ko‘rish uchun kartalardan biriga sichqonchani olib boring.
+            </p>
+          </div>
+
+          <!-- Apple Bento Morph Interaktiv Kartalar (JS orqali 3 tilda chiziladi) -->
+          <div id="appleBentoGrid" class="apple-bento-grid pt-1" onmouseleave="collapseAllAppleBento()"></div>
         </div>
 
-        <div class="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-indigo-200/80">
-          <div>🎁 <b>7 kun bepul</b> to‘liq sinov</div>
-          <div>💎 $99/yil yoki $299 umrbod</div>
+        <div id="promoFooterRow" class="relative z-10 pt-5 mt-3 border-t border-white/10 flex items-center justify-between text-[11.5px] text-indigo-100/85">
+          <div id="promoFooterLeft">✨ <b>7 kunlik bepul</b> to‘liq sinov</div>
+          <div id="promoFooterRight" class="font-semibold text-indigo-200">Yillik $99 • Umrbod $299</div>
         </div>
       </div>
 
@@ -6707,7 +6887,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
         while ((node = walker.nextNode())) {
           const parent = node.parentElement;
           if (!parent || parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') continue;
-          if (parent.hasAttribute('data-lang-btn')) continue;
+          if (parent.hasAttribute('data-lang-btn') || parent.closest('#appleLoginPromoPanel')) continue;
           const val = node.nodeValue;
           if (!val || !val.trim()) continue;
           if (node._rhOrigText === undefined) node._rhOrigText = val;
@@ -6738,8 +6918,362 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
           }
         }
       }
+      renderAppleLoginBento();
       applyLanguageToSubtree(document.body);
     }
+
+    // ==================== APPLE BENTO MORPH (ADABIY UZ / RU / EN) ====================
+    const APPLE_BENTO_CONTENT = {
+      uz: {
+        badge: 'Bulutli boshqaruv tizimi • 24/7',
+        headline: 'Mehmonxonangizni <span class="text-indigo-300">to‘liq nazorat</span> qiling — daftarsiz va xatosiz',
+        subtext: 'Xonalar kalendari, smenali kassa hisoboti, qarzdorlik nazorati va moliyaviy tahlil — barchasi yagona tezkor tizimda.',
+        footerLeft: '✨ <b>7 kunlik bepul</b> to‘liq sinov',
+        footerRight: 'Yillik $99 • Umrbod $299',
+        hint: 'Batafsil →',
+        cards: [
+          {
+            pos: 'tl',
+            color: 'text-indigo-300',
+            bgIcon: 'bg-indigo-500/20 border-indigo-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+            title: 'Xonalar kalendari',
+            short: 'Bandlik jadvali, xonalarni ko‘chirish va muddatni uzaytirish',
+            points: [
+              'Bir xonani ikki marta band qilib qo‘yishdan avtomatik himoya',
+              'Xonani boshqa kunga ko‘chirish va yashash muddatini oson uzaytirish',
+              'Chiqish vaqtidan kechikkan mehmonlarni qizil belgi bilan ogohlantirish',
+              'Ta’mirga yopilgan xonalarni alohida belgilash imkoniyati'
+            ],
+            miniVis: `
+              <div class="flex items-center justify-between text-[10px] text-indigo-200/80 mb-1.5 font-semibold">
+                <span>Jonli bandlik jadvali</span><span class="text-emerald-300">Faol nazorat</span>
+              </div>
+              <div class="space-y-1.5 text-[10px] font-bold">
+                <div class="flex items-center gap-2"><span class="w-10 text-indigo-200/80">№ 204</span><div class="flex-1 h-5 rounded-md bg-emerald-500/85 px-2 flex items-center justify-between text-white"><span>A. Karimov</span><span class="text-[9px] opacity-90">To‘langan</span></div></div>
+                <div class="flex items-center gap-2"><span class="w-10 text-rose-300">№ 205</span><div class="flex-1 h-5 rounded-md bg-rose-600/90 px-2 flex items-center justify-between text-white"><span>S. Alimov</span><span class="text-[9px] bg-white/20 px-1.5 rounded">Kech chiqish</span></div></div>
+              </div>`
+          },
+          {
+            pos: 'tr',
+            color: 'text-emerald-300',
+            bgIcon: 'bg-emerald-500/20 border-emerald-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+            title: 'Smena va moliya',
+            short: 'Kassa hisoboti, xarajatlar va sof daromad tahlili',
+            points: [
+              'Har bir smena yakunida kassa hisobotini tasdiqlab qulflash',
+              'Naqd pul, plastik karta, onlayn to‘lovlar va xarajatlar hisobi',
+              'Xonalar bandlik darajasi va o‘rtacha kunlik daromad ko‘rsatkichlari',
+              'Qarzdor mehmonlar bo‘yicha avtomatik hisob-kitob'
+            ],
+            miniVis: `
+              <div class="grid grid-cols-3 gap-1.5 text-center">
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Bandlik</div><div class="text-xs font-extrabold text-emerald-300">84%</div></div>
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Kassa naqd</div><div class="text-xs font-extrabold text-white">4.8 mln</div></div>
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Smena</div><div class="text-xs font-extrabold text-amber-300">Yopildi ✓</div></div>
+              </div>`
+          },
+          {
+            pos: 'bl',
+            color: 'text-sky-300',
+            bgIcon: 'bg-sky-500/20 border-sky-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+            title: 'Nazorat va xavfsizlik',
+            short: 'Xodimlar faoliyati jurnali va rahbar uchun xabarnomalar',
+            points: [
+              'Barcha amallar vaqti va mas’ul xodim ismi bilan saqlanadi',
+              'Yopilgan bronlar va hisobotlarni faqat rahbar tahrirlay oladi',
+              'Yangi bron, to‘lov va xarajat haqida Telegram orqali tezkor xabar',
+              'Har bir xodim uchun alohida kirish huquqi va parol himoyasi'
+            ],
+            miniVis: `
+              <div class="space-y-1 text-[10px]">
+                <div class="flex items-center justify-between text-sky-200 font-semibold"><span>Telegram xabarnoma</span><span class="text-[9px] text-emerald-300">Hozirgina</span></div>
+                <div class="text-indigo-100/90 leading-snug">Yangi to‘lov qabul qilindi: <b>№ 302 • 500 000 so‘m</b> (Naqd) • 1-smena administratori</div>
+              </div>`
+          },
+          {
+            pos: 'br',
+            color: 'text-amber-300',
+            bgIcon: 'bg-amber-500/20 border-amber-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+            title: 'Bulutli tizim va qulaylik',
+            short: 'Telefon va kompyuterda 24/7 ishlash, 3 til va arxiv',
+            points: [
+              'Dunyoning istalgan nuqtasidan telefon yoki kompyuterda kuzatish',
+              'O‘zbek, rus va ingliz tillarida to‘liq interfeys hamda tungi rejim',
+              'Barcha hisobotlarni bir bosishda Excel jadvalga yuklab olish',
+              'Har bir mehmonxona uchun alohida himoyalangan bulutli baza'
+            ],
+            miniVis: `
+              <div class="flex items-center justify-between gap-2 text-[10px]">
+                <div class="flex items-center gap-1.5 text-emerald-300 font-bold"><span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Bulut bilan ulangan</span></div>
+                <div class="flex items-center gap-1 text-[9.5px] font-bold text-indigo-100">
+                  <span class="px-1.5 py-0.5 rounded bg-white/10">UZ / RU / EN</span>
+                  <span class="px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-200">Excel</span>
+                </div>
+              </div>`
+          }
+        ]
+      },
+      ru: {
+        badge: 'Облачная система управления • 24/7',
+        headline: 'Управляйте отелем <span class="text-indigo-300">на 100% точно</span> — без тетрадей и ошибок',
+        subtext: 'Календарь номеров, сменная касса, контроль задолженностей и финансовая аналитика — всё в единой быстрой системе.',
+        footerLeft: '✨ <b>7 дней бесплатно</b> полный доступ',
+        footerRight: 'Годовой $99 • Бессрочный $299',
+        hint: 'Подробнее →',
+        cards: [
+          {
+            pos: 'tl',
+            color: 'text-indigo-300',
+            bgIcon: 'bg-indigo-500/20 border-indigo-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+            title: 'Календарь номеров',
+            short: 'Защита от накладок, перенос дат и продление проживания',
+            points: [
+              'Автоматическая защита от двойного бронирования одного номера',
+              'Удобный перенос брони и продление срока проживания мышью',
+              'Мгновенное красное выделение при задержке выезда гостя',
+              'Временное закрытие номеров на техническое обслуживание'
+            ],
+            miniVis: `
+              <div class="flex items-center justify-between text-[10px] text-indigo-200/80 mb-1.5 font-semibold">
+                <span>График занятости</span><span class="text-emerald-300">Активный контроль</span>
+              </div>
+              <div class="space-y-1.5 text-[10px] font-bold">
+                <div class="flex items-center gap-2"><span class="w-10 text-indigo-200/80">№ 204</span><div class="flex-1 h-5 rounded-md bg-emerald-500/85 px-2 flex items-center justify-between text-white"><span>А. Каримов</span><span class="text-[9px] opacity-90">Оплачено</span></div></div>
+                <div class="flex items-center gap-2"><span class="w-10 text-rose-300">№ 205</span><div class="flex-1 h-5 rounded-md bg-rose-600/90 px-2 flex items-center justify-between text-white"><span>С. Алимов</span><span class="text-[9px] bg-white/20 px-1.5 rounded">Поздний выезд</span></div></div>
+              </div>`
+          },
+          {
+            pos: 'tr',
+            color: 'text-emerald-300',
+            bgIcon: 'bg-emerald-500/20 border-emerald-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+            title: 'Смены и финансы',
+            short: 'Кассовый отчёт, учёт расходов и анализ чистой прибыли',
+            points: [
+              'Закрытие и фиксация итогового отчёта по завершении смены',
+              'Точный учёт наличных, банковских карт, переводов и расходов',
+              'Показатели загрузки номеров и среднего дохода за сутки',
+              'Автоматический контроль задолженностей гостей'
+            ],
+            miniVis: `
+              <div class="grid grid-cols-3 gap-1.5 text-center">
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Загрузка</div><div class="text-xs font-extrabold text-emerald-300">84%</div></div>
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Наличные</div><div class="text-xs font-extrabold text-white">4.8 млн</div></div>
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Смена</div><div class="text-xs font-extrabold text-amber-300">Закрыта ✓</div></div>
+              </div>`
+          },
+          {
+            pos: 'bl',
+            color: 'text-sky-300',
+            bgIcon: 'bg-sky-500/20 border-sky-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+            title: 'Контроль и безопасность',
+            short: 'Журнал действий сотрудников и уведомления руководителю',
+            points: [
+              'Каждая операция фиксируется с указанием времени и сотрудника',
+              'Редактирование закрытых броней и смен доступно только руководителю',
+              'Мгновенные уведомления в Telegram о бронях, оплатах и расходах',
+              'Разделение прав доступа и индивидуальные пароли для персонала'
+            ],
+            miniVis: `
+              <div class="space-y-1 text-[10px]">
+                <div class="flex items-center justify-between text-sky-200 font-semibold"><span>Уведомление Telegram</span><span class="text-[9px] text-emerald-300">Только что</span></div>
+                <div class="text-indigo-100/90 leading-snug">Принята оплата: <b>№ 302 • 500 000 сум</b> (Наличные) • Администратор 1-й смены</div>
+              </div>`
+          },
+          {
+            pos: 'br',
+            color: 'text-amber-300',
+            bgIcon: 'bg-amber-500/20 border-amber-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+            title: 'Облачный доступ и удобство',
+            short: 'Работа с телефона и ПК 24/7, 3 языка и выгрузка архива',
+            points: [
+              'Контроль отеля в реальном времени из любой точки мира',
+              'Полный интерфейс на узбекском, русском и английском + ночной режим',
+              'Выгрузка всех отчётов в таблицы Excel и резервные копии',
+              'Отдельная защищённая облачная база данных для каждого отеля'
+            ],
+            miniVis: `
+              <div class="flex items-center justify-between gap-2 text-[10px]">
+                <div class="flex items-center gap-1.5 text-emerald-300 font-bold"><span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Синхронизация активна</span></div>
+                <div class="flex items-center gap-1 text-[9.5px] font-bold text-indigo-100">
+                  <span class="px-1.5 py-0.5 rounded bg-white/10">UZ / RU / EN</span>
+                  <span class="px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-200">Excel</span>
+                </div>
+              </div>`
+          }
+        ]
+      },
+      en: {
+        badge: 'Cloud Hospitality System • 24/7',
+        headline: 'Manage your hotel with <span class="text-indigo-300">complete clarity</span> — paperless and accurate',
+        subtext: 'Room calendar, shift cash reports, balance tracking, and financial insights — unified in one fast workspace.',
+        footerLeft: '✨ <b>7-day free</b> full trial',
+        footerRight: 'Annual $99 • Lifetime $299',
+        hint: 'Details →',
+        cards: [
+          {
+            pos: 'tl',
+            color: 'text-indigo-300',
+            bgIcon: 'bg-indigo-500/20 border-indigo-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+            title: 'Room Calendar',
+            short: 'Conflict protection, room reassignment, and stay extensions',
+            points: [
+              'Automatic protection against double-booking any room',
+              'Move reservations between rooms or extend stays effortlessly',
+              'Instant red highlight when a guest stays past scheduled departure',
+              'Mark rooms temporarily unavailable for maintenance or renovation'
+            ],
+            miniVis: `
+              <div class="flex items-center justify-between text-[10px] text-indigo-200/80 mb-1.5 font-semibold">
+                <span>Live Room Schedule</span><span class="text-emerald-300">Active Sync</span>
+              </div>
+              <div class="space-y-1.5 text-[10px] font-bold">
+                <div class="flex items-center gap-2"><span class="w-10 text-indigo-200/80">№ 204</span><div class="flex-1 h-5 rounded-md bg-emerald-500/85 px-2 flex items-center justify-between text-white"><span>A. Karimov</span><span class="text-[9px] opacity-90">Paid</span></div></div>
+                <div class="flex items-center gap-2"><span class="w-10 text-rose-300">№ 205</span><div class="flex-1 h-5 rounded-md bg-rose-600/90 px-2 flex items-center justify-between text-white"><span>S. Alimov</span><span class="text-[9px] bg-white/20 px-1.5 rounded">Overdue</span></div></div>
+              </div>`
+          },
+          {
+            pos: 'tr',
+            color: 'text-emerald-300',
+            bgIcon: 'bg-emerald-500/20 border-emerald-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+            title: 'Shifts & Finance',
+            short: 'Shift cash register, expenses, and net profit overview',
+            points: [
+              'Lock and hand over each shift report at the end of the day',
+              'Clear breakdown of cash, cards, online payments, and expenses',
+              'Occupancy rate and average daily room revenue analytics',
+              'Automatic tracking of unpaid guest balances'
+            ],
+            miniVis: `
+              <div class="grid grid-cols-3 gap-1.5 text-center">
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Occupancy</div><div class="text-xs font-extrabold text-emerald-300">84%</div></div>
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Net Cash</div><div class="text-xs font-extrabold text-white">4.8M</div></div>
+                <div class="rounded-lg bg-white/5 p-1.5 border border-white/10"><div class="text-[9px] text-indigo-200/70">Shift</div><div class="text-xs font-extrabold text-amber-300">Closed ✓</div></div>
+              </div>`
+          },
+          {
+            pos: 'bl',
+            color: 'text-sky-300',
+            bgIcon: 'bg-sky-500/20 border-sky-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+            title: 'Control & Security',
+            short: 'Staff activity journal and instant Telegram alerts for owners',
+            points: [
+              'Every reservation, payment, and edit is logged with time and staff name',
+              'Closed bookings and shifts can only be modified by the manager',
+              'Instant Telegram alerts for new bookings, payments, and expenses',
+              'Individual staff permissions and password-protected accounts'
+            ],
+            miniVis: `
+              <div class="space-y-1 text-[10px]">
+                <div class="flex items-center justify-between text-sky-200 font-semibold"><span>Telegram Alert</span><span class="text-[9px] text-emerald-300">Just now</span></div>
+                <div class="text-indigo-100/90 leading-snug">Payment received: <b>№ 302 • 500,000 UZS</b> (Cash) • Shift 1 Reception</div>
+              </div>`
+          },
+          {
+            pos: 'br',
+            color: 'text-amber-300',
+            bgIcon: 'bg-amber-500/20 border-amber-400/35',
+            icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+            title: 'Cloud Access & Ease',
+            short: '24/7 mobile and desktop access, 3 languages, and instant backup',
+            points: [
+              'Monitor your property live from anywhere on phone or computer',
+              'Complete Uzbek, Russian, and English interface with night mode',
+              'Export all reports to Excel spreadsheets and backup archives in one click',
+              'Dedicated, isolated cloud database for every single property'
+            ],
+            miniVis: `
+              <div class="flex items-center justify-between gap-2 text-[10px]">
+                <div class="flex items-center gap-1.5 text-emerald-300 font-bold"><span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Cloud Synced</span></div>
+                <div class="flex items-center gap-1 text-[9.5px] font-bold text-indigo-100">
+                  <span class="px-1.5 py-0.5 rounded bg-white/10">UZ / RU / EN</span>
+                  <span class="px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-200">Excel</span>
+                </div>
+              </div>`
+          }
+        ]
+      }
+    };
+
+    function expandAppleBento(cardEl) {
+      const grid = document.getElementById('appleBentoGrid');
+      if (!grid || !cardEl) return;
+      grid.querySelectorAll('.apple-bento-card').forEach(c => c.classList.remove('is-expanded'));
+      cardEl.classList.add('is-expanded');
+      grid.classList.add('has-active');
+    }
+
+    function collapseAllAppleBento() {
+      const grid = document.getElementById('appleBentoGrid');
+      if (!grid) return;
+      grid.querySelectorAll('.apple-bento-card').forEach(c => c.classList.remove('is-expanded'));
+      grid.classList.remove('has-active');
+    }
+
+    function trackAppleCardSpotlight(e, el) {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    }
+
+    function renderAppleLoginBento() {
+      const grid = document.getElementById('appleBentoGrid');
+      if (!grid) return;
+      const lang = ['uz', 'ru', 'en'].includes(currentLang) ? currentLang : 'uz';
+      const data = APPLE_BENTO_CONTENT[lang];
+      const badgeEl = document.getElementById('promoBadgeText');
+      const headEl = document.getElementById('promoHeadline');
+      const subEl = document.getElementById('promoSubtext');
+      const flEl = document.getElementById('promoFooterLeft');
+      const frEl = document.getElementById('promoFooterRight');
+      if (badgeEl) badgeEl.textContent = data.badge;
+      if (headEl) headEl.innerHTML = data.headline;
+      if (subEl) subEl.textContent = data.subtext;
+      if (flEl) flEl.innerHTML = data.footerLeft;
+      if (frEl) frEl.textContent = data.footerRight;
+
+      grid.innerHTML = data.cards.map(c => `
+        <div class="apple-bento-slot" data-pos="${c.pos}">
+          <div class="apple-bento-card" onmouseenter="expandAppleBento(this)" onmousemove="trackAppleCardSpotlight(event, this)" onclick="if(this.classList.contains('is-expanded')) collapseAllAppleBento(); else expandAppleBento(this);">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-xl border ${c.bgIcon} ${c.color} flex items-center justify-center shrink-0">${c.icon}</div>
+                <div class="text-[13px] font-extrabold text-white truncate">${c.title}</div>
+              </div>
+              <span class="text-[10px] font-semibold text-indigo-200/70 shrink-0">${data.hint}</span>
+            </div>
+            <p class="apple-bento-short mt-2 text-[11.5px] text-indigo-100/75 leading-snug line-clamp-2">${c.short}</p>
+            <div class="apple-bento-extra mt-3 space-y-2.5">
+              <div class="apple-mini-vis">${c.miniVis}</div>
+              <ul class="space-y-1.5 text-[11.5px] text-indigo-50/90 leading-snug">
+                ${c.points.map(pt => `<li class="flex items-start gap-2"><span class="text-emerald-400 font-bold mt-0.5">✓</span><span>${pt}</span></li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Dastur ichidagi KPI kartalar uchun nozik Apple nur effekti
+    document.addEventListener('pointermove', (e) => {
+      if (isDragging || moveDragState || isResizingBooking) return;
+      const card = e.target && e.target.closest ? e.target.closest('.fin-kpi-card, .fin-chart-card') : null;
+      if (!card) return;
+      if (!card.classList.contains('rh-apple-sheen')) card.classList.add('rh-apple-sheen');
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    }, { passive: true });
 
     let i18nObserverTimer = null;
     const i18nObserver = new MutationObserver(() => {
@@ -6749,6 +7283,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
     });
     window.addEventListener('DOMContentLoaded', () => {
       updateLangButtonsUI();
+      renderAppleLoginBento();
       if (currentLang !== 'uz') applyLanguageToSubtree(document.body);
       i18nObserver.observe(document.body, { childList: true, subtree: true });
     });
