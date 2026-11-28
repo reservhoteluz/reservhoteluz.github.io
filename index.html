@@ -149,8 +149,8 @@
       .booking-bar { height: 28px !important; top: 4px !important; font-size: 10.5px !important; padding: 0 6px !important; }
       .booking-resize-handle { display: none !important; }
       #loginScreen {
-        padding: 10px max(12px, env(safe-area-inset-right)) 16px max(12px, env(safe-area-inset-left)) !important;
-        align-items: flex-start !important;
+        display: block !important;
+        padding: 10px max(12px, env(safe-area-inset-right)) 20px max(12px, env(safe-area-inset-left)) !important;
       }
       #loginScreen > div { margin-top: 0 !important; margin-bottom: 12px !important; }
       #bookingModal, #createHotelModal, #cancelModal, #tariffOfferModal, #globalSearchModal, #rhDialogModal {
@@ -813,10 +813,34 @@
     .beam-shell {
       border-radius: 22px;
       padding: 1.5px;
-      background: linear-gradient(135deg, rgba(129, 140, 248, 0.55), rgba(16, 185, 129, 0.35), rgba(91, 84, 230, 0.55));
+      background: linear-gradient(135deg, rgba(129, 140, 248, 0.45), rgba(16, 185, 129, 0.28), rgba(91, 84, 230, 0.45));
     }
-    .beam-shell::before {
-      display: none;
+    /* Mobil tik (portrait) va albom (landscape) rejimlarida kirish vizual effektlari 100% ko'rinishi uchun */
+    @media (max-width: 1023px) {
+      #loginScreen {
+        display: block !important;
+        padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      #loginScreen > div {
+        margin: 0 auto 16px auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      #appleLoginPromoPanel {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        position: relative !important;
+      }
+      .tilt-wrapper { perspective: none !important; }
+      .beam-shell {
+        transform: none !important;
+        transform-style: flat !important;
+        will-change: auto !important;
+      }
     }
     @keyframes scanSweep {
       0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
@@ -838,7 +862,7 @@
       top: 0;
       bottom: 0;
       width: 38%;
-      background: linear-gradient(90deg, transparent, rgba(165, 180, 252, 0.08), rgba(52, 211, 153, 0.06), transparent);
+      background: linear-gradient(90deg, transparent, rgba(165, 180, 252, 0.14), rgba(52, 211, 153, 0.10), transparent);
       animation: scanSweep 7.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
       will-change: transform, opacity;
     }
@@ -1137,7 +1161,7 @@
 
   <!-- ==================== 1. YOPIQ KIRISH EKRANI (INSTAGRAM USLUBIDA) ==================== -->
   <div id="loginScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-[#090d22] via-[#131b3a] to-[#1b2554] flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-[1160px] grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden border border-indigo-400/25 shadow-[0_32px_90px_-18px_rgba(0,0,0,0.85)] bg-white my-auto">
+    <div class="w-full max-w-[1160px] grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden border border-indigo-400/25 shadow-[0_32px_90px_-18px_rgba(0,0,0,0.85)] bg-white my-2 lg:my-auto">
       <!-- CHAP TOMON: CINEMATIC INTERACTIVE VALUE STAGE -->
       <section id="appleLoginPromoPanel" onpointermove="handleShowcasePointerMove(event)" onpointerleave="handleShowcasePointerLeave()" class="flex lg:col-span-6 stage-bg p-4 sm:p-6 xl:p-7 text-white flex-col justify-between gap-3.5 sm:gap-4 overflow-hidden select-none">
         <!-- Ambient Visual Layers -->
@@ -1193,10 +1217,13 @@
 
         <!-- 4. BOTTOM TRUST & CONVERSION STRIP -->
         <div id="trustStrip" class="relative z-10 pt-2.5 border-t border-white/10 grid grid-cols-3 gap-1.5 sm:gap-2 text-[9.5px] sm:text-[10.5px] font-bold"></div>
+        <button type="button" onclick="document.getElementById('loginFormCard')?.scrollIntoView({behavior:'smooth'})" class="lg:hidden relative z-10 w-full py-2.5 rounded-xl bg-gradient-to-r from-[#5b54e6] to-indigo-500 text-white text-xs font-extrabold shadow-lg flex items-center justify-center gap-1.5 active:scale-[0.98] transition">
+          <span>🔑 Tizimga kirish / 7 kun bepul Demo</span><span>↓</span>
+        </button>
       </section>
 
       <!-- O'NG TOMON: KIRISH / RO'YXATDAN O'TISH KARTASI -->
-      <div class="lg:col-span-6 bg-white w-full overflow-hidden flex flex-col justify-between">
+      <div id="loginFormCard" class="lg:col-span-6 bg-white w-full overflow-hidden flex flex-col justify-between">
       <div class="bg-gradient-to-r from-[#090d22] via-[#131b3a] to-[#1b2554] p-7 text-center text-white flex flex-col items-center relative">
         <div class="absolute top-3 right-3 flex items-center gap-1 bg-white/10 p-1 rounded-lg border border-white/15 text-[10px] font-bold">
           <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2 py-0.5 rounded transition">UZ</button>
@@ -4992,34 +5019,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       if (!isCeoCreator() && !isHotelFeatureEnabled('excel')) { showToast('🔒 Excel eksport ushbu tarifda o‘chirilgan.', 'error'); return; }
       const data = getDailyReportData(), hotel = saasRegistry.hotels[currentHotelId] || { name: 'ReservHotel' };
       const buildShiftExcel = s => `<h3>${s.shiftNum}-SMENA (${s.startTime} – ${s.endTime}) — Admin: ${s.adminName || '-'}</h3><table border="1" cellspacing="0" cellpadding="6"><tr><th>Xona</th><th>Mehmon</th><th>Kirish → Chiqish</th><th>Narxi</th><th>To'langan</th><th>Turi</th></tr>${s.rows.map(r => `<tr><td>№ ${r.room}</td><td>${r.guestName}</td><td>${r.datesText}</td><td>${r.rate}</td><td>${r.paid}</td><td>${r.payType}</td></tr>`).join('') || '<tr><td colspan="6">Yo\'q</td></tr>'}</table><p>Jami: ${s.totalIncome} | Naqd: ${s.cashIn} | Xarajat: ${s.totalExp} | Sof naqd: <b>${s.netCash}</b></p><br/>`;
-      const html = `<html><head><meta charset="UTF-8" /></head><body><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${data.shifts.map(buildShiftExcel).join('')}
-  <script>
-    (function setupMobileOrientationGuard() {
-      let orientTimer = null;
-      let lastWasMobile = (typeof isMobileViewport === 'function') ? isMobileViewport() : (window.innerWidth < 768);
-      function handleViewportChange() {
-        clearTimeout(orientTimer);
-        orientTimer = setTimeout(() => {
-          const nowMobile = (typeof isMobileViewport === 'function') ? isMobileViewport() : (window.innerWidth < 768);
-          if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
-          if (nowMobile !== lastWasMobile) {
-            lastWasMobile = nowMobile;
-            const sb = document.getElementById('sidebar');
-            if (!nowMobile && sb) {
-              sb.classList.remove('hidden', 'mob-drawer-open');
-              sb.classList.add('flex');
-            }
-          }
-          if (typeof currentUser !== 'undefined' && currentUser && typeof renderMatrix === 'function' && activeTabName === 'matrix') {
-            renderMatrix();
-          }
-        }, 160);
-      }
-      window.addEventListener('orientationchange', handleViewportChange, { passive: true });
-      window.addEventListener('resize', handleViewportChange, { passive: true });
-    })();
-  </script>
-</body></html>`;
+      const html = `<html><head><meta charset="UTF-8" /></head><body><h2>${hotel.name} — Kunlik Hisobot (${data.selectedDate})</h2>${data.shifts.map(buildShiftExcel).join('')}</body></html>`;
       const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${hotel.name}_Hisobot_${data.selectedDate}.xls`; a.click();
     }
@@ -8446,12 +8446,19 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       clearTimeout(i18nObserverTimer);
       i18nObserverTimer = setTimeout(() => applyLanguageToSubtree(document.body), 0);
     });
-    window.addEventListener('DOMContentLoaded', () => {
+    function bootLoginShowcaseNow() {
+      if (window._rhShowcaseBooted) return;
+      window._rhShowcaseBooted = true;
       updateLangButtonsUI();
       renderAppleLoginBento();
       if (currentLang !== 'uz') applyLanguageToSubtree(document.body);
       i18nObserver.observe(document.body, { childList: true, subtree: true });
-    });
+    }
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', bootLoginShowcaseNow);
+    } else {
+      bootLoginShowcaseNow();
+    }
 
 
     // ==================== ZAMONAVIY TOAST BILDIRISHNOMALAR & DARK MODE ====================
@@ -8689,6 +8696,33 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
           requestAnimationFrame(updateSpotlight);
         }
       }, { passive: true });
+    })();
+  </script>
+
+  <script>
+    (function setupMobileOrientationGuard() {
+      let orientTimer = null;
+      let lastWasMobile = (typeof isMobileViewport === 'function') ? isMobileViewport() : (window.innerWidth < 768);
+      function handleViewportChange() {
+        clearTimeout(orientTimer);
+        orientTimer = setTimeout(() => {
+          const nowMobile = (typeof isMobileViewport === 'function') ? isMobileViewport() : (window.innerWidth < 768);
+          if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
+          if (nowMobile !== lastWasMobile) {
+            lastWasMobile = nowMobile;
+            const sb = document.getElementById('sidebar');
+            if (!nowMobile && sb) {
+              sb.classList.remove('hidden', 'mob-drawer-open');
+              sb.classList.add('flex');
+            }
+          }
+          if (typeof currentUser !== 'undefined' && currentUser && typeof renderMatrix === 'function' && activeTabName === 'matrix') {
+            renderMatrix();
+          }
+        }, 160);
+      }
+      window.addEventListener('orientationchange', handleViewportChange, { passive: true });
+      window.addEventListener('resize', handleViewportChange, { passive: true });
     })();
   </script>
 </body>
