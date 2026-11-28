@@ -42,6 +42,13 @@
         max-height: calc(100dvh - 176px);
         border-radius: 12px;
         touch-action: pan-x pan-y;
+        transform: none !important;
+        -webkit-overflow-scrolling: touch;
+      }
+      .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y;
+        max-width: 100%;
       }
       .sticky-col-room, .sticky-corner {
         width: 78px !important;
@@ -1047,7 +1054,7 @@
   <div id="loginScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-[#090d22] via-[#131b3a] to-[#1b2554] flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-[1160px] grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden border border-indigo-400/25 shadow-[0_32px_90px_-18px_rgba(0,0,0,0.85)] bg-white my-auto">
       <!-- CHAP TOMON: CINEMATIC INTERACTIVE VALUE STAGE -->
-      <section id="appleLoginPromoPanel" onpointermove="handleShowcasePointerMove(event)" onpointerleave="handleShowcasePointerLeave()" class="hidden lg:flex lg:col-span-6 stage-bg p-6 xl:p-7 text-white flex-col justify-between gap-4 overflow-hidden select-none">
+      <section id="appleLoginPromoPanel" onpointermove="handleShowcasePointerMove(event)" onpointerleave="handleShowcasePointerLeave()" class="flex lg:col-span-6 stage-bg p-4 sm:p-6 xl:p-7 text-white flex-col justify-between gap-3.5 sm:gap-4 overflow-hidden select-none">
         <!-- Ambient Visual Layers -->
         <div class="dot-grid absolute inset-0 pointer-events-none z-0"></div>
         <div class="aurora-orb-a absolute -top-28 -left-24 w-80 h-80 rounded-full bg-[#5b54e6]/30 blur-[85px] pointer-events-none z-0"></div>
@@ -1083,7 +1090,7 @@
 
         <!-- 3. 3D-TILT INTERACTIVE SHOWCASE STAGE (WITH CONIC BORDER BEAM) -->
         <div class="relative z-10 space-y-2.5" onmouseenter="pauseShowcaseCycle(true)" onmouseleave="pauseShowcaseCycle(false)">
-          <div id="stageTabsRow" class="grid grid-cols-2 sm:grid-cols-5 gap-1.5"></div>
+          <div id="stageTabsRow" class="flex sm:grid sm:grid-cols-5 gap-1.5 overflow-x-auto pb-1 sm:pb-0"></div>
 
           <div class="tilt-wrapper">
             <div id="tiltCard" class="beam-shell">
@@ -1100,7 +1107,7 @@
         </div>
 
         <!-- 4. BOTTOM TRUST & CONVERSION STRIP -->
-        <div id="trustStrip" class="relative z-10 pt-2.5 border-t border-white/10 grid grid-cols-3 gap-2 text-[10.5px] font-bold"></div>
+        <div id="trustStrip" class="relative z-10 pt-2.5 border-t border-white/10 grid grid-cols-3 gap-1.5 sm:gap-2 text-[9.5px] sm:text-[10.5px] font-bold"></div>
       </section>
 
       <!-- O'NG TOMON: KIRISH / RO'YXATDAN O'TISH KARTASI -->
@@ -1145,7 +1152,7 @@
         <h1 class="text-2xl font-extrabold tracking-tight"><span class="text-white">Reserv</span><span class="text-indigo-300 font-medium">Hotel</span></h1>
         <p class="text-xs text-indigo-200 mt-1">Har bir mehmonxona uchun alohida yopiq bulutli tizim</p>
       </div>
-      <div class="p-6 space-y-4 bg-gradient-to-b from-white to-[#f6f7ff] max-h-[82vh] overflow-y-auto">
+      <div class="p-5 sm:p-6 space-y-4 bg-gradient-to-b from-white to-[#f6f7ff] lg:max-h-[82vh] lg:overflow-y-auto">
         <!-- Kirish / 7 kunlik Bepul Ro'yxatdan o'tish almashtirgich -->
         <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#eef0ff] border border-[#d8defa] text-xs font-bold">
           <button type="button" id="authTabLoginBtn" onclick="switchAuthMode('login')" class="py-2 px-3 rounded-lg bg-[#5b54e6] text-white shadow-xs transition">
@@ -1416,7 +1423,7 @@
       <div id="trialStatusBanner" class="hidden px-5 py-2.5 text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shrink-0 border-b"></div>
 
       <!-- ==================== TAB 1: BRONLAR KALENDARI ==================== -->
-      <main id="tab-matrix" class="tab-content flex-1 flex flex-col p-2.5 sm:p-4 overflow-hidden">
+      <main id="tab-matrix" class="tab-content flex-1 min-w-0 w-full flex flex-col p-2.5 sm:p-4 overflow-hidden">
         <!-- YANGI DEMO MIJOZLAR UCHUN 3 QADAMLI TEZ BOSHLASH (ONBOARDING) -->
         <div id="onboardingGuideCard" class="hidden mb-2.5 p-3 rounded-xl bg-gradient-to-r from-[#eef0ff] via-white to-emerald-50/70 border border-[#5b54e6]/30 shadow-2xs">
           <div class="flex items-center justify-between gap-2 mb-2">
@@ -1502,7 +1509,7 @@
       </main>
 
       <!-- ==================== TAB 2: KUNLIK HISOBOT (2 SMENA) ==================== -->
-      <main id="tab-daily" class="tab-content hidden flex-1 overflow-y-auto p-5 space-y-5">
+      <main id="tab-daily" class="tab-content hidden flex-1 min-w-0 w-full overflow-y-auto p-5 space-y-5">
         <div class="bg-white/95 rounded-xl border border-[#d8defa] p-4 space-y-3 shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -1564,13 +1571,13 @@
       </main>
 
       <!-- TAB 3: BRONLAR VA AMALLAR TARIXI -->
-      <main id="tab-bookings" class="tab-content hidden flex-1 overflow-y-auto p-5 space-y-5">
+      <main id="tab-bookings" class="tab-content hidden flex-1 min-w-0 w-full overflow-y-auto p-5 space-y-5">
         <div class="bg-white/95 rounded-xl border border-[#d8defa] p-4 flex flex-wrap items-center justify-between gap-3">
           <div><h3 class="font-bold text-[#131b3a] text-base">Barcha Bronlar va Mehmonlar Ro‘yxati</h3><p class="text-xs text-slate-500">Istalgan mehmon ustiga bosib to‘lov qabul qiling yoki tahrirlang</p></div>
           <div class="flex gap-2"><input type="text" id="listSearchInput" oninput="renderBookingsTable()" placeholder="F.I.SH, telefon yoki xona..." class="px-3 py-2 border border-[#d8defa] rounded-lg text-xs w-60 bg-white" /><button onclick="openBookingModal()" class="px-4 py-2 bg-[#5b54e6] hover:bg-[#4942d4] text-white rounded-lg text-xs font-semibold">+ Yangi mehmon</button></div>
         </div>
         <div class="bg-white/95 rounded-xl border border-[#d8defa] overflow-x-auto shadow-sm">
-          <table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-[#f5f6ff] border-b border-slate-200 text-[#131b3a] uppercase text-[11px]"><th class="p-3.5">Xona</th><th class="p-3.5">Mehmon F.I.SH</th><th class="p-3.5">Telefon / Manba</th><th class="p-3.5">Kirish</th><th class="p-3.5">Chiqish</th><th class="p-3.5">Tun</th><th class="p-3.5">Jami Summa</th><th class="p-3.5">To‘langan</th><th class="p-3.5">Qarz</th><th class="p-3.5">To‘lov turi</th><th class="p-3.5">Holati</th><th class="p-3.5 text-right">Amal</th></tr></thead><tbody id="bookingsTableBody" class="divide-y divide-slate-100"></tbody></table>
+          <table class="w-full text-left border-collapse text-xs min-w-[920px]"><thead><tr class="bg-[#f5f6ff] border-b border-slate-200 text-[#131b3a] uppercase text-[11px]"><th class="p-3.5">Xona</th><th class="p-3.5">Mehmon F.I.SH</th><th class="p-3.5">Telefon / Manba</th><th class="p-3.5">Kirish</th><th class="p-3.5">Chiqish</th><th class="p-3.5">Tun</th><th class="p-3.5">Jami Summa</th><th class="p-3.5">To‘langan</th><th class="p-3.5">Qarz</th><th class="p-3.5">To‘lov turi</th><th class="p-3.5">Holati</th><th class="p-3.5 text-right">Amal</th></tr></thead><tbody id="bookingsTableBody" class="divide-y divide-slate-100"></tbody></table>
         </div>
 
         <!-- MEHMONXONA BOSH ADMINI UCHUN AMALLAR TARIXI -->
@@ -1585,7 +1592,7 @@
             </button>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
+            <table class="w-full text-left border-collapse text-xs min-w-[640px]">
               <thead>
                 <tr class="bg-[#f5f6ff] border-b border-slate-200 text-[#131b3a] uppercase text-[11px]">
                   <th class="p-3.5">Vaqt</th>
@@ -1601,7 +1608,7 @@
       </main>
 
       <!-- ==================== TAB 4: MOLIYA VA KASSA (PROFESSIONAL ANALITIKA) ==================== -->
-      <main id="tab-finance" class="tab-content hidden flex-1 overflow-y-auto p-5 space-y-5">
+      <main id="tab-finance" class="tab-content hidden flex-1 min-w-0 w-full overflow-y-auto p-5 space-y-5">
         <!-- Yuqori boshqaruv paneli -->
         <div class="bg-gradient-to-r from-white via-[#f8f9ff] to-[#eef1ff] rounded-2xl border border-[#d8defa] p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
           <div class="flex items-center gap-3">
@@ -1766,7 +1773,7 @@
       </main>
 
       <!-- TAB 5: XONALAR VA NARXLAR (DINAMIK QO'SHISH) -->
-      <main id="tab-rates" class="tab-content hidden flex-1 overflow-y-auto p-5 space-y-4">
+      <main id="tab-rates" class="tab-content hidden flex-1 min-w-0 w-full overflow-y-auto p-5 space-y-4">
         <div class="bg-white/95 rounded-xl border border-[#d8defa] p-4 flex flex-wrap items-center justify-between gap-3">
           <div><h3 id="roomsConfigHeaderTitle" class="font-bold text-[#131b3a] text-base">Xonalar Ro‘yxati va Tariflar</h3><p class="text-xs text-slate-500">Mehmonxonangiz xonalarini 0 dan qo‘shing, qavatini, o‘rinlar sonini va narxini o‘zgartiring</p></div>
           <button onclick="saveRoomRates()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm">💾 O‘zgarishlarni saqlash</button>
@@ -1783,8 +1790,9 @@
           <div><button type="submit" class="w-full py-2 bg-[#5b54e6] hover:bg-[#4942d4] text-white font-bold rounded-lg shadow-xs">+ Yangi xona qo‘shish</button></div>
         </form>
 
-        <div class="bg-white/95 rounded-xl border border-[#d8defa] overflow-hidden shadow-sm">
-          <table class="w-full text-left border-collapse text-xs">
+        <div class="md:hidden text-[11px] font-semibold text-[#5b54e6] px-1">👈 Jadvalni chapga va o‘ngga surib barcha ustunlarni ko‘ring 👉</div>
+        <div class="bg-white/95 rounded-xl border border-[#d8defa] overflow-x-auto shadow-sm">
+          <table class="w-full text-left border-collapse text-xs min-w-[760px]">
             <thead><tr class="bg-[#f5f6ff] border-b border-slate-200 text-[#131b3a] uppercase text-[11px]"><th class="p-3.5">Qavat</th><th class="p-3.5">Xona №</th><th class="p-3.5">Xona toifasi / Nomi</th><th class="p-3.5">O‘rinlar soni</th><th class="p-3.5">1 tun narxi (UZS)</th><th class="p-3.5">Xona holati</th><th class="p-3.5 text-right">Amal</th></tr></thead>
             <tbody id="roomsConfigBody" class="divide-y divide-slate-100"></tbody>
           </table>
@@ -1792,7 +1800,7 @@
       </main>
 
       <!-- TAB 6: XODIMLAR RUXSATI -->
-      <main id="tab-users" class="tab-content hidden flex-1 overflow-y-auto p-5 space-y-4">
+      <main id="tab-users" class="tab-content hidden flex-1 min-w-0 w-full overflow-y-auto p-5 space-y-4">
         <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center justify-between">
           <div><div class="text-xs font-bold text-emerald-900">☁️ Ushbu mehmonxona bazasi bulutga ulangan</div><div class="text-[11px] text-emerald-700 mt-0.5">Parol kamida 6 ta belgidan iborat bo‘lishi shart. Har bir xodim o‘z Gmail va paroli bilan shu mehmonxonaga kiradi.</div></div>
           <button onclick="pushAllToCloud(true)" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs">☁️ Bazaga yuklash</button>
@@ -1889,7 +1897,7 @@
       </main>
 
       <!-- TAB 7: MASTER-ADMIN SAAS PANELI -->
-      <main id="tab-saas" class="tab-content hidden flex-1 overflow-y-auto p-5 space-y-5">
+      <main id="tab-saas" class="tab-content hidden flex-1 min-w-0 w-full overflow-y-auto p-5 space-y-5">
         <div class="bg-gradient-to-r from-[#090d22] via-[#131b3a] to-[#5b54e6] text-white rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-md">
           <div>
             <div class="text-xs font-bold text-amber-300 uppercase tracking-wider">👑 Master-Admin Boshqaruv Markazi (Faqat CEO)</div>
@@ -4549,7 +4557,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
               <span class="text-[11px] font-normal text-amber-700">Faqat bosh administrator qayta ocha oladi</span>
             </div>
             <div class="grid grid-cols-1 xl:grid-cols-3 divide-y xl:divide-y-0 xl:divide-x divide-slate-200">
-              <div class="xl:col-span-2 flex flex-col">
+              <div class="xl:col-span-2 flex flex-col min-w-0">
                 <form id="shiftEntryForm_${n}" onsubmit="addDailyManualEntry(event, ${n})" class="p-4 bg-[#f5f6ff] border-b border-[#d8defa] space-y-2.5 text-xs">
                   <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                     <div><label class="block text-[10px] font-bold text-slate-600 mb-0.5">Xona № *</label><input type="text" id="manRoom_${n}" required placeholder="105" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-bold" /></div>
@@ -4566,7 +4574,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
                     <div><button type="submit" class="w-full py-1.5 rounded-lg ${btnBg} text-white font-bold shadow-xs">+ ${n}-smenaga qo‘shish</button></div>
                   </div>
                 </form>
-                <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-[#f8f9ff] border-b border-slate-200 text-slate-600 uppercase text-[10.5px]"><th class="p-3">Xona</th><th class="p-3">Mehmon nomi</th><th class="p-3">Kirish → Chiqish</th><th class="p-3">Xona narxi</th><th class="p-3">To‘langan</th><th class="p-3">To‘lov turi</th><th class="p-3 text-right">Amal</th></tr></thead><tbody id="shiftTableBody_${n}" class="divide-y divide-slate-100"></tbody></table></div>
+                <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-xs min-w-[640px]"><thead><tr class="bg-[#f8f9ff] border-b border-slate-200 text-slate-600 uppercase text-[10.5px]"><th class="p-3">Xona</th><th class="p-3">Mehmon nomi</th><th class="p-3">Kirish → Chiqish</th><th class="p-3">Xona narxi</th><th class="p-3">To‘langan</th><th class="p-3">To‘lov turi</th><th class="p-3 text-right">Amal</th></tr></thead><tbody id="shiftTableBody_${n}" class="divide-y divide-slate-100"></tbody></table></div>
               </div>
               <div class="flex flex-col bg-rose-50/15">
                 <div class="p-3.5 border-b border-rose-100 bg-rose-50/50"><div class="font-bold text-rose-900 text-xs">💸 ${n}-smena Xarajatlari (Naqd puldan)</div></div>
@@ -7983,7 +7991,7 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       const row = document.getElementById('stageTabsRow');
       if (!row) return;
       row.innerHTML = t.tabs.map((tab, i) => `
-        <button type="button" onclick="selectShowcaseTab(${i})" class="stage-tab-btn ${i === showcaseActiveTab ? 'active' : 'bg-white/[0.04] border-white/10 text-indigo-200/80 hover:bg-white/[0.09] hover:text-white'} px-2 py-2 rounded-xl border text-[10px] font-bold truncate text-center">
+        <button type="button" onclick="selectShowcaseTab(${i})" class="stage-tab-btn ${i === showcaseActiveTab ? 'active' : 'bg-white/[0.04] border-white/10 text-indigo-200/80 hover:bg-white/[0.09] hover:text-white'} shrink-0 sm:shrink px-2.5 sm:px-2 py-2 rounded-xl border text-[10.5px] sm:text-[10px] font-bold whitespace-nowrap sm:truncate text-center">
           ${tab.short}
         </button>
       `).join('');
