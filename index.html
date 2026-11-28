@@ -1117,6 +1117,51 @@
       display: none !important;
     }
 
+  
+    /* ==================== TOZALANMAGAN XONA OGOHLANTIRISH VIZUAL EFFEKTI ==================== */
+    @keyframes dirtyModalEntrance {
+      0% { opacity: 0; transform: scale(0.88) translateY(16px); }
+      55% { opacity: 1; transform: scale(1.02) translateY(-2px); }
+      72% { transform: translateX(-5px) scale(1); }
+      84% { transform: translateX(4px) scale(1); }
+      92% { transform: translateX(-2px) scale(1); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes dirtyPulseRing {
+      0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.65), 0 0 0 0 rgba(245, 158, 11, 0.45); }
+      65% { box-shadow: 0 0 0 14px rgba(244, 63, 94, 0), 0 0 0 24px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0), 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    @keyframes dirtySweep {
+      0% { transform: translateX(-120%) skewX(-20deg); }
+      100% { transform: translateX(260%) skewX(-20deg); }
+    }
+    .dirty-warn-card {
+      animation: dirtyModalEntrance 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .dirty-warn-icon-ring {
+      animation: dirtyPulseRing 1.8s ease-out infinite;
+    }
+    .dirty-inline-banner {
+      position: relative;
+      overflow: hidden;
+      animation: dirtyModalEntrance 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .dirty-inline-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+      animation: dirtySweep 2.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    body.dark-mode .room-band-badge {
+      background-color: rgba(244, 63, 94, 0.24) !important;
+      color: #fda4af !important;
+      border-color: rgba(251, 113, 133, 0.45) !important;
+    }
+
   </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -2347,6 +2392,16 @@
       <form onsubmit="saveBookingForm(event)" class="p-6 space-y-4 max-h-[84vh] overflow-y-auto text-xs">
         <input type="hidden" id="editBookingId" />
         <div id="overbookingAlert" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-semibold"></div>
+        <div id="dirtyRoomInlineAlert" class="hidden dirty-inline-banner p-3.5 rounded-xl bg-gradient-to-r from-amber-50 via-rose-50 to-amber-50 border-2 border-rose-300 text-rose-900 shadow-sm flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="dirty-warn-icon-ring w-9 h-9 rounded-full bg-gradient-to-br from-amber-500 to-rose-600 text-white flex items-center justify-center text-base shrink-0 shadow-sm">🧹</span>
+            <div class="min-w-0">
+              <div id="dirtyInlineTitle" class="font-extrabold text-rose-700 text-xs">⚠️ Diqqat! Xona hali tozalanmagan!</div>
+              <div class="text-[11px] text-rose-800/85 font-medium">Ushbu xona «Tozalash kerak» holatida turibdi.</div>
+            </div>
+          </div>
+          <button type="button" onclick="markFormRoomCleanNow()" class="relative z-10 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-xs transition shrink-0">✨ Toza deb belgilash</button>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label class="block font-semibold text-slate-700 mb-1">Xona raqami *</label><select id="formRoom" onchange="recalcBookingTotal()" required class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold"></select></div>
           <div><label class="block font-semibold text-slate-700 mb-1">Bron holati</label><select id="formStatus" onchange="handleFormStatusChange()" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold"><option value="Bron" selected>Bron (Oldindan band)</option><option value="Band">Band (Check-in qilingan)</option><option value="Chiqdi">Chiqdi (Check-out)</option><option value="Ta'mirda">🔧 Ta’mirda / Yopiq (Out of Order)</option><option value="Bekor qilingan">Bekor qilingan</option></select></div>
@@ -2547,6 +2602,44 @@
         <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
           <button type="button" id="rhDialogCancelBtn" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 font-semibold text-xs transition">Bekor qilish</button>
           <button type="button" id="rhDialogOkBtn" class="px-5 py-2 rounded-xl bg-[#5b54e6] hover:bg-[#4942d4] text-white font-bold text-xs shadow-sm transition">Tasdiqlash</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOZALANMAGAN XONA UCHUN CHIROYLI VISUAL OGOHLANTIRISH OYNASI -->
+  <div id="dirtyRoomWarnModal" class="fixed inset-0 z-[120] hidden bg-[#090d22]/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="dirty-warn-card bg-white w-full max-w-md rounded-3xl shadow-2xl border-2 border-rose-400/70 overflow-hidden">
+      <div class="relative px-6 py-5 bg-gradient-to-br from-rose-600 via-red-600 to-amber-600 text-white text-center overflow-hidden">
+        <div class="dirty-warn-icon-ring mx-auto w-14 h-14 rounded-2xl bg-white/20 border border-white/40 backdrop-blur-md flex items-center justify-center text-3xl shadow-lg mb-2.5">
+          🧹
+        </div>
+        <h3 class="font-extrabold text-base tracking-tight">Diqqat! Xona toza emas!</h3>
+        <p id="dirtyWarnSubtitle" class="text-[11.5px] text-rose-100 mt-1 font-medium">Ushbu xona hali tozalanmagan («Tozalash kerak»)</p>
+      </div>
+      <div class="p-5 space-y-4 text-xs">
+        <div class="p-3.5 rounded-2xl bg-rose-50/90 border border-rose-200 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div id="dirtyWarnRoomBadge" class="text-sm font-extrabold text-rose-700">Xona № 102</div>
+            <div id="dirtyWarnRoomMeta" class="text-[11px] text-slate-600 font-medium mt-0.5 truncate">1-qavat • Standard</div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-extrabold text-[10.5px] shrink-0 animate-pulse">🧹 Tozalash kerak</span>
+        </div>
+        <p id="dirtyWarnBodyText" class="text-slate-600 leading-relaxed text-center font-medium">
+          Shoshilib tozalanmagan xonaga mehmon joylashtirmaslik uchun xona tozalanganiga ishonch hosil qiling.
+        </p>
+        <div class="space-y-2 pt-1">
+          <button type="button" id="dirtyWarnCleanBtn" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-1.5">
+            <span>✨</span> <span>Xonani Toza deb belgilab davom etish</span>
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="dirtyWarnForceBtn" class="py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold text-xs transition">
+              ⚠️ Baribir joylashtirish
+            </button>
+            <button type="button" id="dirtyWarnCancelBtn" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+              ✕ Bekor qilish
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -4496,14 +4589,88 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       }
     }
     function isRoomCheckedInToday(roomId) { const t = toIsoDate(new Date()); return bookings.some(b => b.room === roomId && b.status === 'Band' && b.checkIn <= t && b.checkOut > t); }
+    function isRoomBookedOrCheckedIn(roomId) { const t = toIsoDate(new Date()); return bookings.some(b => b.room === roomId && (b.status === 'Band' || b.status === 'Bron') && toIsoDate(b.checkOut) > t); }
     function isRoomOutOfOrderToday(roomId) { const t = toIsoDate(new Date()); return bookings.some(b => b.room === roomId && b.status === "Ta'mirda" && b.checkIn <= t && b.checkOut > t); }
-    function getEffectiveRoomStatus(r) { if (isRoomOutOfOrderToday(r.id)) return "Ta'mirda"; if (r.manualStatus) return r.clean || 'Toza'; if (isRoomCheckedInToday(r.id)) return 'Band'; return r.clean === 'Tozalash kerak' ? 'Tozalash kerak' : 'Toza'; }
+    function getEffectiveRoomStatus(r) {
+      if (isRoomOutOfOrderToday(r.id)) return "Ta'mirda";
+      if (r.manualStatus) return r.clean || 'Toza';
+      if (r.clean === 'Tozalash kerak') return 'Tozalash kerak';
+      if (r.clean === 'Band' || isRoomCheckedInToday(r.id) || isRoomBookedOrCheckedIn(r.id)) return 'Band';
+      return 'Toza';
+    }
     function getRoomStatusBadgeHtml(r) {
       const st = getEffectiveRoomStatus(r);
       if (st === "Ta'mirda") return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-slate-700 text-amber-300 border border-amber-400/60 font-bold text-[10px]">🔧 Ta’mir</button>`;
-      if (st === 'Band') return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-indigo-100 text-[#4338ca] font-bold text-[10px]">Band</button>`;
+      if (st === 'Band') return `<button onclick="toggleRoomClean('${r.id}')" class="room-band-badge px-2 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[10px]">Band</button>`;
       if (st === 'Tozalash kerak') return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-sky-100 text-sky-700 font-bold text-[10px]">Tozalash</button>`;
       return `<button onclick="toggleRoomClean('${r.id}')" class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px]">Toza</button>`;
+    }
+
+    function confirmDirtyRoomPlacement(roomObj, actionLabel = 'mehmon joylashtirish') {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('dirtyRoomWarnModal');
+        if (!modal || !roomObj) { resolve('continue'); return; }
+        document.getElementById('dirtyWarnRoomBadge').textContent = `Xona № ${roomObj.id}`;
+        document.getElementById('dirtyWarnRoomMeta').textContent = `${roomObj.floor || '1-qavat'} • ${roomObj.name || 'Standard'} (${roomObj.beds || 1} o‘rin)`;
+        document.getElementById('dirtyWarnSubtitle').textContent = `№ ${roomObj.id} xonasi hali tozalanmagan — ${actionLabel}dan oldin tekshiring!`;
+
+        const cleanBtn = document.getElementById('dirtyWarnCleanBtn');
+        const forceBtn = document.getElementById('dirtyWarnForceBtn');
+        const cancelBtn = document.getElementById('dirtyWarnCancelBtn');
+
+        const cleanup = (choice) => {
+          modal.classList.add('hidden');
+          cleanBtn.onclick = null;
+          forceBtn.onclick = null;
+          cancelBtn.onclick = null;
+          modal.onclick = null;
+          document.removeEventListener('keydown', onKey);
+          resolve(choice);
+        };
+        const onKey = (ev) => { if (ev.key === 'Escape') { ev.preventDefault(); cleanup('cancel'); } };
+
+        cleanBtn.onclick = () => cleanup('clean_and_continue');
+        forceBtn.onclick = () => cleanup('continue');
+        cancelBtn.onclick = () => cleanup('cancel');
+        modal.onclick = (ev) => { if (ev.target === modal) cleanup('cancel'); };
+        document.addEventListener('keydown', onKey);
+
+        modal.classList.remove('hidden');
+      });
+    }
+
+    function updateDirtyRoomInlineBanner() {
+      const box = document.getElementById('dirtyRoomInlineAlert');
+      if (!box) return;
+      const roomSel = document.getElementById('formRoom');
+      const statusSel = document.getElementById('formStatus');
+      if (!roomSel || !statusSel) return;
+      const roomId = roomSel.value;
+      const st = statusSel.value;
+      const rObj = rooms.find(x => x.id === roomId);
+      const isDirty = Boolean(rObj && getEffectiveRoomStatus(rObj) === 'Tozalash kerak' && (st === 'Band' || st === 'Bron'));
+      if (isDirty) {
+        const titleEl = document.getElementById('dirtyInlineTitle');
+        if (titleEl) titleEl.textContent = `⚠️ Diqqat! № ${rObj.id} xonasi hali tozalanmagan!`;
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    function markFormRoomCleanNow() {
+      const roomSel = document.getElementById('formRoom');
+      if (!roomSel) return;
+      const rObj = rooms.find(x => x.id === roomSel.value);
+      if (!rObj) return;
+      rObj.clean = 'Toza';
+      rObj.manualStatus = false;
+      saveAllLocal();
+      updateDirtyRoomInlineBanner();
+      renderMatrix();
+      renderRoomsConfig();
+      const clPatch = {}; addCollectionPatchItem(clPatch, 'rooms', rObj.id, rObj); patchHotelCloud(clPatch);
+      showToast(`✨ № ${rObj.id} xonasi «Toza» deb belgilandi!`, 'success', 2200);
     }
     function getBookingUnpaidAmount(b) {
       // Faqat Check-in qilingan ("Band") xonalar uchun to'lanmagan aniq summa hisoblanadi; "Bron" ga qarz yozilmaydi
@@ -5492,7 +5659,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
 📝 Sabab: <b>${escapeTgHtml(b.cancelReason)}</b>
 👤 Bekor qildi: ${escapeTgHtml(b.canceledBy)}`);
       const r = rooms.find(x => x.id === b.room);
-      if (r && !isRoomCheckedInToday(b.room) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
+      if (r && !isRoomCheckedInToday(b.room) && !isRoomBookedOrCheckedIn(b.room) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
       saveAllLocal(); closeCancelModal(); openGuestDrawer(b.id); refreshAllViews(false);
       const cancelPatch = {}; addCollectionPatchItem(cancelPatch, 'bookings', b.id, b); if (r) addCollectionPatchItem(cancelPatch, 'rooms', r.id, r); patchHotelCloud(cancelPatch);
     }
@@ -5860,7 +6027,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       processMoveDragPosition(e.clientX, e.clientY);
     }, { passive: true });
 
-    window.addEventListener('pointerup', () => {
+    window.addEventListener('pointerup', async () => {
       if (!moveDragState) return;
       const st = moveDragState;
       const wasStarted = st.started;
@@ -5897,6 +6064,16 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       }
 
       const oldRoomId = b.room;
+      const newRoomObj = rooms.find(r => r.id === targetRoomId);
+      if (targetRoomId !== oldRoomId && (b.status === 'Band' || b.status === 'Bron') && newRoomObj && getEffectiveRoomStatus(newRoomObj) === 'Tozalash kerak') {
+        const choice = await confirmDirtyRoomPlacement(newRoomObj, 'mehmonni ko‘chirish');
+        if (choice === 'cancel') return;
+        if (choice === 'clean_and_continue') {
+          newRoomObj.clean = 'Toza';
+          newRoomObj.manualStatus = false;
+        }
+      }
+
       const oldDates = `${b.checkIn} → ${b.checkOut}`;
       b.room = targetRoomId;
       b.checkIn = newCheckIn;
@@ -5904,12 +6081,11 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       b.nights = nights;
 
       const oldRoomObj = rooms.find(r => r.id === oldRoomId);
-      if (oldRoomObj && !isRoomCheckedInToday(oldRoomId) && oldRoomObj.clean === 'Band') {
+      if (oldRoomObj && !isRoomCheckedInToday(oldRoomId) && !isRoomBookedOrCheckedIn(oldRoomId) && oldRoomObj.clean === 'Band') {
         oldRoomObj.clean = 'Toza';
         oldRoomObj.manualStatus = false;
       }
-      const newRoomObj = rooms.find(r => r.id === targetRoomId);
-      if (newRoomObj && b.status === 'Band' && isRoomCheckedInToday(targetRoomId)) {
+      if (newRoomObj && (b.status === 'Band' || b.status === 'Bron')) {
         newRoomObj.clean = 'Band';
         newRoomObj.manualStatus = false;
       }
@@ -6134,13 +6310,14 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       const calcDebtVal = (curStatus === 'Bron' || curStatus === 'Bekor qilingan' || curStatus === "Ta'mirda") ? 0 : Math.max(0, total - paid);
       document.getElementById('calcNights').textContent = nights; document.getElementById('calcTotal').textContent = formatMoney(total);
       document.getElementById('calcPaidSum').textContent = formatMoney(paid); document.getElementById('calcDebt').textContent = formatMoney(calcDebtVal);
+      updateDirtyRoomInlineBanner();
     }
 
     function checkOverbooking(roomId, checkIn, checkOut, ignoreId) {
       return bookings.find(b => b.id !== ignoreId && b.status !== 'Chiqdi' && b.status !== 'Bekor qilingan' && b.room === roomId && checkIn < b.checkOut && checkOut > b.checkIn);
     }
 
-    function saveBookingForm(e) {
+    async function saveBookingForm(e) {
       e.preventDefault();
       const editId = document.getElementById('editBookingId').value, room = document.getElementById('formRoom').value;
       const checkIn = document.getElementById('formCheckIn').value, checkInTime = document.getElementById('formCheckInTime').value || getCurrentTimeStr();
@@ -6151,6 +6328,15 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       if (status !== 'Bekor qilingan') {
         const conflict = checkOverbooking(room, checkIn, checkOut, editId);
         if (conflict) { alertBox.textContent = `⛔ Sana band! № ${room} xonasi ${conflict.checkIn} dan band!`; alertBox.classList.remove('hidden'); return; }
+      }
+      const targetRoomCheck = rooms.find(x => x.id === room);
+      if ((status === 'Band' || status === 'Bron') && targetRoomCheck && getEffectiveRoomStatus(targetRoomCheck) === 'Tozalash kerak') {
+        const choice = await confirmDirtyRoomPlacement(targetRoomCheck, status === 'Band' ? 'Check-in qilish' : 'bron qo‘yish');
+        if (choice === 'cancel') return;
+        if (choice === 'clean_and_continue') {
+          targetRoomCheck.clean = 'Toza';
+          targetRoomCheck.manualStatus = false;
+        }
       }
       const isOoo = status === "Ta'mirda";
       const nights = diffNights(checkIn, checkOut);
@@ -6201,7 +6387,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       }
       addCollectionPatchItem(bkPatch, 'bookings', payload.id, payload);
       const rObj = rooms.find(x => x.id === room);
-      if (rObj) { rObj.manualStatus = false; if (status === 'Chiqdi') rObj.clean = 'Tozalash kerak'; else if (isRoomCheckedInToday(room)) rObj.clean = 'Band'; else if (rObj.clean === 'Band') rObj.clean = 'Toza'; addCollectionPatchItem(bkPatch, 'rooms', rObj.id, rObj); }
+      if (rObj) { rObj.manualStatus = false; if (status === 'Chiqdi') rObj.clean = 'Tozalash kerak'; else if (status === 'Band' || status === 'Bron' || isRoomBookedOrCheckedIn(room)) rObj.clean = 'Band'; else if (rObj.clean === 'Band') rObj.clean = 'Toza'; addCollectionPatchItem(bkPatch, 'rooms', rObj.id, rObj); }
       saveAllLocal(); closeBookingModal(); refreshAllViews(false); patchHotelCloud(bkPatch);
     }
 
@@ -6289,13 +6475,21 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       setTimeout(() => { gd.classList.add('hidden'); }, 260);
       activeDrawerBookingId = null;
     }
-    function quickStatusChange(newStatus) {
+    async function quickStatusChange(newStatus) {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
       if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bron holatini faqat bosh administrator o‘zgartira oladi!'); return; }
+      const r = rooms.find(x => x.id === b.room);
+      if (newStatus === 'Band' && r && getEffectiveRoomStatus(r) === 'Tozalash kerak') {
+        const choice = await confirmDirtyRoomPlacement(r, 'Check-in qilish');
+        if (choice === 'cancel') return;
+        if (choice === 'clean_and_continue') {
+          r.clean = 'Toza';
+          r.manualStatus = false;
+        }
+      }
       const nowDate = toIsoDate(new Date());
       const nowTime = getCurrentTimeStr();
       b.status = newStatus;
-      const r = rooms.find(x => x.id === b.room);
       if (newStatus === 'Band') {
         const cIn = toIsoDate(b.checkIn);
         if (!cIn || cIn > nowDate) {
@@ -6370,7 +6564,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
 🚪 Xona: <b>№ ${escapeTgHtml(b.room)}</b>
 👤 Mehmon: <b>${escapeTgHtml(b.guestName || 'Mehmon')}</b>
 📅 Sana: ${b.checkIn} → ${b.checkOut}`); bookings = bookings.filter(x => x.id !== delBkId);
-      const r = rooms.find(x => x.id === roomId); if (r && !isRoomCheckedInToday(roomId) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
+      const r = rooms.find(x => x.id === roomId); if (r && !isRoomCheckedInToday(roomId) && !isRoomBookedOrCheckedIn(roomId) && r.clean === 'Band') { r.clean = 'Toza'; r.manualStatus = false; }
       saveAllLocal(); closeGuestDrawer(); refreshAllViews(false);
       const dbkPatch = {}; addCollectionDeleteItem(dbkPatch, 'bookings', delBkId); if (r) addCollectionPatchItem(dbkPatch, 'rooms', r.id, r); patchHotelCloud(dbkPatch);
     }
