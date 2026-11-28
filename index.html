@@ -656,7 +656,7 @@
     .rh-win-2 { animation: rhWindowBlink 2.2s ease-in-out 1.15s infinite; }
     .rh-win-3 { animation: rhWindowBlink 2.2s ease-in-out 1.5s infinite; }
     .rh-splash-title { opacity: 0; animation: rhTextUp 0.65s ease-out 0.45s forwards; }
-    .rh-splash-bar { animation: rhBarLoad 1.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .rh-splash-bar { animation: rhBarLoad 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 
     /* ==================== CINEMATIC INTERACTIVE LOGIN SHOWCASE (EXACT PORT) ==================== */
     .stage-bg {
@@ -1162,9 +1162,77 @@
       border-color: rgba(251, 113, 133, 0.45) !important;
     }
 
+  
+    /* ==================== SKELETON SYNC BAR, LIVE CLOCK PILL, PAYMENT FLASH & HOVER CARD ==================== */
+    @keyframes rhSyncSlide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(300%); }
+    }
+    #rhTopSyncBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      z-index: 99998;
+      overflow: hidden;
+      background: rgba(91, 84, 230, 0.14);
+      pointer-events: none;
+    }
+    #rhTopSyncBar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      width: 38%;
+      background: linear-gradient(90deg, transparent, #5b54e6, #10b981, transparent);
+      animation: rhSyncSlide 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    .today-live-clock-pill {
+      position: absolute;
+      top: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #5b54e6, #4338ca);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 9999px;
+      line-height: 1.25;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(91, 84, 230, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      pointer-events: none;
+      z-index: 26;
+    }
+    @keyframes paySuccessGlow {
+      0% { transform: scale(1); background-color: rgba(16, 185, 129, 0.32); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65); }
+      45% { transform: scale(1.07); background-color: rgba(16, 185, 129, 0.18); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(1); background-color: transparent; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .pay-flash-green {
+      border-radius: 6px;
+      padding: 0 5px;
+      animation: paySuccessGlow 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #bookingHoverCard {
+      position: fixed;
+      z-index: 99990;
+      width: 280px;
+      pointer-events: none;
+      background: rgba(13, 19, 48, 0.94);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      border: 1px solid rgba(129, 140, 248, 0.42);
+      border-radius: 14px;
+      padding: 11px 13px;
+      box-shadow: 0 20px 44px -12px rgba(2, 4, 15, 0.72);
+    }
+
   </style>
 </head>
 <body class="h-screen flex flex-col">
+  <div id="rhTopSyncBar" class="hidden"></div>
 
   <!-- ==================== 0. KIRISH ANIMATSIYASI (SPLASH SCREEN) ==================== -->
   <div id="splashScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 select-none">
@@ -1280,11 +1348,6 @@
       <!-- O'NG TOMON: KIRISH / RO'YXATDAN O'TISH KARTASI -->
       <div id="loginFormCard" class="lg:col-span-6 bg-white w-full overflow-hidden flex flex-col justify-between">
       <div class="bg-gradient-to-r from-[#090d22] via-[#131b3a] to-[#1b2554] p-7 text-center text-white flex flex-col items-center relative">
-        <div class="absolute top-3 right-3 flex items-center gap-1 bg-white/10 p-1 rounded-lg border border-white/15 text-[10px] font-bold">
-          <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-2 py-0.5 rounded transition">UZ</button>
-          <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-2 py-0.5 rounded transition">RU</button>
-          <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-2 py-0.5 rounded transition">EN</button>
-        </div>
         <svg class="rh-logo-svg w-16 h-16 mb-3" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M26 16 H67 C89 16 101 29 101 47 C101 61 93 71 80 76 L71 63 C80 60 85 55 85 47 C85 37 78 30 66 30 H42 V58 H26 V16 Z" fill="#5b54e6"/>
           <g class="rh-part-building">
@@ -1556,6 +1619,9 @@
         </div>
 
         <div class="flex items-center gap-1.5 shrink-0">
+          <button type="button" id="headerCleaningQueueBtn" onclick="openCleaningQueueModal()" title="Tozalanishi kerak bo‘lgan xonalar" class="hidden px-2.5 py-1.5 rounded-lg border border-sky-300 bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-extrabold items-center gap-1 whitespace-nowrap shrink-0 transition">
+            <span>🧹</span><span id="headerCleaningCount">0</span>
+          </button>
           <button type="button" id="headerSearchBtn" onclick="openGlobalSearch()" title="Tezkor qidiruv (Ctrl + K)" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap transition">
             <span>🔍</span>
             <span class="hidden md:inline text-slate-500">Qidirish</span>
@@ -1578,6 +1644,11 @@
         </div>
       </header>
 
+      <!-- INTERNET UZILGANDA OFFLINE BANNER -->
+      <div id="networkStatusBanner" class="hidden px-5 py-2 bg-rose-600 text-white text-xs font-bold flex items-center justify-center gap-2 shrink-0 shadow-sm">
+        <span class="animate-pulse">📡</span>
+        <span>Internet uzildi — o‘zgarishlar vaqtincha lokal saqlanmoqda. Ulanish tiklanishi bilan bulutga yuklanadi.</span>
+      </div>
       <!-- GLOBAL E'LON BANNERI (CEO BROADCAST) -->
       <div id="globalBroadcastBanner" class="hidden px-5 py-2 text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shrink-0 border-b"></div>
       <!-- CEO GHOST / SUPPORT MODE INDIKATORI -->
@@ -2645,6 +2716,29 @@
     </div>
   </div>
 
+  <!-- TOZALASH NAVBATI OYNASI (1 BOSISHDA TOZA QILISH) -->
+  <div id="cleaningQueueModal" onclick="if(event.target===this) closeCleaningQueueModal()" class="fixed inset-0 z-[115] hidden bg-[#090d22]/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-sky-300/60 overflow-hidden">
+      <div class="px-5 py-4 bg-gradient-to-r from-[#0f172a] via-[#131b3a] to-[#0284c7] text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-extrabold text-sm flex items-center gap-1.5"><span>🧹</span><span>Tozalash navbati</span></h3>
+          <p class="text-[11px] text-sky-100/90 mt-0.5">Tozalanishi kerak bo‘lgan xonalarni 1 bosishda tayyorlang</p>
+        </div>
+        <button type="button" onclick="closeCleaningQueueModal()" class="text-sky-200 hover:text-white text-lg">✕</button>
+      </div>
+      <div id="cleaningQueueList" class="max-h-72 overflow-y-auto divide-y divide-slate-100 p-2 text-xs"></div>
+      <div class="px-4 py-3 bg-[#f8f9ff] border-t border-slate-200 flex items-center justify-between gap-2">
+        <button type="button" id="cleanAllRoomsBtn" onclick="markAllDirtyRoomsClean()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
+          ✨ Barchasini Toza qilish
+        </button>
+        <button type="button" onclick="closeCleaningQueueModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-600 font-semibold text-xs hover:bg-slate-50">Yopish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KALENDAR BRON HOVER PREVIEW KARTASI -->
+  <div id="bookingHoverCard" class="hidden"></div>
+
   <script>
     const MIN_PASSWORD_LENGTH = 6;
 
@@ -3184,9 +3278,8 @@
         return;
       }
       sessionStorage.setItem('rh_splash_shown', '1');
-      playStartupSound();
       if (splash) {
-        setTimeout(() => { splash.classList.add('splash-hide'); setTimeout(() => { splash.style.display = 'none'; }, 600); }, 1600);
+        setTimeout(() => { splash.classList.add('splash-hide'); setTimeout(() => { splash.style.display = 'none'; }, 380); }, 550);
       }
     });
 
@@ -3318,7 +3411,7 @@
 
     function getCurrentTimeStr() { const n = new Date(); return `${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`; }
     function getTodayTimePercent() { const n = new Date(); return (((n.getHours() * 60 + n.getMinutes()) / 1440) * 100).toFixed(2); }
-    function updateTodayLinePosition() { const p = getTodayTimePercent(); document.querySelectorAll('.today-line').forEach(el => { el.style.left = p + '%'; }); }
+    function updateTodayLinePosition() { const p = getTodayTimePercent(); const t = getCurrentTimeStr(); document.querySelectorAll('.today-line').forEach(el => { el.style.left = p + '%'; }); document.querySelectorAll('.today-live-clock-pill').forEach(el => { el.textContent = t; }); }
     function toIsoDate(d) {
       if (!d) return '';
       if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}/.test(d.trim())) return d.trim().slice(0, 10);
@@ -3383,45 +3476,16 @@
       await dbPatch('/saas_registry.json', patch);
     }
 
-    async function migrateLegacyFayzDataIfNeeded() {
-      if (currentHotelId !== DEFAULT_HOTEL_ID) return;
-      try {
-        const checkNew = await dbGet(`/hotels/${DEFAULT_HOTEL_ID}.json`);
-        const newData = await checkNew.json();
-        if (newData && (newData.bookings || newData.rooms)) return;
-
-        const legacyRes = await dbGet('/pms_data.json');
-        const legacy = await legacyRes.json();
-        if (legacy && (legacy.bookings || legacy.rooms)) {
-          await dbPut(`/hotels/${DEFAULT_HOTEL_ID}.json`, {
-            bookings: legacy.bookings || [], rooms: legacy.rooms || DEFAULT_FAYZ_ROOMS,
-            users: legacy.users || [{ email: MASTER_ADMIN_EMAIL, name: 'Bosh Administrator', role: 'Admin', pinHash: MASTER_FALLBACK_HASH, active: true }],
-            dailyExpenses: legacy.dailyExpenses || [], dailyManualEntries: legacy.dailyManualEntries || [],
-            dailyShiftAdmins: legacy.dailyShiftAdmins || {}, migratedFromLegacy: true, updatedAt: new Date().toISOString()
-          });
-          const legacyUsers = Array.isArray(legacy.users) ? legacy.users : (legacy.users ? Object.values(legacy.users) : []);
-          legacyUsers.forEach(u => {
-            const em = String(u.email || '').trim().toLowerCase();
-            if (em && em !== MASTER_ADMIN_EMAIL.toLowerCase()) {
-              let rawPin = String(u.pin || '123456').trim();
-              if (rawPin.length < MIN_PASSWORD_LENGTH) rawPin = rawPin.padEnd(MIN_PASSWORD_LENGTH, '0');
-              saasRegistry.emailMap[em] = { hotelId: DEFAULT_HOTEL_ID, name: u.name || 'Admin', role: u.role || 'Admin', pin: rawPin, active: u.active !== false, isOwner: false };
-            }
-          });
-          await saveSaasRegistry();
-        }
-      } catch (e) {}
-    }
-
     async function syncFromCloud(showAlert = false) {
       if (isSyncingNow || isPushingNow) return;
       if (!showAlert && (Date.now() - lastLocalWriteAt) < 5000) return;
       isSyncingNow = true;
       const syncTextEl = document.getElementById('syncText');
+      const topBarEl = document.getElementById('rhTopSyncBar');
+      if (topBarEl && showAlert) topBarEl.classList.remove('hidden');
       if (syncTextEl && showAlert) syncTextEl.textContent = 'Bulutli tizim: Yuklanmoqda...';
       try {
         await loadSaasRegistry();
-        if (currentHotelId === DEFAULT_HOTEL_ID) await migrateLegacyFayzDataIfNeeded();
         const res = await dbGet(`/hotels/${currentHotelId}.json`);
         if (!res.ok) {
           throw new Error(`HTTP_${res.status}`);
@@ -3495,7 +3559,7 @@
         if (showAlert) alert('Barcha ma’lumotlar bulutli bazadan yangilandi!');
       } catch (err) {
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Ulanish xatosi';
-      } finally { isSyncingNow = false; }
+      } finally { isSyncingNow = false; const tb = document.getElementById('rhTopSyncBar'); if (tb) tb.classList.add('hidden'); }
     }
 
     async function pushAllToCloud(showAlert = false) {
@@ -3882,7 +3946,6 @@
           return;
         }
         await loadSaasRegistry();
-        if (email === MASTER_ADMIN_EMAIL.toLowerCase()) await migrateLegacyFayzDataIfNeeded();
       } catch (err) {
         errBox.textContent = 'Internet sekin yoki serverga ulanib bo‘lmadi. Qayta urinib ko‘ring.';
         errBox.classList.remove('hidden');
@@ -4500,7 +4563,8 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
             && document.getElementById('bookingModal').classList.contains('hidden')
             && document.getElementById('cancelModal').classList.contains('hidden')) syncFromCloud(false);
       }, 6000);
-      setInterval(() => { if (currentUser) { syncDailyInTimesLive(false); updateTodayLinePosition(); checkLateCheckoutLiveUpdate(); } }, 30000);
+      checkOperationalReminders();
+      setInterval(() => { if (currentUser) { syncDailyInTimesLive(false); updateTodayLinePosition(); checkLateCheckoutLiveUpdate(); checkOperationalReminders(); } }, 30000);
     }
 
     function getBookingPayments(b) {
@@ -5491,6 +5555,169 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       ).length;
       document.getElementById('kpiDepartures').textContent = bookings.filter(b => toIsoDate(b.checkOut) === today && b.status === 'Band').length;
       document.getElementById('kpiDebtors').textContent = bookings.filter(b => isBookingInDebt(b)).length;
+      updateCleaningQueueBadge();
+      updateDynamicTabTitle();
+    }
+
+    function getDirtyRoomsList() {
+      return (rooms || []).filter(r => getEffectiveRoomStatus(r) === 'Tozalash kerak');
+    }
+
+    function updateCleaningQueueBadge() {
+      const btn = document.getElementById('headerCleaningQueueBtn');
+      const cntEl = document.getElementById('headerCleaningCount');
+      if (!btn || !cntEl) return;
+      const dirty = getDirtyRoomsList();
+      if (dirty.length > 0 && activeTabName !== 'saas') {
+        cntEl.textContent = `${dirty.length} ta`;
+        btn.classList.remove('hidden');
+        btn.classList.add('inline-flex');
+      } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('inline-flex');
+      }
+    }
+
+    function openCleaningQueueModal() {
+      const modal = document.getElementById('cleaningQueueModal');
+      if (!modal) return;
+      renderCleaningQueueModal();
+      modal.classList.remove('hidden');
+    }
+
+    function closeCleaningQueueModal() {
+      const modal = document.getElementById('cleaningQueueModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderCleaningQueueModal() {
+      const listEl = document.getElementById('cleaningQueueList');
+      const allBtn = document.getElementById('cleanAllRoomsBtn');
+      if (!listEl) return;
+      const dirty = getDirtyRoomsList();
+      if (allBtn) allBtn.classList.toggle('hidden', dirty.length === 0);
+      if (!dirty.length) {
+        listEl.innerHTML = `<div class="p-6 text-center text-emerald-600 font-bold">✨ Barcha xonalar toza!</div>`;
+        return;
+      }
+      listEl.innerHTML = dirty.map(r => `
+        <div class="p-3 flex items-center justify-between gap-2 hover:bg-sky-50/50 rounded-xl">
+          <div class="min-w-0">
+            <div class="font-extrabold text-[#131b3a]">Xona № ${r.id}</div>
+            <div class="text-[11px] text-slate-500 truncate">${r.floor || '1-qavat'} • ${r.name || 'Standard'} (${r.beds || 1} o‘rin)</div>
+          </div>
+          <button type="button" onclick="markSingleDirtyRoomClean('${r.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-xs shrink-0 transition">✨ Toza qilish</button>
+        </div>
+      `).join('');
+    }
+
+    function markSingleDirtyRoomClean(roomId) {
+      const r = rooms.find(x => x.id === roomId);
+      if (!r) return;
+      r.clean = 'Toza';
+      r.manualStatus = false;
+      saveAllLocal();
+      renderCleaningQueueModal();
+      refreshAllViews(false);
+      const clPatch = {}; addCollectionPatchItem(clPatch, 'rooms', r.id, r); patchHotelCloud(clPatch);
+      showToast(`✨ № ${r.id} xonasi «Toza» deb belgilandi!`, 'success', 2200);
+    }
+
+    function markAllDirtyRoomsClean() {
+      const dirty = getDirtyRoomsList();
+      if (!dirty.length) return;
+      const clPatch = {};
+      dirty.forEach(r => {
+        r.clean = 'Toza';
+        r.manualStatus = false;
+        addCollectionPatchItem(clPatch, 'rooms', r.id, r);
+      });
+      saveAllLocal();
+      closeCleaningQueueModal();
+      refreshAllViews(false);
+      patchHotelCloud(clPatch);
+      showToast(`✨ ${dirty.length} ta xona «Toza» holatiga o‘tkazildi!`, 'success', 2600);
+    }
+
+    function updateDynamicTabTitle() {
+      const baseTitle = 'ReservHotel PMS — Mehmonxona Boshqaruv Tizimi';
+      if (!currentUser) { document.title = baseTitle; return; }
+      const lateCount = bookings.filter(isBookingLateCheckout).length;
+      if (lateCount > 0) {
+        document.title = `(${lateCount}) ⏰ Kech chiqish — ReservHotel`;
+        return;
+      }
+      const dirtyCount = getDirtyRoomsList().length;
+      if (dirtyCount > 0) {
+        document.title = `(${dirtyCount}) 🧹 Tozalash — ReservHotel`;
+        return;
+      }
+      document.title = baseTitle;
+    }
+
+    function playSoftChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        if (ctx.state === 'suspended') ctx.resume();
+        const now = ctx.currentTime;
+        [659.25, 880].forEach((freq, i) => {
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now + i * 0.12);
+          gain.gain.setValueAtTime(0.001, now + i * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.08, now + i * 0.12 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.12 + 0.45);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now + i * 0.12); osc.stop(now + i * 0.12 + 0.5);
+        });
+      } catch (e) {}
+    }
+
+    function checkOperationalReminders() {
+      if (!currentUser) return;
+      const now = Date.now();
+      const todayIso = toIsoDate(new Date());
+
+      // 1. Check-out dan 30 daqiqa oldin eslatma
+      const soonRooms = [];
+      bookings.forEach(b => {
+        if (!b || b.status !== 'Band') return;
+        if (toIsoDate(b.checkOut) !== todayIso) return;
+        const outMs = getLocalMs(todayIso, b.checkOutTime || '12:00');
+        const diffMin = (outMs - now) / 60000;
+        if (diffMin > 0 && diffMin <= 30) {
+          const seenKey = `rh_co_rem_${todayIso}_${b.id}`;
+          if (!sessionStorage.getItem(seenKey)) {
+            sessionStorage.setItem(seenKey, '1');
+            soonRooms.push(`№ ${b.room} (${Math.ceil(diffMin)} daq)`);
+          }
+        }
+      });
+      if (soonRooms.length > 0) {
+        playSoftChime();
+        showToast(`⏰ Check-out yaqinlashmoqda: ${soonRooms.join(', ')}`, 'info', 6500);
+      }
+
+      // 2. Smena topshirishdan 15 daqiqa oldin eslatma
+      const activeSh = getCurrentActiveShiftForNow();
+      if (!isShiftLocked(todayIso, activeSh)) {
+        const meta = getShiftMetaInfo(todayIso, activeSh);
+        if (meta && meta.endTime) {
+          const endMs = getLocalMs(todayIso, meta.endTime);
+          const diffEndMin = (endMs - now) / 60000;
+          if (diffEndMin > 0 && diffEndMin <= 15) {
+            const shKey = `rh_sh_rem_${todayIso}_${activeSh}`;
+            if (!sessionStorage.getItem(shKey)) {
+              sessionStorage.setItem(shKey, '1');
+              playSoftChime();
+              showToast(`🔒 ${activeSh}-smena tugashiga ${Math.ceil(diffEndMin)} daqiqa qoldi! Z-hisobotni yopib topshirishni unutmang.`, 'info', 7000);
+            }
+          }
+        }
+      }
+
+      updateDynamicTabTitle();
     }
 
     function shiftStartDate(days) { document.getElementById('matrixStartDate').value = addDays(document.getElementById('matrixStartDate').value, days); renderMatrix(); }
@@ -5590,7 +5817,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
                 barHtml += `<div draggable="false" ${downHandler} onclick="event.stopPropagation(); if(!justFinishedResizing && !justFinishedMoving) openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}${lateTitlePart}${unpaidAmt > 0 ? ' • Qarz: ' + formatMoney(unpaidAmt) : ''}${canDragMove ? ' (Surib ko‘chirish yoki o‘ng chetidan cho‘zib kun qo‘shish mumkin)' : ''}" class="booking-bar ${barClass} ${canDragMove ? 'is-draggable' : ''}" data-booking-id="${b.id}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span><span class="flex items-center shrink-0">${lateBadgeHtml}${debtBadgeHtml}</span>${resizeHandleHtml}</div>`;
               }
             });
-            const todayLine = dt.isToday ? `<div class="today-line" style="left:${todayPct}%;"></div>` : '';
+            const todayLine = dt.isToday ? `<div class="today-line" style="left:${todayPct}%;">${flIdx === 0 && room === floorRooms[0] ? `<span class="today-live-clock-pill">${getCurrentTimeStr()}</span>` : ''}</div>` : '';
             tbodyHtml += `<td class="${cellClasses.join(' ')}" data-room="${room.id}" data-date="${dt.iso}" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;" onmousedown="startCellDrag('${room.id}', '${dt.iso}')" onmouseenter="moveCellDrag('${room.id}', '${dt.iso}')" onmouseup="endCellDrag('${room.id}', '${dt.iso}')">${todayLine}${barHtml}</td>`;
           });
           tbodyHtml += `</tr>`;
@@ -6529,6 +6756,10 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       }
       lastLocalWriteAt = Date.now();
       saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false);
+      ['drawerPaid', 'drawerDebt'].forEach(elId => {
+        const el = document.getElementById(elId);
+        if (el) { el.classList.remove('pay-flash-green'); void el.offsetWidth; el.classList.add('pay-flash-green'); }
+      });
       const stPatch = {}; addCollectionPatchItem(stPatch, 'bookings', b.id, b); if (r) addCollectionPatchItem(stPatch, 'rooms', r.id, r); patchHotelCloud(stPatch);
     }
     function applyQuickPayment() {
@@ -8831,99 +9062,9 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
   </script>
 
   <script>
-    // ==================== APPLE PROMOTION 120 FPS INERTIA & FLUID ENGINE ====================
-    (function initAppleProMotion120Fps() {
-      // 1. macOS-style silky inertia wheel scrolling (lerp @ native 120Hz/144Hz/165Hz)
-      const scrollStates = new WeakMap();
-
-      function getScrollableTarget(el) {
-        while (el && el !== document.body && el !== document.documentElement) {
-          const style = window.getComputedStyle(el);
-          const canY = (style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 2;
-          const canX = (style.overflowX === 'auto' || style.overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 2;
-          if (canY || canX) return { el, canY, canX };
-          el = el.parentElement;
-        }
-        return null;
-      }
-
-      function animateScroll(el) {
-        const st = scrollStates.get(el);
-        if (!st) return;
-        const ease = 0.14; // macOS inertia damping
-        const dx = st.targetX - st.curX;
-        const dy = st.targetY - st.curY;
-
-        if (Math.abs(dx) < 0.4 && Math.abs(dy) < 0.4) {
-          el.scrollLeft = st.targetX;
-          el.scrollTop = st.targetY;
-          st.running = false;
-          return;
-        }
-        st.curX += dx * ease;
-        st.curY += dy * ease;
-        el.scrollLeft = st.curX;
-        el.scrollTop = st.curY;
-        requestAnimationFrame(() => animateScroll(el));
-      }
-
-      window.addEventListener('wheel', (e) => {
-        if (e.ctrlKey || document.body.classList.contains('is-fast-dragging')) return;
-        const hit = getScrollableTarget(e.target);
-        if (!hit) return;
-        const { el, canY, canX } = hit;
-
-        let deltaX = e.deltaX;
-        let deltaY = e.deltaY;
-        if (e.shiftKey && canX && deltaY !== 0 && deltaX === 0) {
-          deltaX = deltaY;
-          deltaY = 0;
-        }
-        if ((deltaY !== 0 && !canY) && (deltaX === 0 || !canX)) return;
-
-        e.preventDefault();
-        let st = scrollStates.get(el);
-        if (!st || !st.running) {
-          st = { curX: el.scrollLeft, curY: el.scrollTop, targetX: el.scrollLeft, targetY: el.scrollTop, running: false };
-          scrollStates.set(el, st);
-        }
-
-        const maxScrollX = Math.max(0, el.scrollWidth - el.clientWidth);
-        const maxScrollY = Math.max(0, el.scrollHeight - el.clientHeight);
-        st.targetX = Math.max(0, Math.min(maxScrollX, st.targetX + deltaX * 1.05));
-        st.targetY = Math.max(0, Math.min(maxScrollY, st.targetY + deltaY * 1.05));
-
-        if (!st.running) {
-          st.running = true;
-          requestAnimationFrame(() => animateScroll(el));
-        }
-      }, { passive: false });
-
-      // 2. 120Hz rAF Spotlight Sheen
-      let rafPending = false;
-      let lastEv = null;
-      function updateSpotlight() {
-        rafPending = false;
-        if (!lastEv) return;
-        const card = lastEv.target && lastEv.target.closest && lastEv.target.closest('.apple-bento-card, .rh-apple-sheen, .fin-kpi-card, .fin-chart-card');
-        if (!card) return;
-        const r = card.getBoundingClientRect();
-        card.style.setProperty('--mx', (lastEv.clientX - r.left).toFixed(1) + 'px');
-        card.style.setProperty('--my', (lastEv.clientY - r.top).toFixed(1) + 'px');
-      }
-      document.addEventListener('pointermove', (e) => {
-        if (document.body.classList.contains('is-fast-dragging')) return;
-        lastEv = e;
-        if (!rafPending) {
-          rafPending = true;
-          requestAnimationFrame(updateSpotlight);
-        }
-      }, { passive: true });
-    })();
-  </script>
-
-  <script>
-    (function setupMobileOrientationGuard() {
+    // ==================== FLUID UI, HOVER PREVIEW, LIVE NOTIFICATIONS & NETWORK GUARD ====================
+    (function initReservHotelEnhancements() {
+      // 1. Mobile orientation & resize guard
       let orientTimer = null;
       let lastWasMobile = (typeof isMobileViewport === 'function') ? isMobileViewport() : (window.innerWidth < 768);
       function handleViewportChange() {
@@ -8946,6 +9087,108 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       }
       window.addEventListener('orientationchange', handleViewportChange, { passive: true });
       window.addEventListener('resize', handleViewportChange, { passive: true });
+
+      // 2. Online / Offline Network Status Banner
+      function updateNetworkBanner(justReconnected = false) {
+        const banner = document.getElementById('networkStatusBanner');
+        if (!banner) return;
+        if (!navigator.onLine) {
+          banner.classList.remove('hidden');
+        } else {
+          banner.classList.add('hidden');
+          if (justReconnected && typeof showToast === 'function') {
+            showToast('✅ Internet tiklandi — bulut bilan sinxronlanmoqda ✓', 'success', 3200);
+            if (typeof currentUser !== 'undefined' && currentUser && typeof syncFromCloud === 'function') {
+              syncFromCloud(false);
+            }
+          }
+        }
+      }
+      window.addEventListener('offline', () => updateNetworkBanner(false));
+      window.addEventListener('online', () => updateNetworkBanner(true));
+      updateNetworkBanner(false);
+
+      // 3. Desktop Booking Bar Hover Preview Card
+      let hoverHideTimer = null;
+      let hoverBookingId = null;
+
+      function hideBookingHoverCard() {
+        const card = document.getElementById('bookingHoverCard');
+        if (card) card.classList.add('hidden');
+        hoverBookingId = null;
+      }
+
+      function showBookingHoverCard(barEl, ev) {
+        if (window.innerWidth < 1024 || isDragging || moveDragState || isResizingBooking) return;
+        const bId = barEl.getAttribute('data-booking-id');
+        if (!bId) return;
+        const b = bookings.find(x => x.id === bId);
+        if (!b) return;
+        const card = document.getElementById('bookingHoverCard');
+        if (!card) return;
+
+        clearTimeout(hoverHideTimer);
+        if (hoverBookingId !== bId) {
+          hoverBookingId = bId;
+          const n = Math.max(1, Number(b.nights) || diffNights(b.checkIn, b.checkOut));
+          const total = Number(b.total) || ((n * (Number(b.rate) || 0)) + (Number(b.extra) || 0));
+          const pList = getBookingPayments(b);
+          const paid = pList.length ? pList.reduce((s, x) => s + Number(x.amount || 0), 0) : (Number(b.paid) || 0);
+          const debt = getBookingUnpaidAmount(b);
+          const isLate = isBookingLateCheckout(b);
+
+          const statusPillCls = isLate
+            ? 'bg-rose-600 text-white'
+            : (b.status === 'Band' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+              : (b.status === 'Bron' ? 'bg-indigo-500/25 text-indigo-200 border border-indigo-400/40'
+                : (b.status === "Ta'mirda" ? 'bg-amber-500/25 text-amber-200 border border-amber-400/40'
+                  : 'bg-slate-500/30 text-slate-200')));
+
+          card.innerHTML = `
+            <div class="flex items-center justify-between gap-2 pb-2 border-b border-white/10">
+              <div class="min-w-0">
+                <div class="text-xs font-extrabold text-white truncate">${b.guestName || 'Mehmon'}</div>
+                <div class="text-[10.5px] text-indigo-200/80 font-semibold">Xona № ${b.room} • ${n} tun ${b.phone ? '• ' + b.phone : ''}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[9.5px] font-extrabold shrink-0 ${statusPillCls}">${isLate ? '⏰ Kech chiqish' : b.status}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5 pt-2 text-[10.5px]">
+              <div class="text-indigo-200/75">📥 ${b.checkIn} <span class="text-white font-bold">${b.checkInTime || '14:00'}</span></div>
+              <div class="text-indigo-200/75 text-right">📤 ${b.checkOut} <span class="text-white font-bold">${b.checkOutTime || '12:00'}</span></div>
+            </div>
+            ${b.status !== "Ta'mirda" ? `
+            <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[11px]">
+              <div><span class="text-indigo-200/70">Jami:</span> <b class="text-white">${formatMoney(total)}</b></div>
+              <div><span class="text-indigo-200/70">Qarz:</span> <b class="${debt > 0 ? 'text-rose-400' : 'text-emerald-400'}">${debt > 0 ? formatMoney(debt) : '0 so‘m ✓'}</b></div>
+            </div>` : ''}
+          `;
+        }
+
+        const vw = window.innerWidth, vh = window.innerHeight;
+        let left = ev.clientX + 14;
+        let top = ev.clientY + 14;
+        if (left + 290 > vw) left = Math.max(10, ev.clientX - 294);
+        if (top + 150 > vh) top = Math.max(10, ev.clientY - 140);
+        card.style.left = left + 'px';
+        card.style.top = top + 'px';
+        card.classList.remove('hidden');
+      }
+
+      document.addEventListener('pointerover', (e) => {
+        if (e.pointerType === 'touch') return;
+        const bar = e.target && e.target.closest ? e.target.closest('.booking-bar') : null;
+        if (bar) showBookingHoverCard(bar, e);
+      }, { passive: true });
+
+      document.addEventListener('pointerout', (e) => {
+        const bar = e.target && e.target.closest ? e.target.closest('.booking-bar') : null;
+        if (bar) {
+          hoverHideTimer = setTimeout(hideBookingHoverCard, 80);
+        }
+      }, { passive: true });
+
+      document.addEventListener('pointerdown', hideBookingHoverCard, { passive: true });
+      window.addEventListener('scroll', hideBookingHoverCard, { passive: true, capture: true });
     })();
   </script>
 </body>
