@@ -3210,6 +3210,8 @@
         const res = await dbPatch(`/hotels/${currentHotelId}.json`, finalPatch);
         if (!res.ok) throw new Error(`HTTP_${res.status}`);
         lastLocalWriteAt = Date.now();
+        window._rhLastCloudStamp = finalPatch.updatedAt;
+        window._rhLastCloudHotel = currentHotelId;
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
         if (showAlert) showToast('O‘zgarishlar bulutga saqlandi!', 'success');
       } catch (err) {
@@ -3221,8 +3223,10 @@
 
     async function patchSaasRegistry(patchObj) {
       if (!patchObj || !Object.keys(patchObj).length) return;
-      const payload = Object.assign({}, patchObj, { updatedAt: new Date().toISOString() });
+      const ts = new Date().toISOString();
+      const payload = Object.assign({}, patchObj, { updatedAt: ts });
       await dbPatch('/saas_registry.json', payload);
+      window._rhLastRegStamp = ts;
     }
 
     function normalizeLegacyPin(pin, email = '') {
@@ -3450,10 +3454,22 @@
     function encodeEmailKey(email) { return String(email || '').trim().toLowerCase().replace(/\./g, '_dot_').replace(/@/g, '_at_'); }
     function decodeEmailKey(key) { return String(key || '').replace(/_dot_/g, '.').replace(/_at_/g, '@'); }
 
-    async function loadSaasRegistry() {
+    async function loadSaasRegistry(forceFull = true) {
       try {
+        if (!forceFull && window._rhLastRegStamp) {
+          const stampRes = await dbGet('/saas_registry/updatedAt.json');
+          if (stampRes.ok) {
+            const remoteRegStamp = await stampRes.json();
+            if (remoteRegStamp && String(remoteRegStamp) === window._rhLastRegStamp) {
+              return false;
+            }
+          }
+        }
         const res = await dbGet('/saas_registry.json');
         const reg = await res.json();
+        if (reg && reg.updatedAt) {
+          window._rhLastRegStamp = String(reg.updatedAt);
+        }
         if (reg && reg.hotels) {
           saasRegistry.hotels = reg.hotels;
           const decodedMap = {};
@@ -3479,7 +3495,8 @@
     }
 
     async function saveSaasRegistry() {
-      const patch = { updatedAt: new Date().toISOString() };
+      const ts = new Date().toISOString();
+      const patch = { updatedAt: ts };
       Object.entries(saasRegistry.hotels || {}).forEach(([hId, hObj]) => {
         patch[`hotels/${safeFbKey(hId)}`] = hObj;
       });
@@ -3496,6 +3513,7 @@
         patch['globalTelegramBot'] = saasRegistry.globalTelegramBot;
       }
       await dbPatch('/saas_registry.json', patch);
+      window._rhLastRegStamp = ts;
     }
 
     async function syncFromCloud(showAlert = false) {
@@ -3507,21 +3525,30 @@
       if (topBarEl && showAlert) topBarEl.classList.remove('hidden');
       if (syncTextEl && showAlert) syncTextEl.textContent = 'Bulutli tizim: Yuklanmoqda...';
       try {
-        await loadSaasRegistry();
+        const isPollCheck = !showAlert && Boolean(window._rhLastCloudStamp) && window._rhLastCloudHotel === currentHotelId;
+        const regChanged = await loadSaasRegistry(!isPollCheck);
+        if (regChanged !== false) updateHotelSwitcherUI();
+
+        if (isPollCheck) {
+          const stRes = await dbGet(`/hotels/${currentHotelId}/updatedAt.json`);
+          if (stRes.ok) {
+            const remoteHotelStamp = await stRes.json();
+            if (remoteHotelStamp && String(remoteHotelStamp) === window._rhLastCloudStamp) {
+              if (syncTextEl) {
+                const okTxt = typeof translateUiString === 'function' ? translateUiString('Bulutli tizim: Faol ✓') : 'Bulutli tizim: Faol ✓';
+                if (syncTextEl.textContent !== okTxt) syncTextEl.textContent = okTxt;
+              }
+              return;
+            }
+          }
+        }
+
         const res = await dbGet(`/hotels/${currentHotelId}.json`);
         if (!res.ok) {
           throw new Error(`HTTP_${res.status}`);
         }
         const data = await res.json();
         const cloudStamp = (data && typeof data === 'object' && data.updatedAt) ? String(data.updatedAt) : '';
-        const isUnchangedPoll = !showAlert && Boolean(cloudStamp) && cloudStamp === window._rhLastCloudStamp && window._rhLastCloudHotel === currentHotelId;
-        if (isUnchangedPoll) {
-          if (syncTextEl) {
-            const okTxt = typeof translateUiString === 'function' ? translateUiString('Bulutli tizim: Faol ✓') : 'Bulutli tizim: Faol ✓';
-            if (syncTextEl.textContent !== okTxt) syncTextEl.textContent = okTxt;
-          }
-          return;
-        }
         if (cloudStamp) {
           window._rhLastCloudStamp = cloudStamp;
           window._rhLastCloudHotel = currentHotelId;
@@ -3609,6 +3636,8 @@
         resetLegacyKeysMap();
         pendingAuditPatchEntries = [];
         lastLocalWriteAt = Date.now();
+        window._rhLastCloudStamp = payload.updatedAt;
+        window._rhLastCloudHotel = currentHotelId;
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
         if (showAlert) showToast('Ma’lumotlar bulutga saqlandi!', 'success');
       } catch (err) {
@@ -4122,6 +4151,8 @@
       document.getElementById('hotelSwitcherMenu').classList.add('hidden');
       if (hotelId === currentHotelId) return;
       currentHotelId = hotelId;
+      window._rhLastCloudStamp = '';
+      window._rhLastCloudHotel = '';
       sessionStorage.setItem('rh_active_hotel', currentHotelId);
       loadLocalHotelCache(); updateHotelSwitcherUI(); populateRoomSelect(); refreshAllViews(true);
       if (!bookings.length) renderMatrixSkeleton(7);
