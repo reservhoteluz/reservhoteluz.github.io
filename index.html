@@ -841,6 +841,16 @@
         transform-style: flat !important;
         will-change: auto !important;
       }
+      .beam-shell::before { display: none !important; animation: none !important; }
+      .aurora-orb-a, .aurora-orb-b {
+        animation: none !important;
+        filter: none !important;
+        background: radial-gradient(circle, rgba(91, 84, 230, 0.28) 0%, transparent 70%) !important;
+      }
+      .aurora-orb-b {
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.20) 0%, transparent 70%) !important;
+      }
+      #mouseSpotlight { display: none !important; }
     }
     @keyframes scanSweep {
       0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
@@ -2821,10 +2831,20 @@
       return { ok: true, data };
     }
 
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+      try {
+        return await fetch(url, controller ? { ...options, signal: controller.signal } : options);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    }
+
     async function firebaseAuthSignIn(email, password) {
       const cleanEmail = String(email || '').trim().toLowerCase();
       const cleanPass = String(password || '').trim();
-      const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(FIREBASE_CONFIG.apiKey)}`, {
+      const res = await fetchWithTimeout(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(FIREBASE_CONFIG.apiKey)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: cleanEmail, password: cleanPass, returnSecureToken: true })
@@ -3759,18 +3779,25 @@
       }
 
       btn.disabled = true; btn.textContent = 'Tekshirilmoqda...'; errBox.classList.add('hidden');
-      const authLoginRes = await firebaseAuthSignInOrCreate(email, pin);
-      if (!authLoginRes.ok) {
-        btn.disabled = false; btn.textContent = 'Tizimga kirish →';
-        errBox.textContent = authLoginRes.code === 'WRONG_PASSWORD'
-          ? 'Noto‘g‘ri parol!'
-          : 'Kirishni tekshirishda xatolik yuz berdi. Internetni tekshiring.';
+      try {
+        const authLoginRes = await firebaseAuthSignInOrCreate(email, pin);
+        if (!authLoginRes.ok) {
+          errBox.textContent = authLoginRes.code === 'WRONG_PASSWORD'
+            ? 'Noto‘g‘ri parol!'
+            : 'Kirishni tekshirishda xatolik yuz berdi. Internetni tekshiring.';
+          errBox.classList.remove('hidden');
+          return;
+        }
+        await loadSaasRegistry();
+        if (email === MASTER_ADMIN_EMAIL.toLowerCase()) await migrateLegacyFayzDataIfNeeded();
+      } catch (err) {
+        errBox.textContent = 'Internet sekin yoki serverga ulanib bo‘lmadi. Qayta urinib ko‘ring.';
         errBox.classList.remove('hidden');
         return;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = typeof translateUiString === 'function' ? translateUiString('Tizimga kirish →') : 'Tizimga kirish →';
       }
-      await loadSaasRegistry();
-      if (email === MASTER_ADMIN_EMAIL.toLowerCase()) await migrateLegacyFayzDataIfNeeded();
-      btn.disabled = false; btn.textContent = 'Tizimga kirish →';
 
       if (email === CEO_CREATOR_EMAIL.toLowerCase()) {
         const ceoObj = saasRegistry.ceo || {};
@@ -8441,10 +8468,12 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
     }, { passive: true });
 
     let i18nObserverTimer = null;
-    const i18nObserver = new MutationObserver(() => {
+    const i18nObserver = new MutationObserver((mutations) => {
       if (isApplyingI18n || currentLang === 'uz' || isDragging || moveDragState || isResizingBooking) return;
+      const promo = document.getElementById('appleLoginPromoPanel');
+      if (promo && mutations.every(m => promo.contains(m.target))) return;
       clearTimeout(i18nObserverTimer);
-      i18nObserverTimer = setTimeout(() => applyLanguageToSubtree(document.body), 0);
+      i18nObserverTimer = setTimeout(() => applyLanguageToSubtree(document.body), 120);
     });
     function bootLoginShowcaseNow() {
       if (window._rhShowcaseBooted) return;
