@@ -279,7 +279,7 @@
       right: 0;
       top: 0;
       bottom: 0;
-      width: 10px;
+      width: 14px;
       cursor: ew-resize;
       z-index: 25;
       display: flex;
@@ -5855,7 +5855,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
                   ? `onpointerdown="startBookingMovePointer(event, '${b.id}')"`
                   : `onmousedown="event.stopPropagation()"`;
                 const resizeHandleHtml = canResize
-                  ? `<div class="booking-resize-handle" title="O‘ngga cho‘zib kun qo‘shish" onmousedown="startBookingResize(event, '${b.id}')" onclick="event.stopPropagation()"></div>`
+                  ? `<div class="booking-resize-handle" title="O‘ngga cho‘zib kun qo‘shish" onpointerdown="startBookingResize(event, '${b.id}')" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()"></div>`
                   : '';
                 const lateTitlePart = isLateOut ? ` • ⏰ ${lateLabels.tooltip}` : '';
                 barHtml += `<div draggable="false" ${downHandler} onclick="event.stopPropagation(); if(!justFinishedResizing && !justFinishedMoving) openGuestDrawer('${b.id}')" style="left:${startOffsetPx}px; width:${widthPx}px;" title="${safeName}${lateTitlePart}${unpaidAmt > 0 ? ' • Qarz: ' + formatMoney(unpaidAmt) : ''}${canDragMove ? ' (Surib ko‘chirish yoki o‘ng chetidan cho‘zib kun qo‘shish mumkin)' : ''}" class="booking-bar ${barClass} ${canDragMove ? 'is-draggable' : ''}" data-booking-id="${b.id}"><span class="truncate ${b.status === 'Bekor qilingan' ? 'line-through' : ''}">${displayLabel}</span><span class="flex items-center shrink-0">${lateBadgeHtml}${debtBadgeHtml}</span>${resizeHandleHtml}</div>`;
@@ -5981,6 +5981,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     }
 
     function startBookingResize(e, bookingId) {
+      if (e.button !== undefined && e.button !== 0) return;
       e.preventDefault();
       e.stopPropagation();
       const b = bookings.find(x => x.id === bookingId);
@@ -6018,7 +6019,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       document.body.appendChild(badge);
     }
 
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('pointermove', (e) => {
       if (!isResizingBooking || !resizeState) return;
       const b = bookings.find(x => x.id === resizeState.bookingId);
       if (!b) return;
@@ -6054,7 +6055,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       }
     });
 
-    window.addEventListener('mouseup', () => {
+    window.addEventListener('pointerup', () => {
       if (!isResizingBooking || !resizeState) return;
       const st = resizeState;
       isResizingBooking = false;
@@ -6117,6 +6118,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
 
     function startBookingMovePointer(e, bookingId) {
       if (e.pointerType === 'touch' || e.button !== 0 || isResizingBooking) return;
+      if (e.target && e.target.closest && e.target.closest('.booking-resize-handle')) return;
       e.preventDefault();
       e.stopPropagation();
 
