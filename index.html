@@ -7,6 +7,12 @@
   <link rel="icon" type="image/jpeg" href="logo.jpg" />
   <link rel="shortcut icon" type="image/jpeg" href="logo.jpg" />
   <link rel="apple-touch-icon" href="logo.jpg" />
+  <meta name="theme-color" content="#131b3a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ReservHotel" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22ReservHotel%20PMS%20%E2%80%94%20Mehmonxona%20Boshqaruv%20Tizimi%22%2C%20%22short_name%22%3A%20%22ReservHotel%22%2C%20%22description%22%3A%20%22Bulutli%20mehmonxona%20va%20xostel%20boshqaruv%20tizimi%20%28Cloud%20PMS%29%22%2C%20%22start_url%22%3A%20%22./%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22background_color%22%3A%20%22%23131b3a%22%2C%20%22theme_color%22%3A%20%22%235b54e6%22%2C%20%22orientation%22%3A%20%22any%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22logo.jpg%22%2C%20%22sizes%22%3A%20%22192x192%22%2C%20%22type%22%3A%20%22image/jpeg%22%7D%2C%20%7B%22src%22%3A%20%22logo.jpg%22%2C%20%22sizes%22%3A%20%22512x512%22%2C%20%22type%22%3A%20%22image/jpeg%22%7D%5D%7D" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -362,10 +368,6 @@
     }
 
     /* Glassmorphism & Premium Elevation */
-    header {
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
     .booking-bar:hover {
       box-shadow: 0 8px 20px -4px rgba(91, 84, 230, 0.42), 0 0 0 1.5px rgba(255, 255, 255, 0.55);
     }
@@ -697,6 +699,7 @@
       position: relative;
       border-radius: 22px;
       padding: 1.5px;
+      background: linear-gradient(135deg, rgba(129, 140, 248, 0.45), rgba(16, 185, 129, 0.28), rgba(91, 84, 230, 0.45));
       overflow: hidden;
       transform-style: preserve-3d;
       transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
@@ -809,11 +812,6 @@
     #appleLoginPromoPanel * {
       -webkit-font-smoothing: subpixel-antialiased;
       text-rendering: geometricPrecision;
-    }
-    .beam-shell {
-      border-radius: 22px;
-      padding: 1.5px;
-      background: linear-gradient(135deg, rgba(129, 140, 248, 0.45), rgba(16, 185, 129, 0.28), rgba(91, 84, 230, 0.45));
     }
     /* Mobil tik (portrait) va albom (landscape) rejimlarida kirish vizual effektlari 100% ko'rinishi uchun */
     @media (max-width: 1023px) {
@@ -1112,6 +1110,7 @@
     /* Hide hotel-specific header widgets in CEO / SaaS Admin panel */
     body.is-saas-tab #headerCapacityBadge,
     body.is-saas-tab #headerKpiGroup,
+    body.is-saas-tab #headerCleaningQueueBtn,
     body.is-saas-tab #headerSearchBtn,
     body.is-saas-tab #headerCreateBookingBtn {
       display: none !important;
@@ -1227,6 +1226,26 @@
       border-radius: 14px;
       padding: 11px 13px;
       box-shadow: 0 20px 44px -12px rgba(2, 4, 15, 0.72);
+    }
+
+  
+    /* ==================== SKELETON LOADING SHIMMER ==================== */
+    @keyframes rhSkeletonShimmer {
+      0% { background-position: -240px 0; }
+      100% { background-position: calc(240px + 100%) 0; }
+    }
+    .rh-skel-bar {
+      display: inline-block;
+      border-radius: 6px;
+      background-color: #e2e8f0;
+      background-image: linear-gradient(90deg, #e2e8f0 0px, #f1f5f9 45px, #e2e8f0 90px);
+      background-size: 240px 100%;
+      background-repeat: no-repeat;
+      animation: rhSkeletonShimmer 1.35s ease-in-out infinite;
+    }
+    body.dark-mode .rh-skel-bar {
+      background-color: #1e294e;
+      background-image: linear-gradient(90deg, #1e294e 0px, #2b3a6e 45px, #1e294e 90px);
     }
 
   </style>
@@ -3192,7 +3211,7 @@
         if (!res.ok) throw new Error(`HTTP_${res.status}`);
         lastLocalWriteAt = Date.now();
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
-        if (showAlert) alert('O‘zgarishlar bulutga saqlandi!');
+        if (showAlert) showToast('O‘zgarishlar bulutga saqlandi!', 'success');
       } catch (err) {
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Saqlash xatosi';
       } finally {
@@ -3272,6 +3291,9 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('rh_dark_mode') === '1' && typeof applyThemeMode === 'function') {
+        applyThemeMode(true);
+      }
       const splash = document.getElementById('splashScreen');
       if (sessionStorage.getItem('rh_splash_shown') === '1') {
         if (splash) splash.style.display = 'none';
@@ -3556,7 +3578,7 @@
         if (syncTextEl) syncTextEl.textContent = typeof translateUiString === 'function' ? translateUiString('Bulutli tizim: Faol ✓') : 'Bulutli tizim: Faol ✓';
         updateHotelSwitcherUI();
         if (currentUser && !isDragging) refreshAllViews(activeTabName !== 'rates' && activeTabName !== 'users');
-        if (showAlert) alert('Barcha ma’lumotlar bulutli bazadan yangilandi!');
+        if (showAlert) showToast('Barcha ma’lumotlar bulutli bazadan yangilandi!', 'success');
       } catch (err) {
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Ulanish xatosi';
       } finally { isSyncingNow = false; const tb = document.getElementById('rhTopSyncBar'); if (tb) tb.classList.add('hidden'); }
@@ -3588,7 +3610,7 @@
         pendingAuditPatchEntries = [];
         lastLocalWriteAt = Date.now();
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Faol ✓';
-        if (showAlert) alert('Ma’lumotlar bulutga saqlandi!');
+        if (showAlert) showToast('Ma’lumotlar bulutga saqlandi!', 'success');
       } catch (err) {
         if (syncTextEl) syncTextEl.textContent = 'Bulutli tizim: Saqlash xatosi';
       } finally {
@@ -3739,7 +3761,7 @@
       await saveSaasRegistry();
       renderSaasHotels();
       updateHotelSwitcherUI();
-      alert(`✅ "${h.name}" muvaffaqiyatli Umrbod litsenziyaga ($299) o‘tkazildi!`);
+      showToast(`✅ "${h.name}" muvaffaqiyatli Umrbod litsenziyaga ($299) o‘tkazildi!`, 'success');
     }
 
     async function upgradeHotelToYearly(hotelId) {
@@ -3754,7 +3776,7 @@
       await saveSaasRegistry();
       renderSaasHotels();
       updateHotelSwitcherUI();
-      alert(`✅ "${h.name}" 1 yillik obunaga (${h.trialExpiresAt} gacha) o‘tkazildi!`);
+      showToast(`✅ "${h.name}" 1 yillik obunaga (${h.trialExpiresAt} gacha) o‘tkazildi!`, 'success');
     }
 
     async function extendHotelTrial(hotelId, extraDays = 7) {
@@ -3771,7 +3793,7 @@
       await saveSaasRegistry();
       renderSaasHotels();
       updateHotelSwitcherUI();
-      alert(`⏳ "${h.name}" sinov muddati ${h.trialExpiresAt} gacha uzaytirildi!`);
+      showToast(`⏳ "${h.name}" sinov muddati ${h.trialExpiresAt} gacha uzaytirildi!`, 'success');
     }
 
     function switchAuthMode(mode) {
@@ -4102,6 +4124,7 @@
       currentHotelId = hotelId;
       sessionStorage.setItem('rh_active_hotel', currentHotelId);
       loadLocalHotelCache(); updateHotelSwitcherUI(); populateRoomSelect(); refreshAllViews(true);
+      if (!bookings.length) renderMatrixSkeleton(7);
       await syncFromCloud(false);
     }
 
@@ -4118,10 +4141,10 @@
       const plan = document.getElementById('newHotelPlan').value;
 
       const pwdErr = validatePasswordLength(ownerPin);
-      if (pwdErr) { alert(pwdErr); return; }
+      if (pwdErr) { showToast(pwdErr, 'error'); return; }
 
       if (!name || !ownerEmail || !ownerPin) return;
-      if (saasRegistry.emailMap[ownerEmail]) { alert('Bu Gmail manzili tizimda allaqachon ro‘yxatdan o‘tgan!'); return; }
+      if (saasRegistry.emailMap[ownerEmail]) { showToast('Bu Gmail manzili tizimda allaqachon ro‘yxatdan o‘tgan!', 'info'); return; }
 
       const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'hotel';
       const newHotelId = `${slug}_${Date.now().toString().slice(-4)}`;
@@ -4145,24 +4168,24 @@
       e.target.reset(); closeCreateHotelModal();
       await switchActiveHotel(newHotelId);
       renderSaasHotels();
-      alert(`"${name}" muvaffaqiyatli yaratildi!`);
+      showToast(`"${name}" muvaffaqiyatli yaratildi!`, 'success');
     }
 
     async function changeCeoPin(e) {
       e.preventDefault();
       if (!isCeoCreator()) {
-        alert('⛔ Ruxsat yo‘q: CEO kodini faqat CEO / Creator o‘zgartira oladi!');
+        showToast('⛔ Ruxsat yo‘q: CEO kodini faqat CEO / Creator o‘zgartira oladi!', 'error');
         return;
       }
       const p1 = String(document.getElementById('newCeoPinInput').value || '').trim();
       const p2 = String(document.getElementById('confirmCeoPinInput').value || '').trim();
       const pwdErr = validatePasswordLength(p1);
       if (pwdErr) {
-        alert(pwdErr);
+        showToast(pwdErr, 'error');
         return;
       }
       if (p1 !== p2) {
-        alert('Kiritilgan ikkala kod bir xil emas! Qayta tekshiring.');
+        showToast('Kiritilgan ikkala kod bir xil emas! Qayta tekshiring.', 'error');
         return;
       }
 
@@ -4178,7 +4201,7 @@
       await saveSaasRegistry();
       document.getElementById('newCeoPinInput').value = '';
       document.getElementById('confirmCeoPinInput').value = '';
-      alert('✅ CEO / Creator kirish kodi muvaffaqiyatli almashtirildi!');
+      showToast('✅ CEO / Creator kirish kodi muvaffaqiyatli almashtirildi!', 'success');
     }
 
     const saasHotelStatsCache = {};
@@ -4556,7 +4579,9 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       document.getElementById('matrixStartDate').value = isMobileViewport() ? addDays(todayStr, -1) : addDays(todayStr, -3);
       document.getElementById('dailyReportDate').value = todayStr;
       syncDailyFormDefaultDates(todayStr, true);
-      setFinanceCurrentMonth(); populateRoomSelect(); refreshAllViews(true); syncFromCloud(false);
+      setFinanceCurrentMonth(); populateRoomSelect(); refreshAllViews(true);
+      if (!bookings.length) renderMatrixSkeleton(7);
+      syncFromCloud(false);
 
       setInterval(() => {
         if (currentUser && !isDragging && !isTypingInDailyTab() && activeTabName !== 'rates' && activeTabName !== 'users'
@@ -4810,12 +4835,12 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
 
     async function changeHotelShiftCount(delta) {
       if (!isHotelChiefAdmin()) {
-        alert('⛔ Ruxsat yo‘q: Smenalar sonini faqat bosh administrator o‘zgartira oladi!');
+        showToast('⛔ Ruxsat yo‘q: Smenalar sonini faqat bosh administrator o‘zgartira oladi!', 'error');
         return;
       }
       const nextCount = hotelShiftCount + delta;
       if (nextCount < 1 || nextCount > 4) {
-        alert('Smenalar soni kamida 1 ta, ko‘pi bilan 4 ta bo‘lishi mumkin.');
+        showToast('Smenalar soni kamida 1 ta, ko‘pi bilan 4 ta bo‘lishi mumkin.', 'error');
         return;
       }
       if (delta < 0 && !(await rhConfirm(`${hotelShiftCount}-smenani olib tashlamoqchimisiz? (Oldingi kiritilgan ma’lumotlar bazada saqlanib qoladi)`))) {
@@ -4878,7 +4903,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       patchHotelCloud({ [`dailyShiftAdmins/${safeFbKey(shiftMetaKey)}`]: shiftMetaVal });
       if (inp) inp.blur();
       renderDailyReport();
-      alert(`${shiftNum}-smena administratori va vaqti (${startTime} – ${endTime}) saqlandi!`);
+      showToast(`${shiftNum}-smena administratori va vaqti (${startTime} – ${endTime}) saqlandi!`, 'success');
     }
 
     function buildShiftCardSkeleton(n) {
@@ -5066,7 +5091,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       const currentlyLocked = Boolean(dailyShiftLocks[key]);
       if (currentlyLocked) {
         if (!isHotelChiefAdmin()) {
-          alert('🔒 Ruxsat yo‘q: Yopilgan smenani faqat bosh administrator qayta ocha oladi!');
+          showToast('🔒 Ruxsat yo‘q: Yopilgan smenani faqat bosh administrator qayta ocha oladi!', 'error');
           return;
         }
         if (!(await rhConfirm(`${dateIso} • ${shiftNum}-smenani qayta ochmoqchimisiz?`, { title: "Smenani ochish", okText: "🔓 Qayta ochish" }))) return;
@@ -5101,7 +5126,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       e.preventDefault();
       const dateIso = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
       if (isShiftLocked(dateIso, shiftNum)) {
-        alert('🔒 Ushbu smena yopilgan! Yangi yozuv qo‘shib bo‘lmaydi.');
+        showToast('🔒 Ushbu smena yopilgan! Yangi yozuv qo‘shib bo‘lmaydi.', 'error');
         return;
       }
       const inDate = document.getElementById(`manInDate_${shiftNum}`).value || dateIso, inTime = document.getElementById(`manInTime_${shiftNum}`).value || getCurrentTimeStr();
@@ -5129,7 +5154,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     async function deleteDailyManualEntry(id) {
       const target = dailyManualEntries.find(x => x.id === id);
       if (target && isShiftLocked(target.date, target.shift) && !isHotelChiefAdmin()) {
-        alert('🔒 Yopilgan smena yozuvini o‘chirib bo‘lmaydi!');
+        showToast('🔒 Yopilgan smena yozuvini o‘chirib bo‘lmaydi!', 'error');
         return;
       }
       if (await rhConfirm('Ushbu kassa yozuvini o‘chirmoqchimisiz?', { danger: true })) { dailyManualEntries = dailyManualEntries.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); const delPatch = {}; addCollectionDeleteItem(delPatch, 'dailyManualEntries', id); patchHotelCloud(delPatch); }
@@ -5138,7 +5163,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       e.preventDefault();
       const dateIso = document.getElementById('dailyReportDate').value || toIsoDate(new Date());
       if (isShiftLocked(dateIso, shiftNum)) {
-        alert('🔒 Ushbu smena yopilgan! Xarajat qo‘shib bo‘lmaydi.');
+        showToast('🔒 Ushbu smena yopilgan! Xarajat qo‘shib bo‘lmaydi.', 'error');
         return;
       }
       const title = document.getElementById(`expTitle_${shiftNum}`).value.trim(), amount = Number(document.getElementById(`expAmount_${shiftNum}`).value) || 0;
@@ -5157,7 +5182,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     async function deleteDailyExpense(id) {
       const target = dailyExpenses.find(x => x.id === id);
       if (target && isShiftLocked(target.date, target.shift) && !isHotelChiefAdmin()) {
-        alert('🔒 Yopilgan smena xarajatini o‘chirib bo‘lmaydi!');
+        showToast('🔒 Yopilgan smena xarajatini o‘chirib bo‘lmaydi!', 'error');
         return;
       }
       if (await rhConfirm('Ushbu xarajatni o‘chirmoqchimisiz?', { danger: true })) { dailyExpenses = dailyExpenses.filter(x => x.id !== id); saveAllLocal(); renderDailyReport(); const delExpPatch = {}; addCollectionDeleteItem(delExpPatch, 'dailyExpenses', id); patchHotelCloud(delExpPatch); }
@@ -5725,6 +5750,25 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     function changeMatrixScale() { currentMatrixScale = parseInt(document.getElementById('matrixScale').value) || 64; renderMatrix(); }
     function getFilteredBookings() { const st = document.getElementById('filterStatus').value; return bookings.filter(b => st === 'ALL' || b.status === st); }
 
+    function renderMatrixSkeleton(rowCount = 8) {
+      const tbody = document.getElementById('matrixBody');
+      if (!tbody) return;
+      const daysCount = Math.min(20, parseInt(document.getElementById('matrixDaysCount')?.value, 10) || 14);
+      const scale = currentMatrixScale || 64;
+      let html = '';
+      for (let i = 0; i < rowCount; i++) {
+        html += `<tr>
+          <td class="sticky-col-room px-3 py-2.5 border-b border-slate-200"><span class="rh-skel-bar h-3.5 w-20"></span></td>
+          <td class="sticky-col-clean text-center border-b border-slate-200"><span class="rh-skel-bar h-4 w-11 rounded-full"></span></td>`;
+        for (let d = 0; d < daysCount; d++) {
+          const showBar = (i + d) % 5 === 0;
+          html += `<td class="day-cell" style="width:${scale}px; min-width:${scale}px; max-width:${scale}px;">${showBar ? `<span class="rh-skel-bar h-6 w-12 block mx-1 mt-2"></span>` : ''}</td>`;
+        }
+        html += `</tr>`;
+      }
+      tbody.innerHTML = html;
+    }
+
     function renderMatrix() {
       const startStr = document.getElementById('matrixStartDate').value || toIsoDate(new Date());
       const daysCount = parseInt(document.getElementById('matrixDaysCount').value, 10) || 90;
@@ -5838,7 +5882,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       e.preventDefault();
       const floor = document.getElementById('newRoomFloor').value.trim() || '1-qavat', id = document.getElementById('newRoomId').value.trim();
       const name = document.getElementById('newRoomType').value.trim() || 'Standard', beds = Number(document.getElementById('newRoomBeds').value) || 2, price = Number(document.getElementById('newRoomPrice').value) || 250000;
-      if (!id || rooms.some(r => String(r.id).toLowerCase() === id.toLowerCase())) { alert(`№ ${id} xonasi mavjud yoki noto‘g‘ri!`); return; }
+      if (!id || rooms.some(r => String(r.id).toLowerCase() === id.toLowerCase())) { showToast(`№ ${id} xonasi mavjud yoki noto‘g‘ri!`, 'error'); return; }
       const newRoomObj = { id, floor, name, beds, price, clean: 'Toza', sortOrder: rooms.length };
       rooms.push(newRoomObj);
       saveAllLocal(); populateRoomSelect(); refreshAllViews(true);
@@ -5866,7 +5910,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     function saveRoomRates() {
       const ratesPatch = {};
       rooms.forEach((r, idx) => { r.floor = document.getElementById(`rc_floor_${idx}`).value.trim() || r.floor; r.name = document.getElementById(`rc_name_${idx}`).value.trim() || r.name; r.beds = Number(document.getElementById(`rc_beds_${idx}`).value) || r.beds; r.price = Number(document.getElementById(`rc_price_${idx}`).value) || r.price; r.sortOrder = idx; addCollectionPatchItem(ratesPatch, 'rooms', r.id, r); });
-      saveAllLocal(); populateRoomSelect(); refreshAllViews(false); patchHotelCloud(ratesPatch); alert('Barcha xonalar va narxlar saqlandi!');
+      saveAllLocal(); populateRoomSelect(); refreshAllViews(false); patchHotelCloud(ratesPatch); showToast('Barcha xonalar va narxlar saqlandi!', 'success');
     }
 
     function openCancelModal() {
@@ -6029,7 +6073,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
 
       if (st.hasConflict) {
         st.barEl.style.width = `${st.origWidth}px`;
-        alert(`⛔ Sana band! № ${b.room} xonasi ${st.newCheckOut} gacha bo‘sh emas! Muddatni uzaytirib bo‘lmaydi.`);
+        showToast(`⛔ Sana band! № ${b.room} xonasi ${st.newCheckOut} gacha bo‘sh emas! Muddatni uzaytirib bo‘lmaydi.`, 'error');
         return;
       }
 
@@ -6383,7 +6427,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       const checkOut = addDays(d2, 1);
       const conflict = checkOverbooking(dragRoomId, d1, checkOut, null);
       if (conflict) {
-        alert(`⛔ Sana band! № ${dragRoomId} xonasi ${conflict.checkIn} — ${conflict.checkOut} sanalarida band! Bron ustidan bron qo‘yib bo‘lmaydi.`);
+        showToast(`⛔ Sana band! № ${dragRoomId} xonasi ${conflict.checkIn} — ${conflict.checkOut} sanalarida band! Bron ustidan bron qo‘yib bo‘lmaydi.`, 'error');
         return;
       }
       openBookingModal(null, dragRoomId, d1, checkOut);
@@ -6455,7 +6499,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     }
 
     function openBookingModal(bookingId = null, presetRoom = null, presetIn = null, presetOut = null) {
-      if (!rooms.length) { alert('Avval «Xonalar va Narxlar» bo‘limidan kamida 1 ta xona qo‘shing!'); switchTab('rates'); return; }
+      if (!rooms.length) { showToast('Avval «Xonalar va Narxlar» bo‘limidan kamida 1 ta xona qo‘shing!', 'error'); switchTab('rates'); return; }
       const modal = document.getElementById('bookingModal');
       document.getElementById('overbookingAlert').classList.add('hidden');
       const rgBadge = document.getElementById('returningGuestBadge'); if (rgBadge) rgBadge.classList.add('hidden');
@@ -6704,7 +6748,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     }
     async function quickStatusChange(newStatus) {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
-      if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bron holatini faqat bosh administrator o‘zgartira oladi!'); return; }
+      if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { showToast('🔒 Yopilgan bron holatini faqat bosh administrator o‘zgartira oladi!', 'error'); return; }
       const r = rooms.find(x => x.id === b.room);
       if (newStatus === 'Band' && r && getEffectiveRoomStatus(r) === 'Tozalash kerak') {
         const choice = await confirmDirtyRoomPlacement(r, 'Check-in qilish');
@@ -6780,13 +6824,13 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     }
     function removeSinglePayment(idx) {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b) return;
-      if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bron to‘lovini faqat bosh administrator o‘chira oladi!'); return; }
+      if ((b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { showToast('🔒 Yopilgan bron to‘lovini faqat bosh administrator o‘chira oladi!', 'error'); return; }
       const p = getBookingPayments(b); p.splice(idx, 1);
       b.payments = p; b.paid = p.reduce((s, x) => s + Number(x.amount || 0), 0); b.payType = getBookingSummaryPayType(p);
       saveAllLocal(); openGuestDrawer(b.id); refreshAllViews(false);
       const rpPatch = {}; addCollectionPatchItem(rpPatch, 'bookings', b.id, b); patchHotelCloud(rpPatch);
     }
-    function editCurrentDrawerBooking() { const b = bookings.find(x => x.id === activeDrawerBookingId); if (b && (b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { alert('🔒 Yopilgan bronni faqat bosh administrator tahrirlay oladi!'); return; } const id = activeDrawerBookingId; closeGuestDrawer(); openBookingModal(id); }
+    function editCurrentDrawerBooking() { const b = bookings.find(x => x.id === activeDrawerBookingId); if (b && (b.status === 'Chiqdi' || b.status === 'Bekor qilingan') && !isHotelChiefAdmin()) { showToast('🔒 Yopilgan bronni faqat bosh administrator tahrirlay oladi!', 'error'); return; } const id = activeDrawerBookingId; closeGuestDrawer(); openBookingModal(id); }
     async function deleteCurrentDrawerBooking() {
       const b = bookings.find(x => x.id === activeDrawerBookingId); if (!b || !isHotelOwnerOrMaster()) return;
       if (!(await rhConfirm('Ushbu bronni butunlay o‘chirmoqchimisiz?', { danger: true }))) return;
@@ -6850,7 +6894,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
 
     async function clearAuditLogs() {
       if (!isHotelChiefAdmin()) {
-        alert('⛔ Ruxsat yo‘q: Amallar tarixini faqat bosh administrator o‘chira oladi!');
+        showToast('⛔ Ruxsat yo‘q: Amallar tarixini faqat bosh administrator o‘chira oladi!', 'error');
         return;
       }
       if (!(await rhConfirm('Barcha qilingan amallar tarixini o‘chirmoqchimisiz?', { danger: true }))) return;
@@ -7434,9 +7478,9 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
     async function saveUserEdit(idx) {
       if (!isHotelOwnerOrMaster()) return;
       const newName = document.getElementById(`editUserName_${idx}`).value.trim(), newPin = document.getElementById(`editUserPin_${idx}`).value.trim();
-      if (!newName || !newPin) { alert('Ism va Parolni bo‘sh qoldirmang!'); return; }
+      if (!newName || !newPin) { showToast('Ism va Parolni bo‘sh qoldirmang!', 'error'); return; }
       const pwdErr = validatePasswordLength(newPin);
-      if (pwdErr) { alert(pwdErr); return; }
+      if (pwdErr) { showToast(pwdErr, 'error'); return; }
 
       const target = allowedUsers[idx]; target.name = newName; target.pin = newPin;
       const em = String(target.email || '').toLowerCase();
@@ -7447,15 +7491,15 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       if (saasRegistry.hotels[currentHotelId] && String(saasRegistry.hotels[currentHotelId].ownerEmail || '').toLowerCase() === em) { saasP[`hotels/${safeFbKey(currentHotelId)}`] = saasRegistry.hotels[currentHotelId]; }
       await patchSaasRegistry(saasP);
       const uPatch = {}; addCollectionPatchItem(uPatch, 'users', encodeEmailKey(em), target); await patchHotelCloud(uPatch);
-      alert('Xodim ma’lumotlari saqlandi!');
+      showToast('Xodim ma’lumotlari saqlandi!', 'success');
     }
 
     async function addAllowedUser(e) {
       e.preventDefault(); if (!isHotelOwnerOrMaster()) return;
       const email = document.getElementById('newUserEmail').value.trim().toLowerCase(), name = document.getElementById('newUserName').value.trim(), role = document.getElementById('newUserRole').value, pin = document.getElementById('newUserPin').value.trim();
       const pwdErr = validatePasswordLength(pin);
-      if (pwdErr) { alert(pwdErr); return; }
-      if (saasRegistry.emailMap[email]) { alert('Ushbu Gmail manzili tizimda allaqachon bor!'); return; }
+      if (pwdErr) { showToast(pwdErr, 'error'); return; }
+      if (saasRegistry.emailMap[email]) { showToast('Ushbu Gmail manzili tizimda allaqachon bor!', 'error'); return; }
 
       await firebaseAuthSignUp(email, pin, false);
       const newUserObj = { email, name, role, pin, active: true, isOwner: false };
@@ -8965,11 +9009,6 @@ Endi barcha muhim bronlar, to‘lovlar va smena hisobotlari shu yerga keladi.`, 
       showToast(nextDark ? '🌙 Tungi smena rejimi yoqildi' : '☀️ Kunduzgi rejim yoqildi', 'info', 2200);
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('rh_dark_mode') === '1') {
-        applyThemeMode(true);
-      }
-    });
 
 
     // ==================== ONBOARDING (TEZ BOSHLASH) & GLOBAL SEARCH (CTRL+K) ====================
