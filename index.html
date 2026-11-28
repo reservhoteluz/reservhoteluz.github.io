@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
   <title>ReservHotel PMS — Mehmonxona Boshqaruv Tizimi</title>
   <link rel="icon" type="image/jpeg" href="logo.jpg" />
   <link rel="shortcut icon" type="image/jpeg" href="logo.jpg" />
@@ -32,31 +32,49 @@
     .sticky-corner-clean { position: sticky; top: 0; left: 155px; z-index: 40; width: 75px; min-width: 75px; }
     .sticky-footer-bottom { position: sticky; bottom: 0; z-index: 28; background: #f2f4ff; border-top: 2px solid #cbd5e1; }
 
-    /* Mobil ekranlar uchun qulay bronlar kalendari va pastki ilova menyusi */
+    /* Mobil ekranlar uchun mukammal moslashuv (iOS & Android) */
     @media (max-width: 767px) {
+      body { height: 100dvh; }
+      #appShell { height: 100dvh; }
+      header { padding-left: 10px !important; padding-right: 10px !important; gap: 6px !important; height: 52px !important; }
+      #pageTitle { font-size: 13.5px !important; max-width: 145px; overflow: hidden; text-overflow: ellipsis; }
       .matrix-container {
-        max-height: calc(100vh - 225px);
-        border-radius: 10px;
+        max-height: calc(100dvh - 176px);
+        border-radius: 12px;
+        touch-action: pan-x pan-y;
       }
       .sticky-col-room, .sticky-corner {
-        width: 82px !important;
-        min-width: 82px !important;
-        max-width: 82px !important;
+        width: 78px !important;
+        min-width: 78px !important;
+        max-width: 78px !important;
         padding-left: 6px !important;
-        padding-right: 6px !important;
+        padding-right: 4px !important;
       }
       .sticky-col-clean, .sticky-corner-clean {
-        left: 82px !important;
-        width: 54px !important;
-        min-width: 54px !important;
-        max-width: 54px !important;
+        left: 78px !important;
+        width: 52px !important;
+        min-width: 52px !important;
+        max-width: 52px !important;
         padding-left: 2px !important;
         padding-right: 2px !important;
       }
-      .day-cell { height: 42px; }
-      .booking-bar { height: 32px; top: 4px; font-size: 10.5px; padding: 0 5px; }
-      .tab-content { padding-bottom: 74px !important; }
-      #rhToastContainer { bottom: 72px !important; right: 12px !important; left: 12px !important; max-width: none !important; }
+      .day-cell { height: 44px; touch-action: pan-x pan-y; }
+      .booking-bar { height: 34px; top: 4px; font-size: 10.5px; padding: 0 6px; border-radius: 6px; }
+      .booking-resize-handle { display: none !important; }
+      .tab-content { padding: 10px 10px calc(78px + env(safe-area-inset-bottom)) 10px !important; }
+      #mobileBottomNav {
+        padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
+        padding-top: 6px !important;
+      }
+      #rhToastContainer { bottom: calc(74px + env(safe-area-inset-bottom)) !important; right: 10px !important; left: 10px !important; max-width: none !important; }
+      #loginScreen { padding: 10px !important; align-items: flex-start !important; }
+      #bookingModal, #createHotelModal, #cancelModal, #tariffOfferModal, #rhDialogModal { padding: 8px !important; align-items: flex-end !important; }
+      #bookingModal > div, #createHotelModal > div, #cancelModal > div, #tariffOfferModal > div, #rhDialogModal > div {
+        max-height: 92dvh !important;
+        border-radius: 20px 20px 14px 14px !important;
+      }
+      #guestDrawerPanel { max-width: 100% !important; width: 100% !important; }
+      #sidebar { width: 272px !important; max-width: 84vw !important; box-shadow: 12px 0 40px rgba(0, 0, 0, 0.55); }
     }
     .mobile-bottom-nav {
       backdrop-filter: blur(14px);
@@ -1226,6 +1244,8 @@
   <!-- ==================== 2. ASOSIY TIZIM INTERFEYSI ==================== -->
   <div id="appShell" class="hidden flex-1 flex h-screen overflow-hidden">
     
+    <!-- MOBIL SIDEBAR ORQA FONI (TAP TO CLOSE) -->
+    <div id="sidebarBackdrop" onclick="toggleSidebar()" class="hidden md:hidden fixed inset-0 z-40 bg-[#090d22]/60 backdrop-blur-xs"></div>
     <!-- LEFT SIDEBAR (ReservHotel Logo rangida: #131b3a + #5b54e6) -->
     <aside id="sidebar" class="hidden md:flex w-64 bg-gradient-to-b from-[#131b3a] via-[#131b3a] to-[#0b1024] text-slate-200 flex-col justify-between transition-all duration-200 shrink-0 border-r border-[#5b54e6]/25 fixed md:static inset-y-0 left-0 z-50">
       <div>
@@ -1323,6 +1343,11 @@
             <span>📊</span> <span>Excel</span>
           </button>
         </div>
+        <div class="flex sm:hidden items-center justify-between gap-1 bg-white/5 p-1 rounded-lg border border-white/10 text-[11px] font-bold">
+          <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn flex-1 py-1 rounded transition">UZ</button>
+          <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn flex-1 py-1 rounded transition">RU</button>
+          <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn flex-1 py-1 rounded transition">EN</button>
+        </div>
         <button onclick="logout()" class="w-full py-2 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-medium text-left flex items-center gap-2">
           <span>🚪</span> <span>Chiqish</span>
         </button>
@@ -1365,7 +1390,7 @@
           <button type="button" id="themeToggleBtn" onclick="toggleDarkMode()" title="Kunduzgi / Tungi smena rejimi" class="p-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-bold shrink-0 transition">
             🌙
           </button>
-          <div class="flex items-center gap-0.5 bg-[#f4f5ff] p-0.5 rounded-lg border border-[#d8defa] text-[11px] font-bold shrink-0">
+          <div class="hidden sm:flex items-center gap-0.5 bg-[#f4f5ff] p-0.5 rounded-lg border border-[#d8defa] text-[11px] font-bold shrink-0">
             <button type="button" onclick="setAppLanguage('uz')" data-lang-btn="uz" class="lang-btn px-1.5 py-1 rounded transition">UZ</button>
             <button type="button" onclick="setAppLanguage('ru')" data-lang-btn="ru" class="lang-btn px-1.5 py-1 rounded transition">RU</button>
             <button type="button" onclick="setAppLanguage('en')" data-lang-btn="en" class="lang-btn px-1.5 py-1 rounded transition">EN</button>
@@ -1373,8 +1398,8 @@
           <button onclick="syncFromCloud(true)" title="Bazani yangilash" class="p-1.5 rounded-lg border border-[#d8defa] bg-white hover:bg-[#eef0ff] text-[#131b3a] text-xs font-semibold shrink-0">
             🔄
           </button>
-          <button id="headerCreateBookingBtn" onclick="openBookingModal()" class="px-3 py-1.5 bg-[#5b54e6] hover:bg-[#4942d4] text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1 whitespace-nowrap shrink-0">
-            <span>+</span> <span>Bron yaratish</span>
+          <button id="headerCreateBookingBtn" onclick="openBookingModal()" class="px-2.5 sm:px-3 py-1.5 bg-[#5b54e6] hover:bg-[#4942d4] text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1 whitespace-nowrap shrink-0">
+            <span>+</span> <span class="sm:hidden">Bron</span><span class="hidden sm:inline">Bron yaratish</span>
           </button>
         </div>
       </header>
@@ -1415,44 +1440,45 @@
             </button>
           </div>
         </div>
-        <div class="bg-white/95 p-3 rounded-xl border border-[#d8defa] mb-3 flex flex-wrap items-center gap-3 shadow-2xs">
-          <div class="flex items-center gap-2 flex-wrap flex-1">
+        <div class="bg-white/95 p-2 sm:p-3 rounded-xl border border-[#d8defa] mb-2 sm:mb-3 flex flex-wrap items-center gap-2 sm:gap-3 shadow-2xs">
+          <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap flex-1">
             <button onclick="shiftStartDate(-7)" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-[#f7f8ff] hover:bg-[#eef0ff] text-xs font-semibold text-[#131b3a]">◀</button>
-            <input type="date" id="matrixStartDate" onchange="renderMatrix()" class="px-3 py-1.5 rounded-lg border border-[#d8defa] text-xs font-semibold text-[#131b3a] bg-white" />
+            <input type="date" id="matrixStartDate" onchange="renderMatrix()" class="px-2 sm:px-3 py-1.5 rounded-lg border border-[#d8defa] text-xs font-semibold text-[#131b3a] bg-white flex-1 sm:flex-none min-w-[125px]" />
             <button onclick="shiftStartDate(7)" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-[#f7f8ff] hover:bg-[#eef0ff] text-xs font-semibold text-[#131b3a]">▶</button>
-            <button onclick="jumpToToday()" class="px-3 py-1.5 rounded-lg bg-[#5b54e6]/12 text-[#5b54e6] hover:bg-[#5b54e6]/20 text-xs font-semibold">🕒 Bugun</button>
-            <select id="matrixDaysCount" onchange="renderMatrix()" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] text-xs font-semibold text-[#131b3a] bg-white">
-              <option value="30">30 kun (1 oy)</option>
-              <option value="60">60 kun (2 oy)</option>
-              <option value="90" selected>90 kun (3 oy)</option>
-              <option value="180">180 kun (6 oy)</option>
-              <option value="365">365 kun (1 yil)</option>
-            </select>
-            <div class="border-l border-[#d8defa] mx-1 h-6"></div>
-            <select id="matrixScale" onchange="changeMatrixScale()" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-[#f5f6ff] text-xs font-semibold text-[#131b3a] hover:bg-[#eef0ff] cursor-pointer">
-              <option value="36">📱 36px (Mobil)</option>
-              <option value="48">🔎 48px (Kichik)</option>
-              <option value="64" selected>🔎 64px (Standart)</option>
-              <option value="96">🔎 96px (Katta)</option>
-              <option value="128">🔎 128px (Keng)</option>
-            </select>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="openMaintenanceModal()" class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold transition">
-              🔧 Ta’mirga yopish
-            </button>
-            <select id="filterStatus" onchange="renderMatrix()" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] text-xs font-medium text-[#131b3a] bg-white">
-              <option value="ALL">Holat: Barchasi</option>
-              <option value="Band">Band (Check-in)</option>
-              <option value="Bron">Bron qilingan</option>
-              <option value="Chiqdi">Chiqdi (Check-out)</option>
-              <option value="Ta'mirda">🔧 Ta’mirda (Yopiq)</option>
-              <option value="Bekor qilingan">Bekor qilingan</option>
-            </select>
+            <button onclick="jumpToToday()" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#5b54e6]/12 text-[#5b54e6] hover:bg-[#5b54e6]/20 text-xs font-semibold">🕒 Bugun</button>
+            <button type="button" onclick="toggleMobileMatrixFilters()" class="md:hidden px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-[#f5f6ff] text-[#131b3a] text-xs font-bold">⚙️ Filtr</button>
+            <div id="matrixExtraControls" class="hidden md:flex items-center gap-2 flex-wrap w-full md:w-auto pt-1 md:pt-0">
+              <select id="matrixDaysCount" onchange="renderMatrix()" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] text-xs font-semibold text-[#131b3a] bg-white">
+                <option value="30">30 kun (1 oy)</option>
+                <option value="60">60 kun (2 oy)</option>
+                <option value="90" selected>90 kun (3 oy)</option>
+                <option value="180">180 kun (6 oy)</option>
+                <option value="365">365 kun (1 yil)</option>
+              </select>
+              <div class="hidden md:block border-l border-[#d8defa] mx-1 h-6"></div>
+              <select id="matrixScale" onchange="changeMatrixScale()" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] bg-[#f5f6ff] text-xs font-semibold text-[#131b3a] hover:bg-[#eef0ff] cursor-pointer">
+                <option value="36">📱 36px (Mobil)</option>
+                <option value="48">🔎 48px (Kichik)</option>
+                <option value="64" selected>🔎 64px (Standart)</option>
+                <option value="96">🔎 96px (Katta)</option>
+                <option value="128">🔎 128px (Keng)</option>
+              </select>
+              <button type="button" onclick="openMaintenanceModal()" class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold transition">
+                🔧 Ta’mirga yopish
+              </button>
+              <select id="filterStatus" onchange="renderMatrix()" class="px-2.5 py-1.5 rounded-lg border border-[#d8defa] text-xs font-medium text-[#131b3a] bg-white">
+                <option value="ALL">Holat: Barchasi</option>
+                <option value="Band">Band (Check-in)</option>
+                <option value="Bron">Bron qilingan</option>
+                <option value="Chiqdi">Chiqdi (Check-out)</option>
+                <option value="Ta'mirda">🔧 Ta’mirda (Yopiq)</option>
+                <option value="Bekor qilingan">Bekor qilingan</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-2 px-1 text-[11px] font-medium text-slate-600">
+        <div id="matrixLegendBar" class="hidden md:flex flex-wrap items-center justify-between gap-2 mb-2 px-1 text-[11px] font-medium text-slate-600">
           <div class="flex flex-wrap items-center gap-3">
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Band (To‘langan)</span>
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500 inline-block"></span> Qisman to‘langan</span>
@@ -5058,7 +5084,9 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
       });
       if (window.innerWidth < 768) {
         const sb = document.getElementById('sidebar');
-        if (sb && !sb.classList.contains('hidden')) sb.classList.add('hidden');
+        const bd = document.getElementById('sidebarBackdrop');
+        if (sb && !sb.classList.contains('hidden')) { sb.classList.add('hidden'); sb.classList.remove('flex'); }
+        if (bd) bd.classList.add('hidden');
       }
       if (tabName === 'daily') syncDailyInTimesLive(false);
       refreshAllViews(true);
@@ -5066,9 +5094,24 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
 
     let isSidebarCollapsed = false;
 
+    function toggleMobileMatrixFilters() {
+      const extra = document.getElementById('matrixExtraControls');
+      const legend = document.getElementById('matrixLegendBar');
+      if (extra) { extra.classList.toggle('hidden'); extra.classList.toggle('flex'); }
+      if (legend) { legend.classList.toggle('hidden'); legend.classList.toggle('flex'); }
+    }
+
     function toggleSidebar() {
       const sb = document.getElementById('sidebar');
+      const bd = document.getElementById('sidebarBackdrop');
       if (!sb) return;
+      if (window.innerWidth < 768) {
+        const willOpen = sb.classList.contains('hidden');
+        sb.classList.toggle('hidden', !willOpen);
+        sb.classList.toggle('flex', willOpen);
+        if (bd) bd.classList.toggle('hidden', !willOpen);
+        return;
+      }
       if (sb.classList.contains('hidden')) {
         sb.classList.remove('hidden'); sb.classList.add('flex'); isSidebarCollapsed = false;
         sb.classList.remove('w-20'); sb.classList.add('w-64');
@@ -5463,7 +5506,7 @@ Bloklangach, ushbu mehmonxonaning barcha xodimlari va rahbari tizimdan chiqarila
     }
 
     function startBookingMovePointer(e, bookingId) {
-      if (e.button !== 0 || isResizingBooking) return;
+      if (e.pointerType === 'touch' || e.button !== 0 || isResizingBooking) return;
       e.preventDefault();
       e.stopPropagation();
 
